@@ -19,25 +19,23 @@ echo "Making a release for project '$PROJECT'"
 echo ""
 
 # initialize the database
-if [ $PROJECT == 'v0.4' ]; then
-    ./bin/db_populate projects/$PROJECT
-else
+if [ $PROJECT == 'v0.5' ]; then
     ./bin/db_pop projects/$PROJECT
 fi
 
 echo ""
 echo "Cleaning release ..."
 # clean up
-rm -rf ../release/$PROJECT
+rm -rf release/$PROJECT
 
 echo ""
 echo "Creating new release ..."
 # new install
-mkdir ../release
-mkdir ../release/$PROJECT
-mkdir ../release/$PROJECT/static
+mkdir release
+mkdir release/$PROJECT
+mkdir release/$PROJECT/static
 
-pushd ../release/$PROJECT
+pushd release/$PROJECT
 ls -la
 pwd
 cp ../../src/gtk/py/gtkserver.py .

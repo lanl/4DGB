@@ -44,7 +44,7 @@ with open(os.path.join(project, "project.json")) as jdata:
 # ---------------------------------------------------------------------------
 # get the current version
 gtkversion = None
-with open("version.md", "r") as vfile:
+with open("src/version.md", "r") as vfile:
     gtkversion = vfile.readline().strip()
 
     # start from scratch
