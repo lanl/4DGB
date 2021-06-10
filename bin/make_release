@@ -57,4 +57,17 @@ cp -rf ../../src/gtk static
 cp -rf ../../src/img static
 cp -rf ../../projects static
 cp -rf ../../src/third_party static
+
+# install the python module and test script
+mkdir python
+pushd python
+cp -rf ../../../src/gentk . 
+mv gentk/setup.py .
+mv gentk/readme.md . 
+python setup.py sdist
+# to upload
+# twine upload dist/*
+cp -rf ../../../test/test-gentk .
+popd
+
 popd

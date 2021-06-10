@@ -44,7 +44,7 @@ def root(path):
 @app.route('/data/structure/<identifier>/segments')
 def SegmentData(identifier):
     conn    = db_connect.connect()
-    query   = conn.execute("SELECT segid, startid, length, startx, starty, startz, endx, endy, endz FROM segments WHERE geomid == {} ORDER BY segid".format(identifier))
+    query   = conn.execute("SELECT segid, startid, length, startx, starty, startz, endx, endy, endz FROM structure WHERE structureid == {} ORDER BY segid".format(identifier))
     data    = []
     lengths = []
     for b in query.cursor.fetchall():
