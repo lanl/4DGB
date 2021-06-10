@@ -7,6 +7,15 @@ class client:
     def __init__(self, url, port):
         self.port = port
         self.url  = url
+        self.project = ""
+
+    @property
+    def project(self):
+        return self._project
+
+    @project.setter
+    def project(self, value):
+        self._project = value
 
     @property
     def url(self):
