@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+
+import json
+import sys
+import os
+
+#
+# handle command line arguments
+#
+project = ""
+if (len(sys.argv) != 2):
+    print("ERROR: must include path to project directory")
+    exit(0)
+else:
+    project = sys.argv[1]
+
+projectfile = os.path.join(project, "project.json")
+print("Testing project json file: {}".format(projectfile))
+print("")
+#
+# read the project file
+#
+pd = {} 
+with open(projectfile) as jdata:
+    pd = json.load(jdata)
+
+#
+# project
+#
+
+schema      = pd["schema"]
+proj        = pd["project"]
+data        = pd["data"]
+
+print("PROJECT")
+print("  {} : {}".format("name".ljust(12), proj["name"]))
+print("  {} : {}".format("created".ljust(12), proj["created"]))
+
+print("SCHEMA")
+print("  {} : {}".format("version".ljust(12), schema["version"]))
+print("")
+
+print("DATA")
+print("SEQUENCE")
+keys = ["url", "name", "type"]
+for k in keys:
+    print("  {} : {}".format(k.ljust(12), data["sequence"][k]))
+print("")
+
+print("ANNOTATIONS")
+keys = ["url"]
+for k in keys:
+    print("  {} : {}".format(k.ljust(12), data["annotations"][k]))
+print("")
+
+print("structure")
+keys = ["id", "description", "url"]
+for d in data["structure"]:
+    for k in keys:
+        print("  {} : {}".format(k.ljust(12), d[k] ))
+    print("")
+
+print("EPIGENETICS")
+keys = ["id", "description", "url", "varname"]
+for d in data["epigenetics"]:
+    for k in keys:
+        print("  {} : {}".format(k.ljust(12), d[k] ))
+    print("")
+

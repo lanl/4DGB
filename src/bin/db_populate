@@ -1,0 +1,165 @@
+#!/usr/bin/env python
+
+import sqlite3
+import re
+import os
+import json
+import sys
+
+# HACK hack
+# TODO: get this from the data
+limit = 1666*100000
+
+
+#
+# handle command line arguments
+#
+project = ""
+if (len(sys.argv) != 2):
+    print("ERROR: must include path to project directory")
+    exit(0)
+else:
+    project = sys.argv[1]
+
+db_generated = os.path.join(project, "generated")
+if not os.path.isdir(db_generated):
+    os.mkdir(db_generated)
+
+db = os.path.join(db_generated, 'generated-project.db')
+if os.path.isfile(db):
+    print("Removing existing database ...")
+    os.remove(db)
+
+#
+# create the database connection
+#
+print("Populating database: {}".format(db))
+conn = sqlite3.connect(db)
+c = conn.cursor()
+
+#
+# read the project file
+#
+jsondata = {} 
+with open(os.path.join(project, "project.json")) as jdata:
+    jsondata = json.load(jdata)
+
+
+# PROJECT table
+# ------------------------------
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS project''')
+    # create the table 
+c.execute('''CREATE TABLE project (name TEXT, title TEXT, num_segments INT)''')
+
+# DATAFILES table 
+# ------------------------------
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS datafiles''')
+    # create the table 
+c.execute('''CREATE TABLE datafiles (state TEXT, type TEXT, id INTEGER, file TEXT)''')
+insert = '''INSERT INTO datafiles (state,type,id,file) values(?,?,?,?)'''
+for state in jsondata["datasets"]["state"]:
+    for f in jsondata["datasets"]["state"][state]["epigenetics"]:
+        print("inserting : {}".format(f["path"]))
+        c.execute(insert, [state, "epigenetics", f["ID"], f["path"]]) 
+
+# states table
+# ------------------------------
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS states''')
+    # create the table 
+c.execute('''CREATE TABLE states (name TEXT, timeID TEXT, timetype TEXT, timevalue TEXT, experimentID TEXT, experimenttype TEXT, experimentvalue TEXT)''')
+insert = '''INSERT INTO states (name,timeID,timetype,timevalue,experimentID,experimenttype,experimentvalue) values(?,?,?,?,?,?,?)'''
+for state in jsondata["datasets"]["state"]:
+    t = jsondata["datasets"]["state"][state]["time"]
+    m = jsondata["datasets"]["state"][state]["experiment"]
+    c.execute(insert, [state, t["ID"], t["type"], t["value"], m["ID"], m["type"], m["value"]])
+
+# GENES table
+# ------------------------------
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS genes''')
+    # create the table
+c.execute('''CREATE TABLE genes (id INTEGER PRIMARY KEY AUTOINCREMENT, start INTEGER, end INTEGER, length INTEGER, gID TEXT, gene_id TEXT, gene_type TEXT, gene_name TEXT)''')
+
+# populate the table from a file
+infile = os.path.join( project, jsondata["datasets"]["annotations"]["path"])
+insert = '''INSERT INTO genes (start,end,length,gID,gene_id,gene_type,gene_name) VALUES(?,?,?,?,?,?,?)'''
+print("Reading: {}".format(infile))
+print("Creating genes table ...")
+with open(infile, 'r') as indata:
+    for l in indata:
+        v = re.split(r'\t+', l) 
+        # check the type
+        if (v[2] == "gene"):
+            names = v[8].split(";")
+            geneID   = names[0].split("=")
+            geneid   = names[1].split("=")
+            genetype = names[2].split("=")
+            genename = names[3].split("=")
+            length = int(v[4]) - int(v[3])
+            # print("ID:{}\ngene_id:{}\ngene_type:{}\ngene_name:{}\n".format(geneID[1], geneid[1], genetype[1], genename[1] ))
+            print("ID:{}\nstart:{}\nend:{}".format(genename, v[3], v[4]))
+            if (int(v[3]) > limit):
+                print("ERROR in start: {}".format(v[3]))
+            if (int(v[4]) > limit):
+                print("ERROR in end:  {}".format(v[4]))
+            c.execute(insert, [v[3], v[4], length, geneID[1], geneid[1], genetype[1], genename[1]] )
+
+# SEGMENTS table
+# ------------------------------
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS segments''')
+    # create the table 
+c.execute('''CREATE TABLE segments (id INTEGER PRIMARY KEY AUTOINCREMENT, state TEXT, start INTEGER, end INTEGER, x REAL, y REAL, z REAL)''')
+
+# populate the table from a file
+print("Creating segments table ...")
+for state in jsondata["datasets"]["state"]:
+    curstate = jsondata["datasets"]["state"][state]
+    infile = os.path.join( project, curstate["geometry"]["path"])
+    insert = '''INSERT INTO segments (state,start,end,x,y,z) VALUES(?,?,?,?,?,?)'''
+    offset = 200000
+    position = 0 
+    print("reading: {}".format(infile))
+    with open(infile, 'r') as indata:
+        for l in indata:
+            if l.startswith("ATOM"): 
+                v = re.split(r'\s+', l[26:]) 
+                c.execute(insert, [state, position, position + offset, float(v[1]), float(v[2]), float(v[3])])
+                position = position + offset
+
+# SEG-EPIGENETICS table
+# epigenetics data for segments in a state 
+# ----------------------------------------
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS segepigenetics''')
+    # create the table 
+c.execute('''CREATE TABLE segepigenetics (id INTEGER, state TEXT)''')
+
+# populate the table from a file
+print("Creating segment epigenetics table ...")
+cols_added = []
+for state in jsondata["datasets"]["state"]:
+    curstate = jsondata["datasets"]["state"][state]
+    for e in jsondata["datasets"]["state"][state]["epigenetics"]:
+        # print("{}:{}:{}".format(state,e["identifier"],e["summary"]))
+        if not e["identifier"] in cols_added:
+            cols_added.append(e["identifier"])
+            c.execute("ALTER TABLE segepigenetics ADD COLUMN {} REAL".format(e["identifier"]))
+            print("    adding column: {}".format(e["identifier"]))
+        with open(os.path.join(project, e["summary"]), 'r') as edata:
+            insert = "INSERT INTO segepigenetics (id,state,{}) VALUES(?,?,?)".format(e["identifier"])
+            curid = 1
+            for line in edata:
+                line = line.strip()
+                c.execute(insert, [curid, state, float(line)])
+                # print("{}:{}:{}".format(state,e["identifier"],line))
+                curid = curid + 1
+
+
+# clean up
+# ------------------------------
+conn.commit()
+conn.close()

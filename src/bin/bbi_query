@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+
+import bbi
+import sys
+
+bfile = ""
+if (len(sys.argv) != 5):
+    print("ERROR: must include file, chromosome, min, max")
+    exit(0)
+
+bfile = sys.argv[1]
+
+data = bbi.fetch(sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]), 100 )
+
+print(len(data))
+print(data)

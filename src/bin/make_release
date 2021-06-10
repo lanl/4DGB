@@ -1,0 +1,62 @@
+#!/bin/bash
+
+PROJECT=nothing
+
+if [ $# -ne 2 ]; then
+    echo "ERROR: must provide 'project' and 'port' arguments"
+    echo "Example:"
+    echo " "
+    echo "   make_release <project> <port>" 
+    echo " "
+    exit
+else
+    PROJECT=$1
+    PORT=$2
+fi
+
+echo ""
+echo "Making a release for project '$PROJECT'" 
+echo ""
+
+# initialize the database
+if [ $PROJECT == 'v0.4' ]; then
+    ./bin/db_populate projects/$PROJECT
+else
+    ./bin/db_pop projects/$PROJECT
+fi
+
+echo ""
+echo "Cleaning release ..."
+# clean up
+rm -rf ../release/$PROJECT
+
+echo ""
+echo "Creating new release ..."
+# new install
+mkdir ../release
+mkdir ../release/$PROJECT
+mkdir ../release/$PROJECT/static
+
+pushd ../release/$PROJECT
+ls -la
+pwd
+cp ../../src/gtk/py/gtkserver.py .
+
+# update settings to be this project
+cp ../../src/settings/template.webhost.yaml webhost.yaml
+sed -i.bak "s/<project>/${PROJECT}/" webhost.yaml
+sed -i.bak "s/<port>/${PORT}/" webhost.yaml
+rm -f webhost.yaml.bak
+
+# update settings to be this project
+cp ../../src/settings/template.localhost.yaml localhost.yaml
+sed -i.bak "s/<project>/${PROJECT}/" localhost.yaml
+sed -i.bak "s/<port>/${PORT}/" localhost.yaml
+rm -f localhost.yaml.bak
+
+cp ../../src/*html static
+cp -rf ../../src/gtk static
+cp -rf ../../src/img static
+cp -rf ../../src/projects static
+cp -rf ../../src/third_party static
+popd

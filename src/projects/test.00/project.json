@@ -1,0 +1,212 @@
+{
+
+"schema": {
+    "version": "0.5"
+},
+
+"project": { 
+    "name": "Test Project",
+    "creator": {
+        "givenName" : "David",
+        "familyName" : "Rogers"
+    },
+    "created" : "2021-04-20T20:20:39+00:00"
+},
+
+"data" : {
+    "sequence": {
+        "url"  : "http://www.cnn.com",
+        "type" : "nothing",
+        "name" : "nothing"
+    },
+    "annotations": {
+        "url"  : "http://www.cnn.com"
+    },
+    "hic" : [
+        {
+            "id"        : 0,
+            "url"       : "hic.0",
+            "unmapped-segments": [
+                            [3,5]
+                        ]
+        },
+        {
+            "id"        : 1,
+            "url"       : "hic.1",
+            "unmapped-segments": [
+                            [6,8]
+                        ]
+        }
+    ],
+    "md-contact-map": [
+        {
+            "id"        : 0,
+            "version"   : "1.0",
+            "url"       : "md-contact-map.0",
+            "hic"       : 0
+        },
+        {
+            "id"        : 1,
+            "version"   : "1.0",
+            "url"       : "md-contact-map.1",
+            "hic"       : 1
+        }
+    ],
+    "structure": [
+        {
+            "id": 0,
+            "description": "pdb structure file",
+            "url": "source/0/test.pdb",
+            "type" : {
+                "name" : "gtk-estimated",
+                "version" : "0.1"
+            },
+            "md-contact-map" : 0,
+            "interval" : 200000
+        },
+        {
+            "id": 1,
+            "description": "pdb structure file",
+            "url": "source/1/test.pdb",
+            "type" : {
+                "name" : "gtk-estimated",
+                "version" : "0.1"
+            },
+            "md-contact-map" : 1,
+            "interval" : 200000
+        }
+    ],
+    "epigenetics": [
+        {
+            "id": 0,
+            "url" : "source/0/var000.txt",
+            "varname" : "var00",
+            "description" : "here is a description",
+            "summary" : "source/0/000.csv"
+        },
+        {
+            "id": 1,
+            "url" : "source/1/var001.txt",
+            "varname" : "var01",
+            "description" : "here is a description",
+            "summary" : "source/1/001.csv"
+        }
+    ]
+},
+
+"datasets": [
+    {
+        "id": 0,
+        "name" : "Test Dataset 0",
+        "structure": {
+            "id": 0,
+            "hic": 0,
+            "md-contact-map": 0
+        },
+        "epigenetics": 0
+    },
+    {
+        "id": 1,
+        "name" : "Test Dataset 1",
+        "structure": {
+            "id": 1,
+            "hic": 1,
+            "md-contact-map": 1
+        },
+        "epigenetics" : 1,
+        "notes" : [
+            {
+                "id" : 0,
+                "title" : "A note about something",
+                "creator": {
+                    "givenName" : "David",
+                    "familyName" : "Rogers"
+                },
+                "created" : "2021-04-20T20:20:39+00:00",
+                "url" : "notes/data/sequence/notes/0.md"
+            },
+            {
+                "id" : 1,
+                "title" : "A note about something",
+                "creator": {
+                    "givenName" : "David",
+                    "familyName" : "Rogers",
+                    "email": "dhr@lanl.gov"
+                },
+                "created" : "2021-04-20T20:20:39+00:00",
+                "url" : "notes/states/1/notes/1.md"
+            }
+        ]
+    }
+],
+"application" : {
+    "gtk": {
+        "application" : {
+            "name": "viewer",
+            "version" : "0.5"
+        },
+        "geometrycanvas" : {
+            "width":  600, 
+            "height": 500,
+            "scene": {
+                "background" : "0x000000",
+                "camera":   { 
+                    "fov":      10, 
+                    "aspect":   1, 
+                    "near":     1, 
+                    "far":      1000,  
+                    "center":   [0.0, 0.0, 0.0],
+                    "position": [0.0, 0.0, 100.0] 
+                },
+                "lights": [
+                    { "label": "Directional Light 0",
+                      "type": "directional",
+                      "color": "0xffffff", 
+                      "position": [10,10,10], 
+                      "castshadow": true 
+                    },
+                    { "label": "Ambient Light 0",
+                      "type": "ambient",
+                      "color": "0x888888" 
+                    }
+                ]
+            },
+            "geometry": {
+                "attributes" : {
+                    "interval" : 100000
+                },
+                "colormap" : {
+                    "name" : "blackbody",
+                    "b" : "blackbody",
+                    "c" : "cooltowarm",
+                    "r" : "rainbow",
+                    "g" : "grayscacle",
+                    "divs" : 512,
+                    "highlight-color": "0x67F0D9",
+                    "opacity-clamp" : 0.2
+                },
+                "segment" : {
+                    "glyph" : {
+                        "type" : "arrow",
+                        "color": "0x0091ea",
+                        "endpoint":{ 
+                            "radius":   0.10, 
+                            "segments": 16
+                        },
+                        "span":    { 
+                            "radius-beg": 0.06, 
+                            "radius-end": 0.01
+                        },
+                        "ghost" : {
+                            "opacity" : 0.5
+                        },
+                        "skeleton" : {
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+}

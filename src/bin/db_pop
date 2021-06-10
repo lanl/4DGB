@@ -1,0 +1,171 @@
+#!/usr/bin/env python
+
+import sqlite3
+import re
+import os
+import json
+import sys
+
+#
+# handle command line arguments
+#
+project = ""
+if (len(sys.argv) != 2):
+    print("ERROR: must include path to project directory")
+    exit(0)
+else:
+    project = sys.argv[1]
+
+db_generated = os.path.join(project, "generated")
+if not os.path.isdir(db_generated):
+    os.mkdir(db_generated)
+
+db = os.path.join(db_generated, 'generated-project.db')
+if os.path.isfile(db):
+    print("Removing existing database ...")
+    os.remove(db)
+
+#
+# create the database connection
+#
+print("Populating database: {}".format(db))
+conn = sqlite3.connect(db)
+c = conn.cursor()
+
+#
+# read the project file
+#
+jsondata = {} 
+with open(os.path.join(project, "project.json")) as jdata:
+    jsondata = json.load(jdata)
+
+# ---------------------------------------------------------------------------
+# GTK table
+# ---------------------------------------------------------------------------
+# get the current version
+gtkversion = None
+with open("version.md", "r") as vfile:
+    gtkversion = vfile.readline().strip()
+
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS gtk''')
+    # create the table 
+c.execute('''CREATE TABLE gtk (version TEXT)''')
+c.execute('''INSERT INTO gtk (version) VALUES(?)''', [gtkversion])
+
+
+# ---------------------------------------------------------------------------
+# PROJECT table
+# ---------------------------------------------------------------------------
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS project''')
+    # create the table 
+c.execute('''CREATE TABLE project (name TEXT, title TEXT, num_segments INT)''')
+
+
+# ---------------------------------------------------------------------------
+# SEGMENTS table
+# ---------------------------------------------------------------------------
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS segments''')
+    # create the table 
+c.execute('''CREATE TABLE segments (geomid INT, segid INT, startid INTEGER, endid INTEGER, length INT, startx REAL, starty REAL, startz REAL, endx REAL, endy REAL, endz REAL, centerx REAL, centery REAL, centerz REAL)''')
+
+# parse all structure files, and insert data into the table
+# a segment is based on two points from the file - the 
+# current point, and the previous one. This takes advantage 
+# of the fact that the points are contiguous in the sequence
+print("Creating segments table ...")
+for geom in jsondata["data"]["structure"]:
+    infile = os.path.join( project, geom["url"])
+    insert = '''INSERT INTO segments (geomid,segid,startid,endid,length,startx,starty,startz,endx,endy,endz,centerx,centery,centerz) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
+    print("reading: {}".format(infile))
+    position = 0 
+        # the first position is arbitrary, and will be re-computed after all values are inserted 
+    prev = [0.0, 0.0, 0.0]
+
+    with open(infile, 'r') as indata:
+        for l in indata:
+            if l.startswith("ATOM"): 
+                    # start at position 26, based on the format of the file, to 
+                    # guarantee that you get the values (sometimes there is no
+                    # whitespace that you can split on)
+                v      = re.split(r'\s+', l[26:]) 
+                    # get the first few values
+                aid    = re.split(r'\s+', l)
+                cur    = [float(v[1]), float(v[2]), float(v[3])]
+                center = [ (prev[0]+cur[0])/2.0, (prev[1]+cur[1])/2.0, (prev[2]+cur[2])/2.0 ]
+                c.execute(insert, [geom["id"], aid[1], position, position + geom["interval"], geom["interval"], 
+                    prev[0], prev[1], prev[2], cur[0], cur[1], cur[2], center[0], center[1], center[2]])
+                prev = cur
+                position = position + geom["interval"]
+
+    # compute an approximation for the endpoint of the first segment, 
+    # based on the data this reflects the endpoint from the second 
+    # segment around the endpoint of the first segment
+        # first
+    query  = conn.execute("SELECT * FROM segments where segid == 1 AND geomid == {}".format(geom["id"]))
+    first  = query.fetchone()
+        # second point
+    query  = conn.execute("SELECT * FROM segments where segid == 2 AND geomid == {}".format(geom["id"]))
+    point = query.fetchone()
+        # compute new values and insert
+    new    = [ (2.0*point[5] - point[8]), (2.0*point[6] - point[9]), (2.0*point[7] - point[10]) ]
+    center = [ (new[0]+first[8])/2.0, (new[1]+first[9])/2.0, (new[2]+first[10])/2.0 ]
+    c.execute("update segments set startx = {}, starty = {}, startz = {}, centerx = {}, centery = {}, centerz = {} where segid == 1 AND geomid == {}".format(new[0], new[1], new[2], center[0], center[1], center[2], geom["id"]))
+
+# ---------------------------------------------------------------------------
+# end of SEGMENTS table 
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# EPIGENETICS table
+# ---------------------------------------------------------------------------
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS epigenetics''')
+    # create the table 
+c.execute('''CREATE TABLE epigenetics (segid INT)''')
+
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS epigenetics_desc''')
+    # create the table 
+c.execute('''CREATE TABLE epigenetics_desc (eid INT, varname TEXT)''')
+
+for e in jsondata["data"]["epigenetics"]:
+    print("epigenetics: {}".format(os.path.join(project, e["summary"])))
+    c.execute("ALTER TABLE epigenetics ADD COLUMN \"{}\" REAL".format(e["id"]))
+    c.execute(  "INSERT INTO epigenetics_desc (eid, varname) VALUES(?,?)",
+                [e["id"], e["varname"]]
+             )
+
+    with open(os.path.join(project, e["summary"]), "r") as sfile:
+        lines = sfile.readlines()
+
+        for l in lines:
+            data = l.strip()
+            values = data.split(",")
+            # print("inserting {}:({}, {})".format(e["id"], values[0], values[1]))
+            c.execute(  "INSERT INTO epigenetics (segid, \"{}\") VALUES(?,?)".format(e["id"]),
+                        [int(values[0]), float(values[1])]
+                     )
+
+# check that the inserts happened
+# c.execute("SELECT * FROM epigenetics")
+# print([member[0] for member in c.description])
+# check that the inserts happened
+# c.execute("SELECT * FROM epigenetics_desc")
+# print([member[0] for member in c.description])
+# results = c.execute("SELECT * FROM epigenetics")
+# for e in results.fetchall(): 
+#     print(e)
+
+# ---------------------------------------------------------------------------
+# end of EPIGENETICS table 
+# ---------------------------------------------------------------------------
+
+
+# ---------------------------------------------------------------------------
+# clean up
+# ---------------------------------------------------------------------------
+conn.commit()
+conn.close()

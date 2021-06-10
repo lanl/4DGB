@@ -1,0 +1,338 @@
+{
+"$schema": "https://json-schema.org//schema#",
+
+"definitions": {
+    "note" : {
+        "description": "a note of arbitrary text",
+        "type" : "object",
+        "properties": {
+            "id": {
+                "description": "a unique identifier for this object",
+                "type": "number"
+            },
+            "creator" : {
+                "description" : "The person who created the project",
+                "@type" : "Person"
+            },
+            "created" : {
+                "description" : "The time the project was created",
+                "type" : "string",
+                "format" : "date-time"
+            },
+            "title": {
+                "description": "A short title for the note",
+                "type": "string"
+            },
+            "url": {
+                "description": "path to the data",
+                "type": "string",
+                "format": "uri"
+            }
+        },
+        "required": ["id", "creator", "created", "title", "url"]
+    },
+    "notes" : {
+        "description": "notes about this data",
+        "type": "array",
+        "items" : {
+            "$ref": "#/definitions/note"
+        }
+    }
+},
+
+
+"$id": "gtk.schema.json",
+"title": "GTKSchema",
+"description": "Genome Toolkit Schema",
+"type": "object",
+
+"properties": {
+    "project": { 
+        "description": "Collection of data for a project",
+        "type": "object",
+        "properties": {
+            "name": {
+                "description" : "The name of the project",
+                "type": "string"
+            }, 
+            "creator" : {
+                "description" : "The person who created the project",
+                "@type" : "Person"
+            },
+            "created" : {
+                "description" : "The time the project was created",
+                "type" : "string",
+                "format" : "date-time"
+            }
+        },
+        "required": ["name", "creator", "created"],
+        "additionalProperties": false
+    },
+    "schema": { 
+        "description": "data about the schema",
+        "type": "object",
+        "properties": {
+            "version": {
+                "description" : "schema version for this project",
+                "type": "string"
+            } 
+        }, 
+        "required": ["version"],
+        "additionalProperties": false
+    },
+    "data": {
+        "description": "The datasets for this project",
+        "type": "object",
+        "properties": {
+            "sequence": {
+                "description": "The one sequence for the data model",
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "description": "path to the data",
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "type": {
+                        "description": "a type string",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "a name",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "a description of the data",
+                        "type": "string"
+                    },
+                    "notes" : {
+                        "description": "notes about this data",
+                        "$ref": "#/definitions/notes"
+                    }
+                },
+                "required": ["url", "type", "name"],
+                "additionalProperties": false
+            },
+            "annotations": {
+                "description": "The one sequence for the data model",
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "description": "path to the data",
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "description": {
+                        "description": "a description of the data",
+                        "type": "string"
+                    },
+                    "notes" : {
+                        "description": "notes about this data",
+                        "$ref": "#/definitions/notes"
+                    }
+                },
+                "required": ["url"],
+                "additionalProperties": false
+            },
+            "hic": {
+                "description": "a set of hic files for the data",
+                "type" : "array",
+                "items": {
+                    "type": "object",
+                    "properties" : {
+                        "id": {
+                            "description": "a unique identifier for this structure object",
+                            "type": "number"
+                        },
+                        "description": {
+                            "description" : "description of the object",
+                            "type": "string"
+                        },
+                        "url": {
+                            "description": "path to the data",
+                            "type": "string",
+                            "format": "uri"
+                        },
+                        "unmapped-segments": {
+                            "description": "a list of ranges of unmapped segments (those that do not have data)",
+                            "type": "array"
+                        },
+                        "notes" : {
+                            "description": "notes about this data",
+                            "$ref": "#/definitions/notes"
+                        }
+                    },
+                    "required": ["id", "url", "unmapped-segments"], 
+                    "additionalProperties": false
+                }
+            },
+            "md-contact-map": {
+                "description": "a set of md-contact-map files for the data",
+                "type" : "array",
+                "items": {
+                    "type": "object",
+                    "properties" : {
+                        "version": {
+                            "description": "version for this data type",
+                            "type": "string"
+                        },
+                        "id": {
+                            "description": "a unique identifier for this structure object",
+                            "type": "number"
+                        },
+                        "description": {
+                            "description" : "description of the object",
+                            "type": "string"
+                        },
+                        "url": {
+                            "description": "path to the data",
+                            "type": "string",
+                            "format": "uri"
+                        },
+                        "hic": {
+                            "description": "the hic dataset that produced this",
+                            "type": "number"
+                        },
+                        "notes" : {
+                            "description": "notes about this data",
+                            "$ref": "#/definitions/notes"
+                        }
+                    },
+                    "required": ["version", "id", "url", "hic"], 
+                    "additionalProperties": false
+                }
+            },
+            "structure": {
+                "description": "a set of structure files for the data",
+                "type" : "array",
+                "items": {
+                    "type": "object",
+                    "properties" : {
+                        "id": {
+                            "description": "a unique identifier for this structure object",
+                            "type": "number"
+                        },
+                        "description": {
+                            "description" : "description of the object",
+                            "type": "string"
+                        },
+                        "type": {
+                            "description": "a type string",
+                            "type": "object",
+                            "properties" : {
+                                "name" : {
+                                    "description" : "name of the type",
+                                    "type": "string"
+                                },
+                                "version" : {
+                                    "description" : "version number of the type",
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["name", "version"]
+                        },
+                        "md-contact-map": {
+                            "description": "ID of the md-contact map used as input to the model",
+                            "type": "number"
+                        },
+                        "url": {
+                            "description": "path to the data",
+                            "type": "string",
+                            "format": "uri"
+                        },
+                        "interval": {
+                            "description": "sampling interval for the structure",
+                            "type": "number"
+                        },
+                        "notes" : {
+                            "description": "notes about this data",
+                            "$ref": "#/definitions/notes"
+                        }
+                    },
+                    "required": ["id", "type", "md-contact-map", "url", "interval"], 
+                    "additionalProperties": false
+                }
+            },
+            "epigenetics": {
+                "description": "a set of epigenetics files for the data",
+                "type" : "array",
+                "items": {
+                    "type": "object",
+                    "properties" : {
+                        "id": {
+                            "description": "a unique identifier for this object",
+                            "type": "number"
+                        },
+                        "url": {
+                            "description": "path to the data",
+                            "type": "string",
+                            "format": "uri"
+                        },
+                        "description": {
+                            "description" : "description of the object",
+                            "type": "string"
+                        },
+                        "varname": {
+                            "description": "a unique variable name",
+                            "type": "string"
+                        },
+                        "summary": {
+                            "description": "uri to a summary of the data",
+                            "type": "string",
+                            "format": "url"
+                        },
+                        "notes" : {
+                            "description": "notes about this data",
+                            "$ref": "#/definitions/notes"
+                        }
+                    },
+                    "required": ["id", "url", "varname"],
+                    "additionalProperties": false
+                }
+            }
+        },
+        "required": ["sequence", "annotations", "structure", "hic", "md-contact-map", "epigenetics"]
+    },
+    "datasets": {
+        "description": "a set of epigenetics files for the data",
+        "type" : "array",
+        "items": {
+            "description": "a collection of data for a specific state",
+            "type": "object",
+            "id": {
+                "description": "a unique state identifier",
+                "type": "number"
+            },
+            "name" : {
+                "description": "a name",
+                "type": "string"
+            },
+            "epigenetics": {
+                "description": "a list of epigenetics data for this state",
+                "type": "array",
+                "items": {
+                    "type": "number"
+                }
+            },
+            "structure": {
+                "description": "a list of geometry data for this state",
+                "type": "array",
+                "items": {
+                    "type": "number"
+                }
+            },
+            "notes" : {
+                "description": "notes about this data",
+                "$ref": "#/definitions/notes"
+            }
+        },
+        "required": [ "id", "name", "epigenetics", "structure" ]
+    },
+    "application" : {
+        "description" : "application-specific data, with each entry named by application"
+    }
+},
+
+"required": [ "project", "schema", "data", "datasets" ]
+
+}

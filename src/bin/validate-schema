@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+
+import jsonschema
+import json
+import sys
+
+#
+# handle command line arguments
+#
+project = ""
+if (len(sys.argv) != 2):
+    print("ERROR: must include path to project directory")
+    exit(0)
+else:
+    project = sys.argv[1]
+
+with open("../doc/design/schema/v0.5/schema.json", "r") as sfile:
+    schema = json.load(sfile)
+
+
+with open("{}/project.json".format(project), "r") as pfile:
+    pdata = json.load(pfile) 
+
+jsonschema.validate( pdata, schema )
+

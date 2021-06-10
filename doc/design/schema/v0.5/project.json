@@ -1,0 +1,227 @@
+{
+
+"schema": {
+    "version": "0.5"
+},
+"project": { 
+    "name": "Mouse X Chromosome",
+    "creator": {
+        "givenName" : "David",
+        "familyName" : "Rogers"
+    },
+    "created" : "2021-04-20T20:20:39+00:00"
+},
+"data" : {
+    "sequence": {
+        "description": "mouse mm9 chromosome X sequencing data",
+        "url": "source/chrX.fa",
+        "name": "chrX",
+        "type": "chromosome",
+        "notes" : [
+            {
+                "id" : 0,
+                "title" : "A note about something",
+                "creator": {
+                    "givenName"  : "David",
+                    "familyName" : "Rogers"
+                },
+                "created" : "2021-04-20T20:20:39+00:00",
+                "url" : "notes/data/sequence/notes/0.md"
+            },
+            {
+                "id" : 1,
+                "title" : "A note about something",
+                "creator": {
+                    "givenName"  : "David",
+                    "familyName" : "Rogers",
+                    "email"      : "dhr@lanl.gov"
+                },
+                "created" : "2021-04-20T20:20:39+00:00",
+                "url" : "notes/data/sequence/notes/1.md"
+            }
+        ]
+    },
+    "annotations": {
+        "description": "no description",
+        "url": "source/ChrX_Annotation.gff3"
+    },
+    "contact-map": [
+        {
+            "id": 0,
+            "description": "description",
+            "url": "source/0/contact.map"
+        },
+        {
+            "id": 1,
+            "description": "description",
+            "url": "source/1/contact.map"
+        }
+    ],
+    "geometry": [
+        {
+            "id": 0,
+            "description": "pdb structure file",
+            "url": "source/0/chrXa.pdb",
+            "type" : {
+                "name" : "gtk-estimated",
+                "version" : "0.1"
+            },
+            "contact-map" : 0,
+            "interval" : 200000
+        },
+        {
+            "id": 1,
+            "description": "pdb structure file",
+            "url": "source/1/chrXi.pdb",
+            "type" : {
+                "name" : "gtk-estimated",
+                "version" : "0.1"
+            },
+            "contact-map" : 1,
+            "interval" : 200000
+        }
+    ],
+    "epigenetics": [
+        {
+            "id": 0,
+            "url": "source/1/GSM2862886_ChIP_MEF_WT_H3K27me3_mus_Rep1.bw",
+            "description": "epigenetic data",
+            "name": "K27",
+            "summary": "source/1/K27_Binned_D7_adjusted.csv",
+            "unmapped" : [ 
+                            [   1,   50],
+                            [ 236,  336],
+                            [ 514,  530],
+                            [ 802,  814],
+                            [1152, 1158],
+                            [1442, 1468],
+                            [1662, 1666]
+                        ]
+        },
+        {
+            "id": 1,
+            "url": "source/0/GSM2862886_ChIP_MEF_WT_H3K27me3_cas_Rep1.bw",
+            "description": "epigenetic data",
+            "name": "K27",
+            "summary": "source/0/K27_Binned_D0_adjusted.csv",
+            "unmapped" : [ 
+                            [   1,   50],
+                            [ 236,  336],
+                            [ 514,  530],
+                            [ 802,  814],
+                            [1152, 1158],
+                            [1442, 1468],
+                            [1662, 1666] ]
+        }
+    ]
+},
+"notebooks": [
+    {
+        "id": 0,
+        "name" : "Mouse X Chromosome (Xa)",
+        "epigenetics": [ 0 ],
+        "geometry": [ 0 ]
+    },
+    {
+        "id": 1,
+        "name" : "Mouse X Chromosome (Xi)",
+        "epigenetics": [ 1 ],
+        "geometry":    [ 1 ],
+        "notes" : [
+            {
+                "id" : 0,
+                "title" : "A note about something",
+                "creator": {
+                    "givenName" : "David",
+                    "familyName" : "Rogers"
+                },
+                "created" : "2021-04-20T20:20:39+00:00",
+                "url" : "notes/data/sequence/notes/0.md"
+            },
+            {
+                "id" : 1,
+                "title" : "A note about something",
+                "creator": {
+                    "givenName" : "David",
+                    "familyName" : "Rogers",
+                    "email": "dhr@lanl.gov"
+                },
+                "created" : "2021-04-20T20:20:39+00:00",
+                "url" : "notes/states/1/notes/1.md"
+            }
+        ]
+    }
+],
+"application" : {
+    "gtk": {
+        "gtk" : {
+            "version": 0.5
+        }, 
+        "scene": {
+            "background" : "0x000000",
+            "camera":   { 
+                "fov":      10, 
+                "aspect":   1, 
+                "near":     1, 
+                "far":      1000,  
+                "center":   [0.0, 0.0, 0.0],
+                "position": [0.0, 0.0, 100.0] 
+            },
+            "lights": [
+                { "label": "Directional Light 0",
+                  "type": "directional",
+                  "color": "0xffffff", 
+                  "position": [10,10,10], 
+                  "castshadow": true 
+                },
+                { "label": "Ambient Light 0",
+                  "type": "ambient",
+                  "color": "0x888888" 
+                }
+            ]
+        },
+        "model": {
+            "attributes" : {
+                "interval" : 100000
+            },
+            "colormap" : {
+                "name" : "blackbody",
+                "b" : "blackbody",
+                "c" : "cooltowarm",
+                "r" : "rainbow",
+                "g" : "grayscacle",
+                "divs" : 512,
+                "highlight-color": "0x67F0D9",
+                "opacity-clamp" : 0.2
+            },
+            "segment" : {
+                "glyph" : {
+                    "type" : "arrow",
+                    "color": "0x0091ea",
+                    "endpoint":{ 
+                        "radius":   0.10, 
+                        "opacity":  0.5, 
+                        "segments": 16
+                    },
+                    "span":    { 
+                        "radius-beg": 0.09, 
+                        "radius-end": 0.01,
+                        "opacity":    0.5 
+                    },
+                    "ghost" : {
+                        "opacity" : 0.1
+                    },
+                    "skeleton" : {
+                    }
+                }
+            }
+        },
+        "canvas": { 
+            "ID": "#gtkgeometry", 
+            "width":  600, 
+            "height": 500 
+        }
+    }
+}
+
+}

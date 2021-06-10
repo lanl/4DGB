@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>4D Genome Browser</title>
+    <meta charset="utf-8">
+    <script src="third_party/three/build/three.js"></script>
+    <script src="third_party/three/examples/js/controls/OrbitControls.js"></script>
+    <script src="third_party/three/examples/js/math/Lut.js"></script>
+    <!-- charts -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+    <script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+
+    <link rel="stylesheet" href="gtk/css/ct-custom.css">
+    <link rel="stylesheet" href="gtk/css/gtk.css">
+    <link rel="stylesheet" href="gtk/css/gtkslider.css">
+</head>
+
+<body>
+
+<div class="gtkpage">
+<div class="gtkcolumn">
+
+<div class="gtkheader" id="gtkheadertitle">
+    <img class="gtkicon" src="gtk/img/logo_25x25.png"></img>
+    4DGenomeBrowser
+</div>
+
+<center>
+<div id="gtkbody">
+</div> <!-- gtkbody -->
+</center>
+<div id="buttons">
+    <button type="button" id=setState>setState</button>
+    <button type="button" id=unSetState>unSetState</button>
+    <button type="button" id=setGhost>setGhost</button>
+</div>
+
+
+<div class="gtkfooter">
+    Copyright (c) 2020 Los Alamos National Laboratory
+</div>
+
+</div> <!-- gtkcolumn -->
+</div> <!-- gtkpage -->
+
+<script>
+    var url = new URL(window.location.href);
+    var params = new URLSearchParams(url.search);
+    <!-- TODO: recover if this is not present -->
+    var GTKProjectName = params.get("gtkproject"); 
+
+    // add the version number to the title
+    document.getElementById("gtkheadertitle").innerHTML = "4DGenomeBrowser (" + GTKProjectName + ")"; 
+</script>
+
+<script src="gtk/js/GTKProject.js"></script>
+<script src="gtk/js/GTKSegment.js"></script>
+<script src="gtk/js/GTKArrowSegment.js"></script>
+<script src="gtk/js/GTKDataset.js"></script>
+<script src="gtk/js/GTKGeometry.js"></script>
+<script src="gtk/js/GTKGeometryCanvas.js"></script>
+<script src="gtk/js/viewer.js"></script>
+
+</body>
+
+</html>

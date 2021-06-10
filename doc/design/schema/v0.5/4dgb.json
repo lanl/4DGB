@@ -1,0 +1,97 @@
+{
+"version": "0.4",
+"favorites" : { "genes" : [ "Firre",
+        "Pbdc1",
+        "Eif2s3x",
+        "Jpx",
+        "Xist",
+        "Ftx",
+        "Kdm5c",
+        "Sox3",
+        "Ddx3x"
+    ],
+    "locations" : {
+        "Megadomain 1": [1, 73000000],
+        "Megadomain 2": [73000000, 166000000]
+    }
+},
+"chartlist" : {
+    "title" : "H3K27me3",
+    "variable" : {
+        "name": "K27",
+        "min" : -0.7,
+        "max" : 11.1,
+        "threshold" : 5.0
+    }
+},
+"scene": {
+    "background" : "0xd3d3d3",
+    "camera":   { 
+        "fov":      10, 
+        "aspect":   1, 
+        "near":     1, 
+        "far":      1000,  
+        "centerold":   [9.2321, 18.4752, -16.1992],
+        "center":   [0.0, 0.0, 0.0],
+        "position": [0.0, 0.0, 100.0] 
+    },
+    "lights": [
+        { "label": "Directional Light 0",
+          "type": "directional",
+          "color": "0xffffff", 
+          "position": [10,10,10], 
+          "castshadow": true 
+        },
+        { "label": "Ambient Light 0",
+          "type": "ambient",
+          "color": "0x888888" 
+        }
+    ]
+},
+"model": {
+    "attributes" : {
+        "interval" : 100000
+    },
+    "colormap" : {
+        "name" : "blackbody",
+        "b" : "blackbody",
+        "c" : "cooltowarm",
+        "r" : "rainbow",
+        "g" : "grayscacle",
+        "divs" : 512,
+        "highlight-color": "0x67F0D9",
+        "opacity-clamp" : 0.2
+    },
+    "segment" : {
+        "glyph" : {
+            "type" : "arrow",
+            "endpoint":{ 
+                "radius":   0.10, 
+                "opacity":  1.0, 
+                "color":    "0xe8e8e8", 
+                "segments": 16
+            },
+            "span":    { 
+                "radius-beg": 0.09, 
+                "radius-end": 0.01,
+                "opacity":    1.0, 
+                "color":      "0xe8e8e8"
+            },
+            "ghost" : {
+                "opacity" : 0.1
+            },
+            "skeleton" : {
+            }
+        }
+    }
+},
+"canvas": { 
+    "ID":     "#gtkgeometry", 
+    "old" : {
+        "width":  850, 
+        "height": 1000 
+    },
+    "width":  600, 
+    "height": 500 
+}
+}

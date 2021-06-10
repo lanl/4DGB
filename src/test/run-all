@@ -1,0 +1,17 @@
+#!/bin/bash
+
+echo ----------------- 
+echo testing database
+echo ----------------- 
+project="projects/v0.4"
+./test/test-db $project 
+
+echo ----------------- 
+echo testing project
+echo ----------------- 
+./test/test-project $project 
+
+echo ----------------- 
+echo testing server
+echo ----------------- 
+./test/test-server

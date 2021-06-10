@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+
+import urllib.request
+import json
+import sys
+from pypac import PACSession
+
+#
+# handle command line arguments
+#
+url = ""
+port = ""
+if (len(sys.argv) != 3):
+    print("ERROR: must include URL and PORT") 
+    exit(0)
+else:
+    url = sys.argv[1]
+    port = sys.argv[2]
+
+# respect local proxy settings
+session = PACSession()
+
+# get the data
+for eid in [0, 1]:
+    print("eid: {}".format(eid))
+    response = session.get('{}:{}/epigenetics/segments/values/{}'.format(url, port, eid))
+    jdata = json.loads(response.text)
+
+    # iterate through the segments 
+    for s in jdata["epigenetics"]:
+        print(s)

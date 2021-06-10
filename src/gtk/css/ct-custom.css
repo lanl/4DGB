@@ -1,0 +1,13 @@
+.ct-series-a .ct-line {
+    stroke: black;
+    stroke-width: 1px;
+}
+
+.ct-chart .ct-label.ct-horizontal {
+    text-align: center;
+    text-anchor: middle;
+}
+
+.ct-label {
+    font-size: 10px;
+}

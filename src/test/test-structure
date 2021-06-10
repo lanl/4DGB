@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+
+import json
+import sys
+from pypac import PACSession
+
+#
+# handle command line arguments
+#
+url = ""
+port = ""
+if (len(sys.argv) != 3):
+    print("ERROR: must include URL and PORT") 
+    exit(0)
+else:
+    url = sys.argv[1]
+    port = sys.argv[2]
+
+print("Testing {}:{}".format(url, port))
+
+# respect local proxy settings
+session = PACSession()
+
+# get the data
+# get the data
+for eid in [0, 1]:
+    print("eid: {}".format(eid))
+    response = session.get('{}:{}/data/structure/{}/segments'.format(url, port, eid))
+    print(response.text)
+    jdata = json.loads(response.text)
+
+    # iterate through the segments 
+    for s in jdata["segments"]:
+        segid = s['segid']
+        start = s['start'] 
+        end   = s['end'] 
+        print("{}, {}, {}".format(segid, start, end))

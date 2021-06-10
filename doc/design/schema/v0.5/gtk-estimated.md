@@ -1,0 +1,4 @@
+- pdb file
+- one line for each segment
+    - can get num_segments from this
+- current version does not include value for the interval

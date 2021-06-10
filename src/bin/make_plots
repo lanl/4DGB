@@ -1,0 +1,89 @@
+#!/usr/bin/env python
+
+import matplotlib
+import matplotlib.pyplot as plt
+import pandas
+import numpy
+import os
+import bbi
+import json
+import sys
+
+project = ""
+if (len(sys.argv) != 2):
+    print("ERROR: must include path to project directory")
+    exit(0)
+else:
+    project = sys.argv[1]
+
+projectfile = os.path.join(project, "project.json")
+print("")
+print("projectfile: " + projectfile) 
+print("")
+
+def make_plot( title, data, startid, endid, path ):
+    # data is a series
+    plt.rcParams["figure.figsize"] = (10, 0.75)
+    plt.clf()
+    plt.plot( data, color='#000000', linewidth=1 )
+    plt.fill_between(range(len(data.array)), data.array, 0, color='#67F0D9')
+    plt.title(title)
+    plt.axhline(color="black", alpha=0.25)
+    # plt.axis("off")
+    if len(data.array) > 0:
+        ax = plt.gca()
+        ax.set_xticks([1, len(data.array)])
+        ax.set_xticklabels([startid, endid])
+    # plt.xlabel("Chromosome Sequence Position")
+    # plt.ylabel("H3 K27 me3")
+    plt.ylabel("level")
+    plt.savefig(path, bbox_inches='tight', pad_inches=0)
+
+# read the settings from the project directory
+settings = {}
+with open (projectfile, "r") as settings_file:
+    settings = json.load(settings_file)
+
+for stateID in settings["datasets"]["state"]:
+    state = settings["datasets"]["state"][stateID]
+    for e in state["epigenetics"]:
+        ep_file = os.path.join(project, e["path"]) 
+        print("epigenetics file: {}".format(ep_file))
+
+        # read the track
+        # for now, we know it's a chromosome
+        chrom = settings["datasets"]["sequence"]["type"]["name"] 
+        with bbi.open( ep_file ) as tdata:
+            if False:
+                print("sizes")
+                print(tdata.chromsizes)
+                print()
+                print("zooms")
+                print(tdata.zooms)
+                print()
+                print("info")
+                print(tdata.info)
+                print()
+                print("schema")
+                print(tdata.schema)
+                print()
+                # print(tdata.chromsizes[chrom])
+                # print(tdata.schema[chrom])
+                # print(tdata.chromsizes[chrom])
+
+            incr = state["geometry"]["interval"] 
+            # TODO: this doesn't have enough epigenetics information
+            resdir = os.path.join(project, "generated", "epigenetics", "state" + str(stateID), "epid" + str(e["ID"]))
+            os.makedirs(resdir)
+            maxlen = 0
+            for ival in range(0, state["geometry"]["hack_num_segments"]):
+                startid = ival*incr
+                endid   = (ival+1)*incr
+                intdata = tdata.fetch_intervals(chrom, startid, endid)
+
+                # plot the intervals
+                # print(intdata["value"].array)
+                # print(intdata.index)
+                if len(intdata) > maxlen:
+                    maxlen = len(intdata)
+                make_plot( "Chromosome Region: " + str(ival), intdata["value"], startid, endid, os.path.join(resdir, str(ival) + ".png" ) )
