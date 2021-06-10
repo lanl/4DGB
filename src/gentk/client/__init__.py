@@ -29,9 +29,7 @@ class client:
         session = PACSession()
 
         # get the data from the server
-        # print("sid: {}".format(sid))
         response = session.get('{}:{}/data/structure/{}/segments'.format(self.url, self.port, sid))
-        # print(response.text)
         jdata = json.loads(response.text)
 
         return jdata
