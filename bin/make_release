@@ -55,6 +55,6 @@ rm -f localhost.yaml.bak
 cp ../../src/*html static
 cp -rf ../../src/gtk static
 cp -rf ../../src/img static
-cp -rf ../../src/projects static
+cp -rf ../../projects static
 cp -rf ../../src/third_party static
 popd
