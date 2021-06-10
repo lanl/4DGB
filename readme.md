@@ -11,10 +11,9 @@
 
 - Here is an example of doing this for the `test.00` project:
 ```
-    cd src
     ./bin/db_pop projects/test.00
     ./bin/make_release test.00 8000
-    pushd ../release/test.00
+    pushd release/test.00
     python gtkserver.py localhost.yaml
 ```
 
