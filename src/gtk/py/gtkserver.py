@@ -16,48 +16,33 @@ else:
     print("ERROR: must include settings file")
     exit(0)
 
+#
+# print out the settings
+#
 print("Settings:")
 for key in data:
     print("{}: {}".format(key, data[key]))
 print("")
 
+#
+# initialize
+#
 PROJECT_HOME = data["project_home"] 
 db_connect = create_engine(data["db_connect"])
 app = Flask(__name__)
 api = Api(app)
 
-class Genes(Resource):
-    def get(self):
-        conn = db_connect.connect()
-        query = conn.execute("select * from genes")
+# class Genes(Resource):
+#    def get(self):
+#        conn = db_connect.connect()
+#        query = conn.execute("select * from genes")
+#
+#        return {'genes': [i[4] for i in query.cursor.fetchall()]}
 
-        return {'genes': [i[4] for i in query.cursor.fetchall()]}
 
-@app.route('/')
-def home():
-    return app.send_static_file('index.html')
-
-@app.route('/<path:path>')
-def root(path):
-    return app.send_static_file(path)
-
-@app.route('/data/structure/<identifier>/segments')
-def SegmentData(identifier):
-    conn    = db_connect.connect()
-    query   = conn.execute("SELECT segid, startid, length, startx, starty, startz, endx, endy, endz FROM structure WHERE structureid == {} ORDER BY segid".format(identifier))
-    data    = []
-    lengths = []
-    for b in query.cursor.fetchall():
-        data.append({ 
-                        'segid'  : int(b[0]),
-                        'startid': int(b[1]),
-                        'length' : int(b[2]),
-                        'start'  : [float(b[3]), float(b[4]), float(b[5])],
-                        'end'    : [float(b[6]), float(b[7]), float(b[8])],
-                    })
-
-    return jsonify({ 'segments': data })
-
+#
+#
+#
 @app.route('/epigenetics/segments/values/<identifier>')
 def EpigeneticsSegmentValues(identifier):
     conn  = db_connect.connect()
@@ -118,6 +103,64 @@ def SegmentsForGene(name):
 
     return jsonify({'segments': segments})
 
+@app.route('/bbi/<state>/<ID>/<chrom>/<begin>/<end>')
+def BBIQuery(state, ID, chrom, begin, end):
+    conn = db_connect.connect()
+    query = conn.execute("SELECT file FROM datafiles WHERE state == ? AND type == ? AND ID == ?", state, "epigenetics", ID)
+    results = query.cursor.fetchone()
+    # TODO: update so query returns the entire value
+    fname = PROJECT_HOME + "/" + results[0]
+    # print("BBI file queried: {}".format(fname))
+
+    numbins = 100
+    data = bbi.fetch(fname, chrom, int(begin), int(end), numbins)
+    labels = [None] * numbins
+    labels[0]  = begin
+    labels[-1] = end
+
+    return jsonify({'labels': labels, 'series': list(data)})
+
+# ------------------------------------------------------------------------------------------------
+# UPDATED CALLS
+# ------------------------------------------------------------------------------------------------
+
+#
+# default index path
+#
+@app.route('/')
+def home():
+    return app.send_static_file('index.html')
+
+#
+# default path
+#
+@app.route('/<path:path>')
+def root(path):
+    return app.send_static_file(path)
+
+#
+# return the segments of a structure
+#
+@app.route('/data/structure/<identifier>/segments')
+def SegmentData(identifier):
+    conn    = db_connect.connect()
+    query   = conn.execute("SELECT segid, startid, length, startx, starty, startz, endx, endy, endz FROM structure WHERE structureid == {} ORDER BY segid".format(identifier))
+    data    = []
+    lengths = []
+    for b in query.cursor.fetchall():
+        data.append({ 
+                        'segid'  : int(b[0]),
+                        'startid': int(b[1]),
+                        'length' : int(b[2]),
+                        'start'  : [float(b[3]), float(b[4]), float(b[5])],
+                        'end'    : [float(b[6]), float(b[7]), float(b[8])],
+                    })
+
+    return jsonify({ 'segments': data })
+
+#
+# get all genes in a project
+#
 @app.route('/genes')
 def Genes():
     # return all genes
@@ -130,6 +173,9 @@ def Genes():
 
     return jsonify({'genes': genes})
 
+#
+# genes for a segment 
+#
 @app.route('/data/structure/<structureid>/segment/<segmentid>/genes')
 def GenesForSegment(structureid, segmentid):
     # find all genes that intersect with this segment
@@ -148,23 +194,6 @@ def GenesForSegment(structureid, segmentid):
         genes.append(g[0])
 
     return jsonify({'genes': genes})
-
-@app.route('/bbi/<state>/<ID>/<chrom>/<begin>/<end>')
-def BBIQuery(state, ID, chrom, begin, end):
-    conn = db_connect.connect()
-    query = conn.execute("SELECT file FROM datafiles WHERE state == ? AND type == ? AND ID == ?", state, "epigenetics", ID)
-    results = query.cursor.fetchone()
-    # TODO: update so query returns the entire value
-    fname = PROJECT_HOME + "/" + results[0]
-    # print("BBI file queried: {}".format(fname))
-
-    numbins = 100
-    data = bbi.fetch(fname, chrom, int(begin), int(end), numbins)
-    labels = [None] * numbins
-    labels[0]  = begin
-    labels[-1] = end
-
-    return jsonify({'labels': labels, 'series': list(data)})
     
 if __name__ == '__main__':
      app.run(host=data["host"], port=data["port"])
