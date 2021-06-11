@@ -42,3 +42,13 @@ class client:
         jdata = json.loads(response.text)
 
         return jdata
+
+    def get_genes(self):
+        # respect local proxy settings
+        session = PACSession()
+
+        # get the data from the server
+        response = session.get('{}:{}/genes'.format(self.url, self.port))
+        jdata = json.loads(response.text)
+
+        return jdata

@@ -20,7 +20,7 @@
         "name" : "nothing"
     },
     "annotations": {
-        "url"  : "http://www.cnn.com"
+        "url"  : "source/ChrX_Annotation.gff3"
     },
     "hic" : [
         {
