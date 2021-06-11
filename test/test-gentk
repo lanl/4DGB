@@ -9,3 +9,6 @@ print(client.get_structure(0))
 print(client.get_genes())
 print(client.get_genes_for_segment(0, 100))
 print(client.get_segments_for_gene(0, "Gm5384"))
+
+print(client.get_genes_for_segment(0, 800))
+print(client.get_segments_for_gene(0, "Sh3kbp1"))

@@ -162,24 +162,9 @@ def SegmentsForGene(name, structureid):
     g_start = results[0]
     g_end   = results[1]
 
-    print("SEGMENTSFORGENE")
-    print("gene   : {}".format(name))
-    print("  start: {}".format(g_start))
-    print("  end  : {}".format(g_end))
-
-    # take out the hack solution
-    if (False):
-        # DEMO HACK we know the segments are 100000
-        segments = []
-        startid = math.ceil(g_start/100000)
-        endid   = math.ceil(g_end/100000)
-        if (startid != endid):
-            # print("MORE THAN ONE SEGMENT")
-            # print("startid, endid: {}, {}".format(startid, endid))
-            for i in range(startid, endid+1):
-                segments.append(i);
-        else:
-            segments.append(startid)
+    # print("gene   : {}".format(name))
+    # print("  start: {}".format(g_start))
+    # print("  end  : {}".format(g_end))
 
     #
     # query-based solution
