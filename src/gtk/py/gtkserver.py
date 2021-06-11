@@ -32,14 +32,6 @@ db_connect = create_engine(data["db_connect"])
 app = Flask(__name__)
 api = Api(app)
 
-# class Genes(Resource):
-#    def get(self):
-#        conn = db_connect.connect()
-#        query = conn.execute("select * from genes")
-#
-#        return {'genes': [i[4] for i in query.cursor.fetchall()]}
-
-
 #
 #
 #
@@ -65,43 +57,6 @@ def SegmentEpigeneticsData(identifier, state):
         data.append(b[0])
 
     return jsonify({'data': data})
-
-@app.route('/segments/gene/<name>')
-def SegmentsForGene(name):
-    # find all genes that intersect with this segment
-    conn = db_connect.connect()
-    query = conn.execute("SELECT startid, endid FROM genes WHERE gene_name == ?", name)
-    results = query.cursor.fetchone()
-    g_start = results[0]
-    g_end   = results[1]
-
-    # print("gene   : {}".format(name))
-    # print("  start: {}".format(g_start))
-    # print("  end  : {}".format(g_end))
-
-    # DEMO HACK we know the segments are 100000
-    segments = []
-    startid = math.ceil(g_start/100000)
-    endid   = math.ceil(g_end/100000)
-    if (startid != endid):
-        # print("MORE THAN ONE SEGMENT")
-        # print("startid, endid: {}, {}".format(startid, endid))
-        for i in range(startid, endid+1):
-            segments.append(i);
-    else:
-        segments.append(startid)
-
-    if (False):
-        query = conn.execute("SELECT ID from segments WHERE \
-                                  ( start BETWEEN ? AND ? ) OR ( end BETWEEN ? AND ? ) OR \
-                                  ( start > ? AND end < ? ) OR ( start < ? AND end > ? ) \
-                                  ORDER BY ID", 
-                                  g_start, g_end, g_start, g_end, g_start, g_end, g_start, g_end)
-        segments = []
-        for b in query.cursor.fetchall():
-            segments.append(b[0])
-
-    return jsonify({'segments': segments})
 
 @app.route('/bbi/<state>/<ID>/<chrom>/<begin>/<end>')
 def BBIQuery(state, ID, chrom, begin, end):
@@ -180,7 +135,7 @@ def Genes():
 def GenesForSegment(structureid, segmentid):
     # find all genes that intersect with this segment
     conn = db_connect.connect()
-    query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid == ? AND segid == ?", structureid, segmentid)
+    query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, segmentid)
     results = query.cursor.fetchone()
     b_start = results[0]
     b_end   = results[1]
@@ -195,5 +150,54 @@ def GenesForSegment(structureid, segmentid):
 
     return jsonify({'genes': genes})
     
+#
+# segments for a gene
+#
+@app.route('/gene/<name>/data/structure/<structureid>')
+def SegmentsForGene(name, structureid):
+    # find all genes that intersect with this segment
+    conn = db_connect.connect()
+    query = conn.execute("SELECT start, end FROM genes WHERE gene_name == ?", name)
+    results = query.cursor.fetchone()
+    g_start = results[0]
+    g_end   = results[1]
+
+    print("SEGMENTSFORGENE")
+    print("gene   : {}".format(name))
+    print("  start: {}".format(g_start))
+    print("  end  : {}".format(g_end))
+
+    # take out the hack solution
+    if (False):
+        # DEMO HACK we know the segments are 100000
+        segments = []
+        startid = math.ceil(g_start/100000)
+        endid   = math.ceil(g_end/100000)
+        if (startid != endid):
+            # print("MORE THAN ONE SEGMENT")
+            # print("startid, endid: {}, {}".format(startid, endid))
+            for i in range(startid, endid+1):
+                segments.append(i);
+        else:
+            segments.append(startid)
+
+    #
+    # query-based solution
+    #
+    query = conn.execute("SELECT segid from structure WHERE structureid = ? AND \
+                              ( ( startid BETWEEN ? AND ? ) OR ( endid BETWEEN ? AND ? ) OR \
+                                ( startid > ? AND endid < ? ) OR ( startid < ? AND endid > ? ) ) ORDER BY segid", 
+                              structureid, g_start, g_end, g_start, g_end, g_start, g_end, g_start, g_end)
+    segments = []
+    for b in query.cursor.fetchall():
+        segments.append(b[0])
+
+    return jsonify({'segments': segments})
+
+
+#
+# activate
+#
 if __name__ == '__main__':
      app.run(host=data["host"], port=data["port"])
+

@@ -62,3 +62,16 @@ class client:
         jdata = json.loads(response.text)
 
         return jdata
+
+    def get_segments_for_gene(self, structureID, gene):
+        # respect local proxy settings
+        session = PACSession()
+
+        # get the data from the server
+        print('{}:{}/gene/{}/data/structure/{}'.format(self.url, self.port, gene, structureID))
+        response = session.get('{}:{}/gene/{}/data/structure/{}'.format(self.url, self.port, gene, structureID))
+        print(response.text)
+        # jdata = json.loads(response.text)
+        jdata = "None"
+
+        return jdata
