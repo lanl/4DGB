@@ -34,7 +34,7 @@ mkdir release
 mkdir release/$PROJECT
 mkdir release/$PROJECT/static
 
-pushd release/$PROJECT
+pushd release/$PROJECT 2>&1 >/dev/null
 pwd
 cp ../../src/gtk/py/gtkserver.py .
 
@@ -60,13 +60,13 @@ cp -rf ../../src/third_party static
 echo ""
 echo "Installing python module and creating package ..."
 mkdir python
-pushd python
+pushd python 2>&1 >/dev/null
 cp -rf ../../../src/gentk . 
 mv gentk/setup.py .
 mv gentk/readme.md . 
 python setup.py sdist
 echo "to upload python module: twine upload dist/*"
 cp -rf ../../../test/test-gentk .
-popd
+popd 2>&1 >/dev/null
 
-popd
+popd 2>&1 >/dev/null

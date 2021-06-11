@@ -85,8 +85,7 @@ def SegmentEpigeneticsData(identifier, state):
 def SegmentsForGene(name):
     # find all genes that intersect with this segment
     conn = db_connect.connect()
-    # gene = request.args.get('gene')
-    query = conn.execute("SELECT start, end FROM genes WHERE gene_name == ?", name)
+    query = conn.execute("SELECT startid, endid FROM genes WHERE gene_name == ?", name)
     results = query.cursor.fetchone()
     g_start = results[0]
     g_end   = results[1]
@@ -131,11 +130,11 @@ def Genes():
 
     return jsonify({'genes': genes})
 
-@app.route('/data/structure/<ID>/segment/<segmentid>/genes')
-def GenesForSegment(ID, segmentid):
+@app.route('/data/structure/<structureid>/segment/<segmentid>/genes')
+def GenesForSegment(structureid, segmentid):
     # find all genes that intersect with this segment
     conn = db_connect.connect()
-    query = conn.execute("SELECT start, end FROM segments WHERE ID == ?", segmentid)
+    query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid == ? AND segid == ?", structureid, segmentid)
     results = query.cursor.fetchone()
     b_start = results[0]
     b_end   = results[1]

@@ -7,3 +7,4 @@ client.project = "test.00"
 
 print(client.get_structure(0))
 print(client.get_genes())
+print(client.get_genes_for_segment(0, 2))
