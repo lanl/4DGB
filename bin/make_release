@@ -72,4 +72,4 @@ echo "or: twine upload --repository testpypi dist/
 cp -rf ../../../test/test-gentk .
 popd 2>&1 >/dev/null
 
-popd 2>&1 >/dev/null
+popd 2>&1 >/dev/null"
