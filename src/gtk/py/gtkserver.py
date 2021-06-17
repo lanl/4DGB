@@ -114,6 +114,23 @@ def SegmentData(identifier):
     return jsonify({ 'segments': data })
 
 #
+# return contact records (Hi-C data)
+#
+@app.route('/data/contactmap/<identifier>/contacts')
+def ContactMap(identifier):
+    conn    = db_connect.connect()
+    query   = conn.execute("SELECT x, y, value FROM contact WHERE mapid == ?", [identifier])
+    data    = []
+    for c in query.cursor.fetchall():
+        data.append({
+            'x': int(c[0]),
+            'y': int(c[1]),
+            'value': float(c[2])
+        })
+
+    return jsonify({ 'contacts': data })
+
+#
 # get all genes in a project
 #
 @app.route('/genes')
