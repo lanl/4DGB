@@ -67,8 +67,8 @@ mv gentk/readme.md .
 mkdir bin
 mv gentk/gentk-dump bin
 python setup.py sdist
-echo "to upload python module: twine upload dist/*"
-echo "or: twine upload --repository testpypi dist/
+echo "    to upload python module: twine upload dist/*"
+echo "    or: twine upload --repository testpypi dist/"
 cp -rf ../../../test/test-gentk .
 popd 2>&1 >/dev/null
 
