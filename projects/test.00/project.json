@@ -42,13 +42,13 @@
         {
             "id"        : 0,
             "version"   : "1.0",
-            "url"       : "md-contact-map.0",
+            "url"       : "source/0/hic.tsv",
             "hic"       : 0
         },
         {
             "id"        : 1,
             "version"   : "1.0",
-            "url"       : "md-contact-map.1",
+            "url"       : "source/1/hic.tsv",
             "hic"       : 1
         }
     ],

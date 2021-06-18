@@ -122,6 +122,31 @@ for geom in jsondata["data"]["structure"]:
 # ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
+# CONTACTS (Hi-C) table
+# ---------------------------------------------------------------------------
+
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS contact''')
+    # create the table 
+c.execute('''CREATE TABLE contact (mapid INT, x INT, y INT, value REAL)''')
+
+print("Creating contact records table")
+for contact_map in jsondata["data"]["md-contact-map"]:
+    map_id = contact_map["id"]
+    infile = os.path.join( project, contact_map["url"] )
+    insert = '''INSERT INTO contact (mapid,x,y,value) VALUES (?,?,?,?)'''
+
+    print("reading: {}".format(infile))
+    with open(infile, 'r') as indata:
+        for l in indata:
+            columns = l.split("\t")
+            c.execute(insert, [map_id, *columns])
+
+# ---------------------------------------------------------------------------
+# end of CONTACTS table
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
 # EPIGENETICS table
 # ---------------------------------------------------------------------------
     # start from scratch
