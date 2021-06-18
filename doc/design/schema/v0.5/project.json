@@ -57,7 +57,7 @@
             "url": "source/1/contact.map"
         }
     ],
-    "geometry": [
+    "structure": [
         {
             "id": 0,
             "description": "pdb structure file",
