@@ -116,7 +116,7 @@ def SegmentData(identifier):
 #
 # return contact records (Hi-C data)
 #
-@app.route('/data/contactmap/<identifier>/contacts')
+@app.route('/data/contact-map/<identifier>')
 def ContactMap(identifier):
     conn    = db_connect.connect()
     query   = conn.execute("SELECT x, y, value FROM contact WHERE mapid == ?", [identifier])

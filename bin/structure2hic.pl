@@ -18,6 +18,9 @@ Given a PDB file (the file that is parsed to generate structure data),
 output tab-delimited data giving a rough contact map of the structure by
 calculating the euclidian distance between every pair points.
 
+The distance values are then inverted (by subtracting from the maximum value
+so closer distances result in higher values)
+
 =cut
 
 use Getopt::Long qw(:config auto_help);
@@ -40,8 +43,13 @@ while (<$fh>) {
     push @pts, { id => $columns[1], x => $pt[0], y => $pt[1], z => $pt[2] }
 }
 
+my %dists;
+my $maxdist;
+my $first = 1;
+
 for my $i (@pts) {
 for my $j (@pts) {
+    next if exists $dists{$i->{id}, $j->{id}};
 
     my $dist = sqrt(
         ( ($i->{x} - $j->{x}) ** 2) +
@@ -49,8 +57,18 @@ for my $j (@pts) {
         ( ($i->{z} - $j->{z}) ** 2)
     );
 
-    say join "\t", $i->{id}, $j->{id}, $dist;
+    if ($first || $dist > $maxdist) {
+        $maxdist = $dist;
+        $first = 0;
+    }
+
+    $dists{$i->{id}, $j->{id}} = $dist;
+    $dists{$j->{id}, $i->{id}} = $dist; 
 }
+}
+
+while ( my ($key,$dist) = each %dists ) {
+    say join "\t", (split /$;/, $key), ($maxdist-$dist);
 }
 
 1;
