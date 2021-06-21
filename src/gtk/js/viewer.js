@@ -33,7 +33,8 @@ function main( project ) {
     // first view
     var dset = project.getDatasets(); 
     var dataset = new GTKDataset(dset[0]);
-    view = new GTKGeometryCanvas( project, dataset, "gtkbody" );
+    view = new GTKGeometryCanvas( project, dataset, "structureview" );
+    new GTKContactMapCanvas( project, dataset, "contactmapview" )
 }
 
 function setState() {
