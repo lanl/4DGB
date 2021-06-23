@@ -5,9 +5,11 @@ import gentk
 client = gentk.client.client("http://127.0.0.1", "8001")
 client.project = "test.01"
 
+# both test.00 and test.01
 print(client.get_structure(0))
 print(client.get_genes())
 
+# test.01 only
 print(client.get_genes_for_segment(0, 100))
 print(client.get_segments_for_gene(0, "Gm5384"))
 

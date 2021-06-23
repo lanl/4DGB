@@ -2,14 +2,15 @@ import setuptools
 
 setuptools.setup(
     name="gentk",
-    version="0.5.2",
+    version="0.5.3",
     author="David H. Rogers",
     author_email="dhr@lanl.gov",
     description="4D Genome Toolkit.",
     url="https://github.com/lanl/4DGB",
     include_package_data=True,
     packages=[  "gentk", 
-                "gentk.client"
+                "gentk.client",
+                "gentk.project"
             ],
     install_requires=[
         "pypac==0.15.0"
