@@ -20,7 +20,7 @@
         "name" : "nothing"
     },
     "annotations": {
-        "url"  : "source/ChrX_Annotation.gff3"
+        "url"     : "None" 
     },
     "hic" : [
         {
