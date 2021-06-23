@@ -12,7 +12,7 @@ setuptools.setup(
                 "gentk.client"
             ],
     install_requires=[
-        "pypac"
+        "pypac==0.15.0"
     ],
     scripts=[
         "bin/gentk-dump"
