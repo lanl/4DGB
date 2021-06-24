@@ -1,5 +1,4 @@
 import bbi
-import math
 import yaml
 import sys
 
