@@ -1,4 +1,5 @@
 # Repository for the 4D Genome Browser project
+![example](https://github.com/lanl/4DGB/actions/workflows/python-app/badge.svg)
 
 ## To run the application locally
 
