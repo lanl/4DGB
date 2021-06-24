@@ -1,0 +1,38 @@
+language: python
+
+# Notification settings
+notifications:
+  email:
+    recipients:
+      - dhr@lanl.gov
+      - rsida2@miners.utep.edu
+      - ctauxe@neptuneinc.com
+
+# Get the repository
+git:
+  # Depth of commits to grab. Less is faster
+  depth: 1
+
+# Matrix of operating systems and dependencies
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+      addons:
+        apt:
+          packages:
+            - doxygen
+
+# Install dependencies here      
+install:
+
+# python
+language:
+  python:
+    - "3.9"
+    - pip install -r requirements.txt
+
+# The build step
+script:
+        - ./bin/make_release test.00 
+        - pushd release/test.00
