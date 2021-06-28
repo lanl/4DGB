@@ -69,7 +69,7 @@ mv gentk/gentk-dump bin
 python setup.py sdist
 echo "    to upload python module: twine upload dist/*"
 echo "    or: twine upload --repository testpypi dist/"
-cp -rf ../../../test/test-gentk .
+cp -rf ../../../testing/test_gentk.py .
 popd 2>&1 >/dev/null
 
 popd 2>&1 >/dev/null
