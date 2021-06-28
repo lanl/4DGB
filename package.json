@@ -1,22 +1,28 @@
 {
-  "name": "4DGB",
-  "version": "0.5",
-  "main": "index.js",
-  "directories": {
-    "doc": "doc"
-  },
-  "scripts": {
-    "test": "jest --watch" 
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lanl/4DGB.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/lanl/4DGB/issues"
-  },
-  "homepage": "https://github.com/lanl/4DGB#readme"
+    "name": "4DGB",
+    "version": "0.5",
+    "main": "index.js",
+    "directories": {
+        "doc": "doc"
+    },
+    "scripts": {
+        "test": "jest"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/lanl/4DGB.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/lanl/4DGB/issues"
+    },
+    "homepage": "https://github.com/lanl/4DGB#readme",
+    "dependencies": {
+        "yarn": "^1.22.10"
+    },
+    "devDependencies": {
+        "jest": "^27.0.6"
+    }
 }
