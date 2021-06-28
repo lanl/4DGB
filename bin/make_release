@@ -64,6 +64,7 @@ pushd python 2>&1 >/dev/null
 cp -rf ../../../src/gentk . 
 mv gentk/setup.py .
 mv gentk/readme.md . 
+mv gentk/requirements.txt . 
 mkdir bin
 mv gentk/gentk-dump bin
 python setup.py sdist
