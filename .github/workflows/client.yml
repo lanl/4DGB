@@ -36,7 +36,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        make_release test.00 8000
+        ./bin/make_release test.00 8000
         pushd release/test.00
         python gtkserver.py localhost.yml &
         pushd python
