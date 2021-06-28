@@ -32,7 +32,7 @@ jobs:
         cd release/test.00
         python -m pip install --upgrade pip
         pip install pytest
-        cd pushd python
+        cd python
         pip install -r requirements.txt
     - name: Run the server and test with client 
       run: |
