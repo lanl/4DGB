@@ -26,15 +26,19 @@ jobs:
     - name: Make the release 
       run: |
         ./bin/make_release test.00 8000
-        pushd release/test.00
     - name: Install dependencies
       run: |
+        pushd release/test.00
         pwd
         python -m pip install --upgrade pip
         pip install pytest
+        pushd python
+        pwd
         pip install -r requirements.txt
     - name: Run the server and test with client 
       run: |
+        pushd release/test.00
+        pwd
         python gtkserver.py localhost.yaml &
         sleep 5
         pushd python
