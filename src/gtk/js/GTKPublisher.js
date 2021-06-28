@@ -43,11 +43,12 @@ class GTKPublisher {
     }
 
     addListener( eventname, callback ) {
-        if eventname in this.listeners:
+        if (this.listeners.includes(eventname)) {
             this.listeners[eventname].push(callback)
-        else:
+        } else {
             this.listeners[eventname] = []
             this.listeners[eventname].push(callback)
+        }
     }
 
     notify( eventname, message) {
