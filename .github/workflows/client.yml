@@ -29,18 +29,15 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
-        pushd release/test.00
-        pwd
+        cd release/test.00
         python -m pip install --upgrade pip
         pip install pytest
-        pushd python
-        pwd
+        cd pushd python
         pip install -r requirements.txt
     - name: Run the server and test with client 
       run: |
-        pushd release/test.00
-        pwd
+        cd release/test.00
         python gtkserver.py localhost.yaml &
         sleep 5
-        pushd python
+        cd python
         pytest test_gentk.py 
