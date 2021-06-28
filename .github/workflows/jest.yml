@@ -9,5 +9,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: |
+        npm install jest
     - name: Run Jest
       run: npm run test
