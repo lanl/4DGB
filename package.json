@@ -1,0 +1,22 @@
+{
+  "name": "4DGB",
+  "version": "0.5",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lanl/4DGB.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lanl/4DGB/issues"
+  },
+  "homepage": "https://github.com/lanl/4DGB#readme"
+}
