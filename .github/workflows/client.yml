@@ -37,5 +37,6 @@ jobs:
         ./bin/make_release test.00 8000
         pushd release/test.00
         python gtkserver.py localhost.yaml &
+        sleep 5
         pushd python
         pytest test_gentk.py 
