@@ -14,4 +14,4 @@ jobs:
         npm install jest
         npm install xmlhttprequest
     - name: Run Jest
-      run: npm run test
+      run: npm run test testing/publisher.test.js

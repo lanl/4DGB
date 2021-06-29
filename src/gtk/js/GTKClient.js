@@ -1,5 +1,5 @@
-var fs = require('fs');
 var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest; 
+var fs = require('fs');
 
 class GTKClient {
     /**
@@ -9,9 +9,17 @@ class GTKClient {
      *
      */
 
-    constructor() {
-        this.url = null;
-        this.port = null;
+    constructor( url, port ) {
+        this.url = url;
+        this.port = port;
+    }
+
+    set data(d) {
+        this._data = d;
+    }
+
+    get data() {
+        return this._data;
     }
 
     set port(p) {
@@ -30,21 +38,31 @@ class GTKClient {
         return this._url;
     }
 
-    get_structure(sid) {
-        this.loadData((response) => {
-            var data = JSON.parse(response);
-
-            var writeStream = fs.createWriteStream('./output.txt', {flags: 'w'});
-            writeStream.write(this.url + ":" + this.port + "\n");
-            writeStream.write(JSON.stringify(data));
-            writeStream.end();
-        }, sid );
+    //
+    // get the structure for an ID
+    //
+    get_contactmap(callback, sid) {
+        this.getData(   (response) => {
+                            callback(JSON.parse(response));
+                        },
+                        this.url + ':' + this.port + '/data/contact-map/' + sid 
+                    );
     }
 
-    loadData(callback, sid) {
+
+    //
+    // get the structure for an ID
+    //
+    get_structure(callback, sid) {
+        this.getData(   (response) => {
+                            callback(JSON.parse(response));
+                        },
+                        this.url + ':' + this.port + '/data/structure/' + sid + "/segments" );
+    }
+
+    getData(callback, url) {
         const xobj = new XMLHttpRequest();
-        // xobj.overrideMimeType("application/json");
-        xobj.open('GET', this.url + ':' + this.port + '/data/structure/' + sid + "/segments");
+        xobj.open('GET', url);
         xobj.onreadystatechange = function() {
             if (xobj.readyState == 4 && (xobj.status == 0 || xobj.status == 200)) {
                 // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
