@@ -1,6 +1,8 @@
 name: Javascript Publisher test 
 
-on: [push]
+on:
+  push:
+    branches: [ master, sida ]
 
 jobs:
   build:
