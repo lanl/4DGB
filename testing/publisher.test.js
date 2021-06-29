@@ -15,7 +15,7 @@ function reload( message ) {
     return message;
 }
 
-test('hello world', () => {
+test('publish test', () => {
     pub = new GTKPublisher();
 
     pub.addListener( "report", report );
