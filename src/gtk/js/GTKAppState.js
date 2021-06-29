@@ -29,34 +29,47 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-class GTKPublisher {
+var GTKPublisher = require( './GTKPublisher.js' );
+
+class GTKAppState extends GTKPublisher {
     /**
-     * Class GTKPublisher
+     * Class GTKAppState
      *
-     * Maintains a list of callbacks to publish to
-     * for an arbitrary number of named events
+     * Maintains the current application state, and broadcasts
+     * change events that listeners can react to
      *
      */
 
     constructor() {
-        this.listeners = {};
+        super();
+        this.dataset    = null;
+        this.range      = null;
+        this.genes      = null;
     }
 
-    addListener( eventname, callback ) {
-        if (eventname in this.listeners) {
-            this.listeners[eventname].push(callback)
-        } else {
-            this.listeners[eventname] = []
-            this.listeners[eventname].push(callback)
-        }
+    get range() {
+        return this._range;
     }
 
-    notify( eventname, message) {
-        for (const listener of this.listeners[eventname]) {
-            listener(message)
-        }
+    set range( r ) {
+        this._range = r; 
     }
 
+    get genes() {
+        return this._genes;
+    }
+
+    set genes( glist ) {
+        this._genes = glist; 
+    }
+
+    get segments() {
+        return this._segments;
+    }
+
+    set segments( slist ) {
+        this._segments = slist; 
+    }
 }
 
-module.exports = GTKPublisher;
+module.exports = GTKAppState;
