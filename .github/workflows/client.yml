@@ -5,7 +5,9 @@ name: Client test
 
 on:
   push:
-    branches: [ master, sida ]
+    branches: 
+      - master
+      - sida
   pull_request:
     branches: [ master ]
 
