@@ -39,7 +39,29 @@ class GTKClient {
     }
 
     //
-    // get the structure for an ID
+    // get the genes for the current project 
+    //
+    get_genes(callback) {
+        this.getData(   (response) => {
+                            callback(JSON.parse(response));
+                        },
+                        this.url + ':' + this.port + '/genes'
+                    );
+    }
+
+    //
+    // get the genes for a segment 
+    //
+    get_genes_for_segment(callback, sid, segid) {
+        this.getData(   (response) => {
+                            callback(JSON.parse(response));
+                        },
+                        this.url + ':' + this.port + '/data/structure/' + sid + '/segment/' + segid + '/genes'
+                    );
+    }
+
+    //
+    // get the contactmap for an id 
     //
     get_contactmap(callback, sid) {
         this.getData(   (response) => {
