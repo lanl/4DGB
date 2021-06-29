@@ -5,9 +5,6 @@ name: Client test
 
 on:
   push:
-    branches: 
-      - master
-      - sida
 
 jobs:
   build:
