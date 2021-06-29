@@ -1,6 +1,6 @@
 import gentk
 
-def test_client():
+def test_segments():
     client = gentk.client.client("http://127.0.0.1", "8000")
     client.project = "test.00"
 
@@ -12,3 +12,7 @@ def test_client():
     result = client.get_structure(0)
 
     assert(result['segments'][0] == gold)
+
+def test_print():
+    print("Hello")
+    assert(False)
