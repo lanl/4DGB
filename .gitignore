@@ -5,3 +5,4 @@ projects/test.00/generated/
 __pycache__/
 venv/
 node_modules/
+.vscode/
