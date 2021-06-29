@@ -1,4 +1,4 @@
-name: Javascript test 
+name: Javascript Publisher test 
 
 on: [push]
 
@@ -13,5 +13,5 @@ jobs:
       run: |
         npm install jest
         npm install xmlhttprequest
-    - name: Run Jest
+    - name: Run Jest on target
       run: npm run test testing/publisher.test.js
