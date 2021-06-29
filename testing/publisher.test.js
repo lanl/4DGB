@@ -1,4 +1,3 @@
-
 const GTKPublisher = require('../src/gtk/js/GTKPublisher.js');
 const GTKAppState  = require('../src/gtk/js/GTKAppState.js');
 

@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="gentk",
-    version="0.5.3",
+    version="0.5.4",
     author="David H. Rogers",
     author_email="dhr@lanl.gov",
     description="4D Genome Toolkit.",
@@ -16,7 +16,7 @@ setuptools.setup(
         "pypac==0.15.0"
     ],
     scripts=[
-        "bin/gentk-dump"
+        "bin/gentk"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

@@ -20,6 +20,7 @@
     },
     "homepage": "https://github.com/lanl/4DGB#readme",
     "dependencies": {
+        "xmlhttprequest": "^1.8.0",
         "yarn": "^1.22.10"
     },
     "devDependencies": {
