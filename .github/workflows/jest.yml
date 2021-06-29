@@ -12,5 +12,6 @@ jobs:
     - name: Install dependencies
       run: |
         npm install jest
+        npm install xmlhttprequest
     - name: Run Jest
       run: npm run test
