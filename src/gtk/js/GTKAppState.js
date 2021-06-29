@@ -53,6 +53,7 @@ class GTKAppState extends GTKPublisher {
 
     set range( r ) {
         this._range = r; 
+        this.notify( "updated", "updated" );
     }
 
     get genes() {
@@ -61,6 +62,7 @@ class GTKAppState extends GTKPublisher {
 
     set genes( glist ) {
         this._genes = glist; 
+        this.notify( "updated", "updated" );
     }
 
     get segments() {
@@ -69,6 +71,7 @@ class GTKAppState extends GTKPublisher {
 
     set segments( slist ) {
         this._segments = slist; 
+        this.notify( "updated", "updated" );
     }
 }
 

@@ -52,8 +52,10 @@ class GTKPublisher {
     }
 
     notify( eventname, message) {
-        for (const listener of this.listeners[eventname]) {
-            listener(message)
+        if (eventname in this.listeners) {
+            for (const listener of this.listeners[eventname]) {
+                listener(message)
+            }
         }
     }
 
