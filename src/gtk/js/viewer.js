@@ -34,7 +34,28 @@ function main( project ) {
     var dset = project.getDatasets(); 
     var dataset = new GTKDataset(dset[0]);
     view = new GTKGeometryCanvas( project, dataset, "structureview" );
-    new GTKContactMapCanvas( project, dataset, "contactmapview" )
+
+    const contactMap = new GTKContactMapCanvas( project, dataset, "contactmapview" )
+
+    // Update view when selection in contact map changes
+    contactMap.onSelectionChange = function(selection) {
+        const segments = {};
+        const [ [x1,x2], [y1,y2] ] = selection; // start/end coordinates for the selection on each axis
+
+        for (let i = Math.floor(x1); i <= Math.ceil(x2); i++ ) {
+            if (!segments[i])
+                segments[i] = true;
+        }
+        for (let i = Math.floor(y1); i <= Math.ceil(y2); i++ ) {
+            if (!segments[i])
+                segments[i] = true;
+        }
+
+        const ids = Object.keys(segments).map( d => parseInt(d) );
+        view.setSegmentStates( ids, GTKSegmentState.LIVE, GTKSegmentState.GHOST );
+        view.render();
+
+    };
 }
 
 function setState() {
