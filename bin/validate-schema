@@ -14,7 +14,7 @@ if (len(sys.argv) != 2):
 else:
     project = sys.argv[1]
 
-with open("./doc/design/schema/v0.5/schema.json", "r") as sfile:
+with open("./schema/schema.json", "r") as sfile:
     schema = json.load(sfile)
 
 
