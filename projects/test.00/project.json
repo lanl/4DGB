@@ -15,7 +15,7 @@
 
 "data" : {
     "sequence": {
-        "url"  : "http://www.cnn.com",
+        "url"  : "http://www.nothing.com",
         "type" : "nothing",
         "name" : "nothing"
     },
@@ -25,14 +25,14 @@
     "hic" : [
         {
             "id"        : 0,
-            "url"       : "hic.0",
+            "url"       : "source/0/file.hic",
             "unmapped-segments": [
                             [3,5]
                         ]
         },
         {
             "id"        : 1,
-            "url"       : "hic.1",
+            "url"       : "source/1/file.hic",
             "unmapped-segments": [
                             [6,8]
                         ]
@@ -43,13 +43,15 @@
             "id"        : 0,
             "version"   : "1.0",
             "url"       : "source/0/contactmap.tsv",
-            "hic"       : 0
+            "hic"       : 0,
+            "interval"  : 200000
         },
         {
             "id"        : 1,
             "version"   : "1.0",
             "url"       : "source/1/contactmap.tsv",
-            "hic"       : 1
+            "hic"       : 1,
+            "interval"  : 200000
         }
     ],
     "structure": [
@@ -173,7 +175,7 @@
             },
             "geometry": {
                 "attributes" : {
-                    "interval" : 100000
+                    "interval" : 200000
                 },
                 "colormap" : {
                     "name" : "blackbody",
