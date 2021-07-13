@@ -75,7 +75,7 @@ class GTKGeometryCanvas {
         // gtkroot.appendChild(groot);
 
         var contdiv = document.createElement("div");
-        contdiv.className = "gtkgeometrycontainer";
+        contdiv.className = "gtkviewcontainer";
         gtkroot.appendChild(contdiv);
 
         var canvas_idstring = "gtkgeometry-" + this.dataset.id.toString();

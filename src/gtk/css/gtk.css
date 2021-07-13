@@ -70,7 +70,17 @@ div.gtk { padding: 5px;
 }
 
 .gtkviewcontainer {
-    padding: 5px;
+    position: relative;
+    margin: 5px;
+    line-height: 0;
+}
+
+.gtkoverlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 }
 
 .gtkchartlistcharts {
@@ -97,7 +107,7 @@ div.gtk { padding: 5px;
     height: 500px;
 }
 
-.gtkgeometrycanvas {
+.gtkgeometrycanvas, .gtkviewcanvas {
     border: 1px solid black;
 }
 
