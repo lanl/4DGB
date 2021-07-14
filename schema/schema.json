@@ -106,8 +106,8 @@
                         "description": "a name",
                         "type": "string"
                     },
-                    "attribution": {
-                        "description": "attribution of the data",
+                    "citation": {
+                        "description": "citation of the data",
                         "type": "string"
                     },
                     "license": {
@@ -139,8 +139,8 @@
                         "description": "license for using the data",
                         "type": "string"
                     },
-                    "attribution": {
-                        "description": "attribution for the data",
+                    "citation": {
+                        "description": "citation for the data",
                         "type": "string"
                     },
                     "description": {
