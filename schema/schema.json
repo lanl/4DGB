@@ -75,6 +75,11 @@
                 "description" : "The time the project was created",
                 "type" : "string",
                 "format" : "date-time"
+            },
+            "updated" : {
+                "description" : "The last time the project was updated",
+                "type" : "string",
+                "format" : "date-time"
             }
         },
         "required": ["name", "creator", "created"],
@@ -101,6 +106,14 @@
                         "description": "a name",
                         "type": "string"
                     },
+                    "attribution": {
+                        "description": "attribution of the data",
+                        "type": "string"
+                    },
+                    "license": {
+                        "description": "license for using the data",
+                        "type": "string"
+                    },
                     "description": {
                         "description": "a description of the data",
                         "type": "string"
@@ -121,6 +134,14 @@
                         "description": "path to the data",
                         "type": "string",
                         "format": "uri"
+                    },
+                    "license": {
+                        "description": "license for using the data",
+                        "type": "string"
+                    },
+                    "attribution": {
+                        "description": "attribution for the data",
+                        "type": "string"
                     },
                     "description": {
                         "description": "a description of the data",
