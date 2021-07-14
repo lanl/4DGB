@@ -1,6 +1,7 @@
 .DS_Store
 release/
 projects/test.01/
+projects/test.02/
 projects/test.00/generated/
 __pycache__/
 venv/
