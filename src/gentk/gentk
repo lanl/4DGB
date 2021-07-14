@@ -13,7 +13,6 @@ import gentk
 # ----------------------------------------------------------------------------
 
 def dump(args):
-    print(args)
     with open("{}/project.json".format(args.project), "r") as pfile:
         pdata = json.load(pfile) 
 
@@ -23,7 +22,6 @@ def dump(args):
             print("    {}:".format(d["name"]))
 
 def client(args):
-    print(args)
     client = gentk.client.client(args.url, args.port)
     client.project = args.project 
 
