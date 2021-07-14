@@ -209,21 +209,22 @@ if jsondata["data"]["annotations"]["url"] != "None":
         for l in indata:
             v = re.split(r'\t+', l) 
             # check the type
-            if (v[2] == "gene"):
-                names = v[8].split(";")
-                geneID   = names[0].split("=")
-                geneid   = names[1].split("=")
-                genetype = names[2].split("=")
-                genename = names[3].split("=")
-                length = int(v[4]) - int(v[3])
-                # print("ID:{}\ngene_id:{}\ngene_type:{}\ngene_name:{}\n".format(geneID[1], geneid[1], genetype[1], genename[1] ))
-                # print("ID:{}\nstart:{}\nend:{}".format(genename, v[3], v[4]))
-                if False:
-                    if (int(v[3]) > limit):
-                        print("ERROR in start: {}".format(v[3]))
-                    if (int(v[4]) > limit):
-                        print("ERROR in end:  {}".format(v[4]))
-                c.execute(insert, [v[3], v[4], length, geneID[1], geneid[1], genetype[1], genename[1]] )
+            if (len(v) > 1):
+                if (v[2] == "gene"):
+                    names = v[8].split(";")
+                    geneID   = names[0].split("=")
+                    geneid   = names[1].split("=")
+                    genetype = names[2].split("=")
+                    genename = names[3].split("=")
+                    length = int(v[4]) - int(v[3])
+                    # print("ID:{}\ngene_id:{}\ngene_type:{}\ngene_name:{}\n".format(geneID[1], geneid[1], genetype[1], genename[1] ))
+                    # print("ID:{}\nstart:{}\nend:{}".format(genename, v[3], v[4]))
+                    if False:
+                        if (int(v[3]) > limit):
+                            print("ERROR in start: {}".format(v[3]))
+                        if (int(v[4]) > limit):
+                            print("ERROR in end:  {}".format(v[4]))
+                    c.execute(insert, [v[3], v[4], length, geneID[1], geneid[1], genetype[1], genename[1]] )
 else:
     print("No annotation data")
 
