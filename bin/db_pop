@@ -5,6 +5,7 @@ import re
 import os 
 import json
 import sys
+from math import nan
 
 #
 # handle command line arguments
@@ -140,6 +141,10 @@ for contact_map in jsondata["data"]["md-contact-map"]:
     with open(infile, 'r') as indata:
         for l in indata:
             columns = l.split("\t")
+            try:
+                columns[2] = float(columns[2])
+            except ValueError:
+                columns[2] = nan
             c.execute(insert, [map_id, *columns])
 
 # ---------------------------------------------------------------------------
