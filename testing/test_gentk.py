@@ -23,6 +23,7 @@ def test_genes():
 
 def test_genes_for_segment():
     result = client.get_genes_for_segment(0,1)
+    print(result)
     ogResult = []
     assert (result['genes'] == ogResult)
     
