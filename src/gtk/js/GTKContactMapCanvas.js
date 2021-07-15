@@ -98,14 +98,19 @@ class GTKContactMapCanvas {
         gtkroot.appendChild(this.contdiv);
 
         // Dimensions
+
+        /**
+         * Display options for the canvas (as defined in the project configuration)
+         */
+        this.displayOpts = project.getApplicationData("gtk")["contactmapcanvas"];
+
         /**
          * Margins separating the canvas from the edges of the widget
          * (the axes are placed in these margins)
          */
         this.margin = { top: 25, right: 25, bottom: 25, left: 25 };
-        const geom = project.getApplicationData("gtk")["geometrycanvas"];
-        this.margin.innerWidth  = geom["width"]  - ( this.margin.left + this.margin.right  );
-        this.margin.innerHeight = geom["height"] - ( this.margin.top  + this.margin.bottom );
+        this.margin.innerWidth  = this.displayOpts["width"]  - ( this.margin.left + this.margin.right  );
+        this.margin.innerHeight = this.displayOpts["height"] - ( this.margin.top  + this.margin.bottom );
 
         /**
          * A d3 selection of the large SVG container.
@@ -115,8 +120,8 @@ class GTKContactMapCanvas {
          * will expand to match this SVG's width and height.
          */
         this.baseSVG = d3.create('svg')
-            .attr('width',  geom["width"] )
-            .attr('height', geom["height"]);
+            .attr('width',  this.displayOpts["width"] )
+            .attr('height', this.displayOpts["height"]);
         this.contdiv.appendChild(this.baseSVG.node());
 
         // Sets CSS attributes on a selection to make it work
@@ -376,10 +381,12 @@ class GTKContactMapCanvas {
     _renderToImageData(cm) {
         const pixels = new Uint8ClampedArray(cm.data.length * 4);
 
+        const magnification = this.displayOpts["magnify"] || 1;
+
         for (let i = 0; i < pixels.length; i+= 4) {
             const val = cm.data[i/4];
 
-            const normalized = (val - cm.minValue) / (cm.maxValue - cm.minValue);
+            const normalized = (val - cm.minValue) / (cm.maxValue - cm.minValue) * magnification;
 
             // color scale from white to red
             pixels[i]   = 255;                // red

@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Localhost",
+            "name": "test.00",
             "type": "firefox",
             "request": "launch",
             "reAttach": true,
@@ -13,5 +13,14 @@
             "clearConsoleOnReload": true,
             "webRoot": "${workspaceFolder}/src/"
         },
+        {
+            "name": "test.01",
+            "type": "firefox",
+            "request": "launch",
+            "reAttach": true,
+            "url": "http://localhost:8000/viewer.html?gtkproject=test.01",
+            "clearConsoleOnReload": true,
+            "webRoot": "${workspaceFolder}/src/"
+        }
     ]
 }

@@ -148,6 +148,10 @@
             "name": "viewer",
             "version" : "0.5"
         },
+        "contactmapcanvas": {
+            "width": 500,
+            "height": 500
+        },
         "geometrycanvas" : {
             "width":  600, 
             "height": 500,
