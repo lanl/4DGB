@@ -2,6 +2,8 @@ import bbi
 import yaml
 import sys
 
+from math import nan
+
 from flask import Flask, request, jsonify, render_template, url_for
 from flask_restful import Resource, Api
 from sqlalchemy import create_engine
@@ -124,7 +126,7 @@ def ContactMap(identifier):
         data.append({
             'x': int(c[0]),
             'y': int(c[1]),
-            'value': float(c[2])
+            'value': None if c[2] is None else float(c[2])
         })
 
     return jsonify({ 'contacts': data })
