@@ -1,0 +1,4 @@
+./bin/gentk query --url http://127.0.0.1 --port 8001 --project test.01 --type structure --values 0
+./bin/gentk query --url http://127.0.0.1 --port 8001 --project test.01 --type genes
+./bin/gentk query --url http://127.0.0.1 --port 8001 --project test.01 --type segments-for-gene --values 0 Gm1993
+./bin/gentk query --url http://127.0.0.1 --port 8001 --project test.01 --type genes-for-segment --values 0 100

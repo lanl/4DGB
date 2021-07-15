@@ -212,24 +212,35 @@ if jsondata["data"]["annotations"]["url"] != "None":
     print("Creating genes table ...")
     with open(infile, 'r') as indata:
         for l in indata:
-            v = re.split(r'\t+', l) 
+            data = l.strip()
+            v = re.split(r'\t+', data) 
+
+            # TODO: check the version of the file
+            #       this works on version 3 of the format
+
             # check the type
             if (len(v) > 1):
                 if (v[2] == "gene"):
-                    names = v[8].split(";")
-                    geneID   = names[0].split("=")
-                    geneid   = names[1].split("=")
-                    genetype = names[2].split("=")
-                    genename = names[3].split("=")
-                    length = int(v[4]) - int(v[3])
-                    # print("ID:{}\ngene_id:{}\ngene_type:{}\ngene_name:{}\n".format(geneID[1], geneid[1], genetype[1], genename[1] ))
-                    # print("ID:{}\nstart:{}\nend:{}".format(genename, v[3], v[4]))
+                    # print(l)
+                    pairs = v[8].split(";")
+                    values = {}
+                    for p in pairs:
+                        (key, value) = p.split("=")
+                        values[key] = value
+                        
+                    # check for possible errors
+                    # this is obsolete, but is left in as a reminder that checks on data
+                    # should be integrated into this process
                     if False:
                         if (int(v[3]) > limit):
                             print("ERROR in start: {}".format(v[3]))
                         if (int(v[4]) > limit):
                             print("ERROR in end:  {}".format(v[4]))
-                    c.execute(insert, [v[3], v[4], length, geneID[1], geneid[1], genetype[1], genename[1]] )
+
+                    # insert the data into the table
+                    length = int(v[4]) - int(v[3])
+                    c.execute(insert, [v[3], v[4], length, values["ID"], values["gene_id"], values["biotype"], values["Name"]] ) 
+
 else:
     print("No annotation data")
 
