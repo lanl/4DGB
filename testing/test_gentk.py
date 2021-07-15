@@ -2,7 +2,7 @@ import gentk
 
 client = gentk.client.client("http://127.0.0.1", "8000")
 client.project = "test.00"
-#test
+
 '''
 def test_segments():
     gold = {'end': [0.0, 0.0, 0.0], 
@@ -17,10 +17,8 @@ def test_segments():
 def test_genes(): 
     
     result = client.get_genes()
-    print(result)
-    assert(False)
-    #ogResult = ""
-    #assert (result == ogResult) 
+    ogResult = '1700011M02Rik'
+    assert (result['genes'][0] == ogResult) 
 
 '''
 def test_genes_for_segment():
