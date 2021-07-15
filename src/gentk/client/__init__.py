@@ -43,6 +43,16 @@ class client:
 
         return jdata
 
+    def get_epigenetics(self, eid):
+        # respect local proxy settings
+        session = PACSession()
+
+        # get the data from the server
+        response = session.get('{}:{}/data/epigenetics/{}'.format(self.url, self.port, eid))
+        jdata = json.loads(response.text)
+
+        return jdata
+
     def get_genes(self):
         # respect local proxy settings
         session = PACSession()
