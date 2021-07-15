@@ -21,11 +21,13 @@ def dump(args):
         for d in pdata["datasets"]:
             print("    {}:".format(d["name"]))
 
-def client(args):
+def query(args):
     client = gentk.client.client(args.url, args.port)
     client.project = args.project 
-
-    print(client.get_structure(args.structure))
+    if (args.type == 'structure'):
+        print(client.get_structure(args.value))
+    elif (args.type == 'genes'):
+        print(client.get_genes())
 
 # ----------------------------------------------------------------------------
 #
@@ -42,7 +44,7 @@ examples: \n\
     gentk dump --project some/directory\n\
        dump project information to stoud\n\
 \n\
-    gentk client --structure 0 --url 127.0.0.1 --port 8000\n\
+    gentk query --structure 0 --url 127.0.0.1 --port 8000\n\
        query a server at url:port and print structure 0\n\
 \n\
 " 
@@ -63,29 +65,40 @@ subparsers = parser.add_subparsers(title='subcommands',
                                    description='valid subcommands',
                                    help='additional help')
 
+#
+# dump
+#
 parser_dump = subparsers.add_parser('dump')
 parser_dump.add_argument(   "--project", 
                             required=True,
                             help="input project file") 
 parser_dump.set_defaults(func=dump)
 
-parser_server = subparsers.add_parser('server')
+#
+# query
+#
+parser_query = subparsers.add_parser('query')
 
-parser_server.add_argument( "--port", 
+parser_query.add_argument(  "--port", 
                             required=True,
                             help="server port") 
  
-parser_server.add_argument( "--project", 
+parser_query.add_argument(  "--project", 
                             required=True,
                             help="project for this operation") 
  
-parser_server.add_argument( "--structure", 
-                            help="structure id") 
+parser_query.add_argument(  '--type',
+                            nargs='?',
+                            choices=['structure', 'genes'],
+                            help='type of query')
+
+parser_query.add_argument(  "--value", 
+                            help="value for the query") 
  
-parser_server.add_argument( "--url", 
+parser_query.add_argument( "--url", 
                             required=True,
                             help="server url") 
-parser_server.set_defaults(func=client)
+parser_query.set_defaults(func=query)
 
 args = parser.parse_args()
 args.func(args)
