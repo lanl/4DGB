@@ -153,8 +153,23 @@ div.gtk { padding: 5px;
     padding-right:  5px;
     padding-bottom: 10px;
     padding-left:   0px;
-}
+} 
 
 .gtkbodytable {
     font-size: 20px;
+}
+
+.gtkviewcontainer .zoomsvg {
+    border-style: solid;
+    transition: border-color 0.2s;
+}
+
+.gtkviewcontainer .zoomsvg[pointer-events=none] {
+    border-color: transparent;
+    cursor: grab;
+}
+
+.gtkviewcontainer .zoomsvg[pointer-events=all] {
+    border-color: steelblue;
+    cursor: grab;
 }

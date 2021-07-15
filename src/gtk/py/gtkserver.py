@@ -33,21 +33,9 @@ db_connect = create_engine(data["db_connect"])
 app = Flask(__name__)
 api = Api(app)
 
-#
-#
-#
-@app.route('/epigenetics/segments/values/<identifier>')
-def EpigeneticsSegmentValues(identifier):
-    conn  = db_connect.connect()
-    query = conn.execute("SELECT segid, \"{}\" FROM epigenetics WHERE \"{}\" IS NOT Null ORDER BY segid".format(identifier, identifier))
-    data  = []
-    for b in query.cursor.fetchall():
-        data.append({ 
-                        'segid' : int(b[0]),
-                        'value' : float(b[1])
-                    })
-
-    return jsonify({ 'epigenetics': data })
+# ------------------------------------------------------------------------------------------------
+# CALLS TO BE DEPRICATED (I THINK)
+# ------------------------------------------------------------------------------------------------
 
 @app.route('/segepi/<identifier>/<state>')
 def SegmentEpigeneticsData(identifier, state):
@@ -58,6 +46,10 @@ def SegmentEpigeneticsData(identifier, state):
         data.append(b[0])
 
     return jsonify({'data': data})
+
+# ------------------------------------------------------------------------------------------------
+# CALLS TO BE UPDATED
+# ------------------------------------------------------------------------------------------------
 
 @app.route('/bbi/<state>/<ID>/<chrom>/<begin>/<end>')
 def BBIQuery(state, ID, chrom, begin, end):
@@ -93,6 +85,22 @@ def home():
 @app.route('/<path:path>')
 def root(path):
     return app.send_static_file(path)
+
+#
+# return the epigenetics data for a segment
+#
+@app.route('/data/epigenetics/<identifier>')
+def EpigeneticsSegmentValues(identifier):
+    conn  = db_connect.connect()
+    query = conn.execute("SELECT segid, \"{}\" FROM epigenetics WHERE \"{}\" IS NOT Null ORDER BY segid".format(identifier, identifier))
+    data  = []
+    for b in query.cursor.fetchall():
+        data.append({ 
+                        'segment' : int(b[0]),
+                        'value' : float(b[1])
+                    })
+
+    return jsonify({ 'epigenetics': data })
 
 #
 # return the segments of a structure

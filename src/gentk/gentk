@@ -36,6 +36,9 @@ def query(args):
     elif (args.type == 'segments-for-gene'):
         print(client.get_segments_for_gene(args.values[0], args.values[1]))
 
+    elif (args.type == 'epigenetics'):
+        print(client.get_epigenetics(args.values[0]))
+
 # ----------------------------------------------------------------------------
 #
 # parse command line options
@@ -96,7 +99,7 @@ parser_query.add_argument(  "--project",
  
 parser_query.add_argument(  '--type',
                             nargs='?',
-                            choices=['structure', 'genes', 'genes-for-segment', 'segments-for-gene'],
+                            choices=['epigenetics', 'genes', 'genes-for-segment', 'segments-for-gene', 'structure'],
                             help='type of query')
 
 parser_query.add_argument(  "--values", 
