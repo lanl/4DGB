@@ -3,7 +3,7 @@ import gentk
 client = gentk.client.client("http://127.0.0.1", "8000")
 client.project = "test.00"
 
-'''
+
 def test_segments():
     gold = {'end': [0.0, 0.0, 0.0], 
             'length': 200000, 
@@ -33,7 +33,7 @@ def test_segments_for_gene():
     assert(False)
     ogResult = ""
     assert (result == ogResult) 
-
+'''
 
  
 
