@@ -33,9 +33,9 @@ db_connect = create_engine(data["db_connect"])
 app = Flask(__name__)
 api = Api(app)
 
-#
-#
-#
+# ------------------------------------------------------------------------------------------------
+# CALLS TO BE DEPRICATED (I THINK)
+# ------------------------------------------------------------------------------------------------
 
 @app.route('/segepi/<identifier>/<state>')
 def SegmentEpigeneticsData(identifier, state):
@@ -46,6 +46,10 @@ def SegmentEpigeneticsData(identifier, state):
         data.append(b[0])
 
     return jsonify({'data': data})
+
+# ------------------------------------------------------------------------------------------------
+# CALLS TO BE UPDATED
+# ------------------------------------------------------------------------------------------------
 
 @app.route('/bbi/<state>/<ID>/<chrom>/<begin>/<end>')
 def BBIQuery(state, ID, chrom, begin, end):

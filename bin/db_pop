@@ -66,6 +66,18 @@ c.execute('''DROP TABLE IF EXISTS project''')
     # create the table 
 c.execute('''CREATE TABLE project (name TEXT, title TEXT, num_segments INT)''')
 
+# ---------------------------------------------------------------------------
+# DATASETS table 
+# ---------------------------------------------------------------------------
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS datasets''')
+    # create the table 
+c.execute('''CREATE TABLE datasets (ID TEXT, name TEXT, epigenetics TEXT, structure TEXT)''')
+insert = '''INSERT INTO datasets (ID,name,epigenetics,structure) values(?,?,?,?)'''
+print("Creating datasets table ...")
+for d in jsondata["datasets"]:
+    c.execute(insert, [d["id"], d["name"], d["epigenetics"], 
+        "{},{},{}".format(d["structure"]["id"], d["structure"]["hic"], d["structure"]["md-contact-map"])]) 
 
 # ---------------------------------------------------------------------------
 # STRUCTURE table
