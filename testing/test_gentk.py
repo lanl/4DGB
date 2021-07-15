@@ -17,7 +17,7 @@ def test_segments():
 def test_genes(): 
     
     result = client.get_genes()
-    ogResult = '1700011M02Rik'
+    ogResult = '1700011M02Rik1'
     assert (result['genes'][0] == ogResult) 
 
 '''
