@@ -25,9 +25,16 @@ def query(args):
     client = gentk.client.client(args.url, args.port)
     client.project = args.project 
     if (args.type == 'structure'):
-        print(client.get_structure(args.value))
+        print(client.get_structure(args.values[0]))
+
     elif (args.type == 'genes'):
         print(client.get_genes())
+
+    elif (args.type == 'genes-for-segment'):
+        print(client.get_genes_for_segment(args.values[0], args.values[1]))
+
+    elif (args.type == 'segments-for-gene'):
+        print(client.get_segments_for_gene(args.values[0], args.values[1]))
 
 # ----------------------------------------------------------------------------
 #
@@ -89,11 +96,12 @@ parser_query.add_argument(  "--project",
  
 parser_query.add_argument(  '--type',
                             nargs='?',
-                            choices=['structure', 'genes'],
+                            choices=['structure', 'genes', 'genes-for-segment', 'segments-for-gene'],
                             help='type of query')
 
-parser_query.add_argument(  "--value", 
-                            help="value for the query") 
+parser_query.add_argument(  "--values", 
+                            nargs='+',
+                            help="values for the query") 
  
 parser_query.add_argument( "--url", 
                             required=True,
