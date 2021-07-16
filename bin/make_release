@@ -65,8 +65,7 @@ cp -rf ../../../src/gentk .
 mv gentk/setup.py .
 mv gentk/readme.md . 
 mv gentk/requirements.txt . 
-mkdir bin
-mv gentk/gentk bin
+mv gentk/genex .
 python setup.py sdist
 echo "    to upload python module: twine upload dist/*"
 echo "    or: twine upload --repository testpypi dist/"

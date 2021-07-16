@@ -162,17 +162,23 @@ def GenesForSegment(structureid, segmentid):
     # find all genes that intersect with this segment
     conn = db_connect.connect()
     query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, segmentid)
-    results = query.cursor.fetchone()
-    b_start = results[0]
-    b_end   = results[1]
+    results = query.cursor.fetchall()
 
-    query = conn.execute("SELECT gene_name from genes WHERE \
-                              ( start BETWEEN ? AND ? ) OR ( end BETWEEN ? AND ? ) OR \
-                              ( start < ? AND end > ? ) ORDER BY gene_name", 
-                              b_start, b_end, b_start, b_end, b_start, b_end)
+    # if the result returns nothing, we return an empty genes list
     genes = []
-    for g in query.cursor.fetchall():
-        genes.append(g[0])
+
+    # query and create a list of genes 
+    if (len(results) != 0):
+        seg_start = results[0][0]
+        seg_end   = results[0][1]
+
+        query = conn.execute("SELECT gene_name from genes WHERE \
+                                ( start BETWEEN ? AND ? ) OR ( end BETWEEN ? AND ? ) OR \
+                                ( start < ? AND end > ? ) ORDER BY gene_name", 
+                                seg_start, seg_end, seg_start, seg_end, seg_start, seg_end)
+
+        for g in query.cursor.fetchall():
+            genes.append(g[0])
 
     return jsonify({'genes': genes})
     
