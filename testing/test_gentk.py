@@ -23,24 +23,27 @@ def test_genes():
 def test_genes_for_segment():
     tests = [
                 {
-                    'note'    : 'Edge test: first segment is 1. Should return empty list',
-                    'segment' : 0,
-                    'gold'    : []
+                    'note'      : 'Edge test: first segment is 1. Should return empty list',
+                    'segment'   : 0,
+                    'structure' : 0,
+                    'gold'      : []
                 },
                 {
-                    'note'    : 'correct query',
-                    'segment' : 8,
-                    'gold'    : ['Btbd35f23', 'Btbd35f24']
+                    'note'      : 'correct query',
+                    'segment'   : 8,
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f23', 'Btbd35f24']
                 },
                 {
-                    'note'    : 'Edge test: last segment is < 10000. Should return empty list',
-                    'segment' : 10000,
-                    'gold'    : []
+                    'note'      : 'Edge test: last segment is < 10000. Should return empty list',
+                    'segment'   : 10000,
+                    'structure' : 0,
+                    'gold'      : []
                 }
             ]
 
     for t in tests:
-        result = client.get_genes_for_segment(0,t["segment"])
+        result = client.get_genes_for_segment(t["structure"], t["segment"])
         assert (result['genes'] == t["gold"])
     
 
