@@ -45,14 +45,14 @@
             "version"   : "1.0",
             "url"       : "source/0/contactmap.tsv",
             "hic"       : 0,
-            "interval"  : 200000
+            "interval"  : 400000
         },
         {
             "id"        : 1,
             "version"   : "1.0",
             "url"       : "source/1/contactmap.tsv",
             "hic"       : 1,
-            "interval"  : 200000
+            "interval"  : 400000
         }
     ],
     "structure": [
@@ -65,7 +65,7 @@
                 "version" : "0.1"
             },
             "md-contact-map" : 0,
-            "interval" : 200000
+            "interval" : 400000
         },
         {
             "id": 1,
@@ -76,7 +76,7 @@
                 "version" : "0.1"
             },
             "md-contact-map" : 1,
-            "interval" : 200000
+            "interval" : 400000
         }
     ],
     "epigenetics": [
@@ -180,7 +180,7 @@
             },
             "geometry": {
                 "attributes" : {
-                    "interval" : 200000
+                    "interval" : 400000
                 },
                 "colormap" : {
                     "name" : "blackbody",
