@@ -3,6 +3,7 @@ import gentk
 client = gentk.client.client("http://127.0.0.1", "8000")
 client.project = "test.00"
 
+
 def test_segments():
     gold = {'end': [0.0, 0.0, 0.0], 
             'length': 400000, 
@@ -58,4 +59,9 @@ def test_segments_for_gene():
     result2 = client.get_segments_for_gene(0, 'Btbd35f24')
     ogResult2 = 8
     assert (result2['segments'][0] == ogResult2) 
+
+def test_get_segment_array():
+    gold = {'array': [{'segment': 1, 'value': 0.1}, {'segment': 2, 'value': 0.2}, {'segment': 3, 'value': 0.3}, {'segment': 4, 'value': 0.4}, {'segment': 5, 'value': 0.5}, {'segment': 6, 'value': 0.6}, {'segment': 7, 'value': 0.7}, {'segment': 8, 'value': 0.8}, {'segment': 9, 'value': 0.9}, {'segment': 10, 'value': 0.1}, {'segment': 11, 'value': 0.11}], 'type': 'epigenetics'}
+
+    assert(client.get_segment_array('epigenetics', 0) == gold)
 

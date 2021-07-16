@@ -87,20 +87,24 @@ def root(path):
     return app.send_static_file(path)
 
 #
-# return the epigenetics data for a segment
+# return a data array defined on the segments 
 #
-@app.route('/data/epigenetics/<identifier>')
-def EpigeneticsSegmentValues(identifier):
+@app.route('/data/segment-array/<arraytype>/<arrayID>')
+def GetSegmentArray(arraytype, arrayID):
     conn  = db_connect.connect()
-    query = conn.execute("SELECT segid, \"{}\" FROM epigenetics WHERE \"{}\" IS NOT Null ORDER BY segid".format(identifier, identifier))
     data  = []
-    for b in query.cursor.fetchall():
-        data.append({ 
-                        'segment' : int(b[0]),
-                        'value' : float(b[1])
-                    })
 
-    return jsonify({ 'epigenetics': data })
+    # for now, this only works for epigenetics data
+    # a redesign is required for this to be more general
+    if (arraytype == "epigenetics"):
+        query = conn.execute("SELECT segid, \"{}\" FROM epigenetics WHERE \"{}\" IS NOT Null ORDER BY segid".format(arrayID, arrayID))
+        for b in query.cursor.fetchall():
+            data.append({ 
+                            'segment' : int(b[0]),
+                            'value' : float(b[1])
+                        })
+
+    return jsonify({ 'array': data, 'type' : arraytype })
 
 #
 # return the segments of a structure
