@@ -28,10 +28,13 @@ def test_genes_for_segment():
 
 
 def test_segments_for_gene():
+    #test1
     result = client.get_segments_for_gene(0, 'Btbd35f23')
-    result2 = client.get_segments_for_gene(0, 'Btbd35f24')
     ogResult = 8
-    ogResult2 = 8
     assert (result['segments'][0] == ogResult) 
+
+    #test2
+    result2 = client.get_segments_for_gene(0, 'Btbd35f24')
+    ogResult2 = 8
     assert (result2['segments'][0] == ogResult2) 
 
