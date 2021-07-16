@@ -21,9 +21,27 @@ def test_genes():
 
 
 def test_genes_for_segment():
-    result = client.get_genes_for_segment(0,8)
-    ogResult = ['Btbd35f23', 'Btbd35f24']
-    assert (result['genes'] == ogResult)
+    tests = [
+                {
+                    'note'    = 'edge test: first segment is 1',
+                    'segment' = [0],
+                    'gold'    = []
+                },
+                {
+                    'note'    = 'correct query',
+                    'segment' = [8],
+                    'gold'    = ['Btbd35f23', 'Btbd35f24']
+                },
+                {
+                    'note'    = 'edge test: last segment is < 10000',
+                    'segment' = [10000],
+                    'gold'    = []
+                }
+            ]
+
+    for t in tests:
+        result = client.get_genes_for_segment(0,t["segment"])
+        assert (result['genes'] == t["gold"])
     
 
 
