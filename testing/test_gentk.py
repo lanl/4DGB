@@ -23,10 +23,8 @@ def test_genes():
 
 def test_genes_for_segment():
     result = client.get_genes_for_segment(0,8)
-    print(result)
-    assert(False) 
-    ogResult = []
-    assert (result['genes'] == ogResult)
+    ogResult = 'Btbd35f23'
+    assert (result['genes'][0] == ogResult)
     
 '''
 
