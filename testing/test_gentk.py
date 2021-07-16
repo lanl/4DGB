@@ -23,7 +23,7 @@ def test_genes():
 def test_genes_for_segment():
     tests = [
                 {
-                    'note'    : 'edge test: first segment is 1',
+                    'note'    : 'Edge test: first segment is 1. Should return empty list',
                     'segment' : [0],
                     'gold'    : []
                 },
@@ -33,7 +33,7 @@ def test_genes_for_segment():
                     'gold'    : ['Btbd35f23', 'Btbd35f24']
                 },
                 {
-                    'note'    : 'edge test: last segment is < 10000',
+                    'note'    : 'Edge test: last segment is < 10000. Should return empty list',
                     'segment' : [10000],
                     'gold'    : []
                 }
