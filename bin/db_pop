@@ -65,6 +65,8 @@ c.execute('''INSERT INTO gtk (version) VALUES(?)''', [gtkversion])
 c.execute('''DROP TABLE IF EXISTS project''')
     # create the table 
 c.execute('''CREATE TABLE project (name TEXT, title TEXT, num_segments INT)''')
+print("Creating project table ...")
+print("")
 
 # ---------------------------------------------------------------------------
 # DATASETS table 
@@ -76,8 +78,8 @@ c.execute('''CREATE TABLE datasets (ID TEXT, name TEXT, epigenetics TEXT, struct
 insert = '''INSERT INTO datasets (ID,name,epigenetics,structure) values(?,?,?,?)'''
 print("Creating datasets table ...")
 for d in jsondata["datasets"]:
-    c.execute(insert, [d["id"], d["name"], d["epigenetics"], 
-        "{},{},{}".format(d["structure"]["id"], d["structure"]["hic"], d["structure"]["md-contact-map"])]) 
+    c.execute(insert, [d["id"], d["name"], d["epigenetics"], d["structure"]["id"]]) 
+print("")
 
 # ---------------------------------------------------------------------------
 # STRUCTURE table
@@ -130,6 +132,8 @@ for geom in jsondata["data"]["structure"]:
     center = [ (new[0]+first[8])/2.0, (new[1]+first[9])/2.0, (new[2]+first[10])/2.0 ]
     c.execute("update structure set startx = {}, starty = {}, startz = {}, centerx = {}, centery = {}, centerz = {} where segid == 1 AND structureid == {}".format(new[0], new[1], new[2], center[0], center[1], center[2], geom["id"]))
 
+print("")
+
 # ---------------------------------------------------------------------------
 # end of STRUCTURE table 
 # ---------------------------------------------------------------------------
@@ -158,6 +162,7 @@ for contact_map in jsondata["data"]["md-contact-map"]:
             except ValueError:
                 columns[2] = nan
             c.execute(insert, [map_id, *columns])
+print("")
 
 # ---------------------------------------------------------------------------
 # end of CONTACTS table
