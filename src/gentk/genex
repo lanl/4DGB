@@ -24,7 +24,10 @@ def dump(args):
 def query(args):
     client = gentk.client.client(args.url, args.port)
     client.project = args.project 
-    if (args.type == 'structure'):
+    if (args.type == 'array'):
+        print(client.get_array(args.values[0]))
+
+    elif (args.type == 'structure'):
         print(client.get_structure(args.values[0]))
 
     elif (args.type == 'genes'):
@@ -99,7 +102,7 @@ parser_query.add_argument(  "--project",
  
 parser_query.add_argument(  '--type',
                             nargs='?',
-                            choices=['genes', 'genes-for-segment', 'segment-array', 'segments-for-gene', 'structure'],
+                            choices=['array', 'genes', 'genes-for-segment', 'segment-array', 'segments-for-gene', 'structure'],
                             help='type of query')
 
 parser_query.add_argument(  "--values", 

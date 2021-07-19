@@ -85,3 +85,13 @@ class client:
         jdata = json.loads(response.text)
 
         return jdata
+
+    def get_array(self, arrayID):
+        # respect local proxy settings
+        session = PACSession()
+
+        # get the data from the server
+        response = session.get('{}:{}/data/array/{}'.format(self.url, self.port, arrayID))
+        jdata = json.loads(response.text)
+
+        return jdata

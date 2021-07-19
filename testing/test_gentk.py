@@ -20,6 +20,30 @@ def test_genes():
     ogResult = '1700011M02Rik'
     assert (result['genes'][0] == ogResult) 
 
+def test_array():
+    tests = [
+                {
+                    'note'  : 'Edge test: first segment is 0. Should return empty dict',
+                    'id'    : -1,
+                    'gold'  : {}
+                },
+                {
+                    'note'  : 'correct query',
+                    'id'    : 0,
+                    'gold'  : [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]
+                },
+                {
+                    'note'  : 'Edge test: last array is < 10000. Should return empty dict',
+                    'id'    : 10000,
+                    'gold'  : {} 
+                }
+            ]
+
+    for t in tests:
+        result = client.get_array(t["id"])
+        assert (result['values'] == t["gold"])
+    
+
 
 def test_genes_for_segment():
     tests = [

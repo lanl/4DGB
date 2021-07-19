@@ -97,7 +97,7 @@ print("Creating structure table ...")
 for geom in jsondata["data"]["structure"]:
     infile = os.path.join( project, geom["url"])
     insert = '''INSERT INTO structure (structureid,segid,startid,endid,length,startx,starty,startz,endx,endy,endz,centerx,centery,centerz) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
-    print("reading: {}".format(infile))
+    print("    reading: {}".format(infile))
     position = 0 
         # the first position is arbitrary, and will be re-computed after all values are inserted 
     prev = [0.0, 0.0, 0.0]
@@ -139,6 +139,26 @@ print("")
 # ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
+# ARRAY table
+# ---------------------------------------------------------------------------
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS array''')
+    # create the table 
+c.execute('''CREATE TABLE array (id INT, url TEXT)''')
+
+print("Creating array table")
+if "array" in jsondata["data"]: 
+    for a in jsondata["data"]["array"]:
+        print("    loading {}".format(a["url"]))
+        c.execute('''INSERT INTO array (id,url) VALUES (?,?)''', [a["id"], a["url"]])
+
+print("")
+
+# ---------------------------------------------------------------------------
+# end of ARRAY table
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
 # CONTACTS (Hi-C) table
 # ---------------------------------------------------------------------------
 
@@ -153,7 +173,7 @@ for contact_map in jsondata["data"]["md-contact-map"]:
     infile = os.path.join( project, contact_map["url"] )
     insert = '''INSERT INTO contact (mapid,x,y,value) VALUES (?,?,?,?)'''
 
-    print("reading: {}".format(infile))
+    print("    reading: {}".format(infile))
     with open(infile, 'r') as indata:
         for l in indata:
             columns = l.split("\t")
@@ -181,8 +201,9 @@ c.execute('''DROP TABLE IF EXISTS epigenetics_desc''')
     # create the table 
 c.execute('''CREATE TABLE epigenetics_desc (eid INT, varname TEXT)''')
 
+print("Creating epigenetics table ...")
 for e in jsondata["data"]["epigenetics"]:
-    print("epigenetics: {}".format(os.path.join(project, e["summary"])))
+    print("    epigenetics: {}".format(os.path.join(project, e["summary"])))
     c.execute("ALTER TABLE epigenetics ADD COLUMN \"{}\" REAL".format(e["id"]))
     c.execute(  "INSERT INTO epigenetics_desc (eid, varname) VALUES(?,?)",
                 [e["id"], e["varname"]]
@@ -198,6 +219,7 @@ for e in jsondata["data"]["epigenetics"]:
             c.execute(  "INSERT INTO epigenetics (segid, \"{}\") VALUES(?,?)".format(e["id"]),
                         [int(values[0]), float(values[1])]
                      )
+print("")
 
 # check that the inserts happened
 # c.execute("SELECT * FROM epigenetics")
@@ -225,8 +247,8 @@ if jsondata["data"]["annotations"]["url"] != "None":
     # populate the table from a file
     infile = os.path.join( project, jsondata["data"]["annotations"]["url"])
     insert = '''INSERT INTO genes (start,end,length,gID,gene_id,gene_type,gene_name) VALUES(?,?,?,?,?,?,?)'''
-    print("Reading: {}".format(infile))
     print("Creating genes table ...")
+    print("    reading: {}".format(infile))
     with open(infile, 'r') as indata:
         for l in indata:
             data = l.strip()

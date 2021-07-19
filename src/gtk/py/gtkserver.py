@@ -7,7 +7,8 @@ from math import nan
 from flask import Flask, request, jsonify, render_template, url_for
 from flask_restful import Resource, Api
 from sqlalchemy import create_engine
-from json import dumps
+# from json import dumps
+import json
 
 data = {}
 if len(sys.argv) == 2:
@@ -85,6 +86,25 @@ def home():
 @app.route('/<path:path>')
 def root(path):
     return app.send_static_file(path)
+
+#
+# return a data array defined on the segments 
+#
+@app.route('/data/array/<arrayID>')
+def GetArray(arrayID):
+    conn  = db_connect.connect()
+    data  = []
+
+    query = conn.execute("SELECT url FROM array WHERE id == {}".format(arrayID))
+    results = query.cursor.fetchall()
+
+    array = {"name": None, "type": None, "value-type": None, "values": {}}
+    if (len(results) != 0):
+        fname = PROJECT_HOME + "/" + results[0][0]
+        with open(fname, "r") as jfile:
+            array = json.load(jfile)
+
+    return array
 
 #
 # return a data array defined on the segments 
