@@ -8,7 +8,7 @@ def test_segments():
                 {
                     'note'      : 'Edge test: first segment is 0. Should return empty list',
                     'sid'       : -1,
-                    'gold'      : []
+                    'gold'      : [],
                     'index'     : None
                 },
                 {
@@ -18,7 +18,7 @@ def test_segments():
                                    'length': 400000, 
                                    'segid': 1, 
                                    'start': [-1.0, 0.0, 0.0], 
-                                   'startid': 0}
+                                   'startid': 0},
                     'index'     : 0
                     
                 },
@@ -29,13 +29,13 @@ def test_segments():
                                    'length': 400000, 
                                    'segid': 1, 
                                    'start': [-1.0, 0.0, 0.0], 
-                                   'startid': 0}
+                                   'startid': 0},
                     'index'     : 0
                 },
                 {
                     'note'      : 'Edge test: Should return empty list',
                     'sid'       : 100,
-                    'gold'      : []
+                    'gold'      : [],
                     'index'     : None
                 }
             ]
