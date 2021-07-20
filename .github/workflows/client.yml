@@ -44,7 +44,7 @@ jobs:
         cd python
         pytest test_gentk.py 
         echo 'running javascript test'
-        sleep 5
         cd ../../..
         npm run test testing/client.test.js
+        sleep 5
         more gtkclient_genes_test.json 
