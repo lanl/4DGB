@@ -42,5 +42,5 @@ jobs:
         python gtkserver.py localhost.yaml &
         sleep 5
         echo 'running javascript test'
-        cd ../../..
+        cd ../..
         npm run test --detectOpenHandles testing/client.test.js
