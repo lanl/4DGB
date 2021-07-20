@@ -25,16 +25,27 @@ jobs:
         ./bin/make_release test.00 8000
     - name: Install dependencies
       run: |
+        echo 'installing python dependencies'
         pip install -r requirements.txt
         cd release/test.00
         python -m pip install --upgrade pip
         pip install pytest
         cd python
         pip install -r requirements.txt
+        echo ''
+        echo 'installing javascript dependencies'
+        npm install jest
+        npm install xmlhttprequest
     - name: Run the server and test with client 
       run: |
         cd release/test.00
         python gtkserver.py localhost.yaml &
         sleep 5
-        cd python
-        pytest test_gentk.py 
+        echo 'running javascript test'
+        cd ../../..
+        npm run test --detectOpenHandles testing/client.test.js
+        ls -la
+        more gtkclient_contactmap_test.json 
+        more gtkclient_genes-for-segment_test.json 
+        more gtkclient_genes_test.json 
+        more gtkclient_structure_test.json 
