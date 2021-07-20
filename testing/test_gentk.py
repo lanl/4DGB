@@ -6,7 +6,7 @@ client.project = "test.00"
 def test_segments():
     tests = [
                 {
-                    'note'      : 'Edge test: first segment is 0. Should return empty list',
+                    'note'      : 'Edge test: first segment is 0. Should return empty list', 
                     'sid'       : -1,
                     'gold'      : [],
                     'index'     : None
