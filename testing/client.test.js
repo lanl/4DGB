@@ -11,6 +11,7 @@ test('client test', () => {
     client.get_genes( (response) => {
                             var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
                             writeStream.write(JSON.stringify(response));
+                            writeStream.end();
                         });
 
     if (false) {
