@@ -11,6 +11,8 @@ def test_segments():
             'start': [-1.0, 0.0, 0.0], 
             'startid': 0}
     result = client.get_structure(0)
+    print(result)
+    assert(False)
     assert(result['segments'][0] == gold)
 
 
