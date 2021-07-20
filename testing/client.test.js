@@ -5,9 +5,10 @@ var fs = require('fs');
 test('client test', () => {
 
     // test.00
-    // client = new GTKClient("http://127.0.0.1", 8000);
+    client = new GTKClient("http://127.0.0.1", 8000);
+
     // test.01
-    client = new GTKClient("http://127.0.0.1", 8001);
+    // client = new GTKClient("http://127.0.0.1", 8001);
 
     streamname = './client_output.txt'
     var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
