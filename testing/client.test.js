@@ -23,14 +23,14 @@ test('client test', () => {
 
     client.get_structure( (response) => {
                             var streamname = "gtkclient_structure_test.json";
-                            var writeStream = fs.createWriteStream(streamname, {flags: 'a'});
+                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
                             writeStream.write(JSON.stringify(response));
                             writeStream.end();
                         }, 0);
 
     client.get_contactmap( (response) => {
                             var streamname = "gtkclient_contactmap_test.json";
-                            var writeStream = fs.createWriteStream(streamname, {flags: 'a'});
+                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
                             writeStream.write(JSON.stringify(response));
                             writeStream.end();
                         }, 0);
