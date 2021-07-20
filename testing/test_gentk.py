@@ -9,7 +9,7 @@ def test_segments():
             'segid': 1, 
             'start': [-1.0, 0.0, 0.0], 
             'startid': 0}
-    result = client.get_structure(-5)
+    result = client.get_structure(100)
     print(result)
     assert(False)
     assert(result['segments'][0] == gold)
