@@ -3,7 +3,7 @@ import gentk
 client = gentk.client.client("http://127.0.0.1", "8000")
 client.project = "test.00"
 
-def test_segments():
+def test_structure():
     tests = [
                 {
                     'note'      : 'Edge test: first segment is 0. Should return empty list', 
@@ -33,8 +33,8 @@ def test_segments():
                     'index'     : 0
                 },
                 {
-                    'note'      : 'Edge test: Should return empty list',
-                    'sid'       : 100,
+                    'note'      : 'Edge test: last segment is < 2. Should return empty list',
+                    'sid'       : 2,
                     'gold'      : [],
                     'index'     : None
                 }
@@ -42,10 +42,12 @@ def test_segments():
 
     for t in tests: 
         result = client.get_structure(t['sid'])
+        #returns a list of dictionaries 
         if t['index'] == None:
-            #edge tests
+            #empty list
             assert(result['segments'] == t['gold'])
         else:
+            #comparing a fraction of the list
             assert (result['segments'][t['index']] == t['gold'])
 
 
@@ -119,12 +121,33 @@ def test_genes_for_segment():
 
 
 def test_segments_for_gene():
-    #test1
-    result = client.get_segments_for_gene(0, 'Btbd35f23')
-    ogResult = 8
-    assert (result['segments'][0] == ogResult) 
+    tests = [
+                {
+                    'note'      : 'Edge test: first strucutre is 0. Should return empty list',
+                    'structure' : -1,
+                    'gene'      : 'Btbd35f23',
+                    'gold'      : []
+                },
+                {
+                    'note'      : 'correct strucutre',
+                    'structure' : 0,
+                    'gene'      : 'Btbd35f23',
+                    'gold'      : [8]
+                },
+                {
+                    'note'      : 'correct strucutre',
+                    'structure' : 0,
+                    'gene'      : 'Btbd35f24',
+                    'gold'      : [8]
+                },
+                {
+                    'note'      : 'Edge test: last strucutre is < 2. Should return empty list',
+                    'structure' : 2,
+                    'gene'      : 'Btbd35f24',
+                    'gold'      : []
+                }
+            ]
 
-    #test2
-    result2 = client.get_segments_for_gene(0, 'Btbd35f24')
-    ogResult2 = 8
-    assert (result2['segments'][0] == ogResult2) 
+    for t in tests:
+        result = client.get_segments_for_gene(t["structure"], t["gene"])
+        assert (result['segments'] == t["gold"])
