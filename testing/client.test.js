@@ -2,6 +2,10 @@ const GTKClient = require('../src/gtk/js/GTKClient.js');
 const GTKAppState  = require('../src/gtk/js/GTKAppState.js');
 var fs = require('fs');
 
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
 test('client test', () => {
 
     // test.00
@@ -35,6 +39,7 @@ test('client test', () => {
                             writeStream.end();
                         }, 0);
 
+    sleep(5000);
     expect(true).toBe(true);
 
 });
