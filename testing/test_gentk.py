@@ -123,25 +123,25 @@ def test_genes_for_segment():
 def test_segments_for_gene():
     tests = [
                 {
-                    'note'      : 'Edge test: first strucutre is 0. Should return empty list',
+                    'note'      : 'Edge test: first structure is 0. Should return empty list',
                     'structure' : -1,
                     'gene'      : 'Btbd35f23',
                     'gold'      : []
                 },
                 {
-                    'note'      : 'correct strucutre',
+                    'note'      : 'correct structure',
                     'structure' : 0,
                     'gene'      : 'Btbd35f23',
                     'gold'      : [8]
                 },
                 {
-                    'note'      : 'correct strucutre',
+                    'note'      : 'correct structure',
                     'structure' : 0,
                     'gene'      : 'Btbd35f24',
                     'gold'      : [8]
                 },
                 {
-                    'note'      : 'Edge test: last strucutre is < 2. Should return empty list',
+                    'note'      : 'Edge test: last structure is < 2. Should return empty list',
                     'structure' : 2,
                     'gene'      : 'Btbd35f24',
                     'gold'      : []
