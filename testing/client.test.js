@@ -14,15 +14,12 @@ test('client test', () => {
                             writeStream.end();
                         });
 
-    if (false) {
-        client.get_genes_for_segment( (response) => {
-                                var writeStream = fs.createWriteStream(streamname, {flags: 'a'});
-                                writeStream.write("call: genes for segment\n");
-                                writeStream.write(JSON.stringify(response));
-                                writeStream.write("\n");
-                                writeStream.end();
-                            }, 0, 100);
-    }
+    var streamname = "gtkclient_genes-for-segment_test.json";
+    client.get_genes_for_segment( (response) => {
+                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
+                            writeStream.write(JSON.stringify(response));
+                            writeStream.end();
+                        }, 0, 100);
 
     if (false) {
         client.get_structure( (response) => {
