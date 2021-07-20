@@ -47,4 +47,5 @@ jobs:
         cd ../../..
         npm run test testing/client.test.js
         sleep 5
+        ll
         more gtkclient_genes_test.json 
