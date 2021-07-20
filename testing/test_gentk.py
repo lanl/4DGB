@@ -42,7 +42,7 @@ def test_segments():
 
     for t in tests:
         result = client.get_structure(t['sid'])
-        if t[index] == None:
+        if t['index'] == None:
             #edge tests
             assert(result['segments'] == t['gold'])
         assert (result['segments']['index'] == t['gold'])
