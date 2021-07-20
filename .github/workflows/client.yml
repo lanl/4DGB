@@ -46,3 +46,4 @@ jobs:
         echo 'running javascript test'
         cd ../../..
         npm run test testing/client.test.js
+        more client_output.txt 
