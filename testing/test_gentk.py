@@ -4,40 +4,49 @@ client = gentk.client.client("http://127.0.0.1", "8000")
 client.project = "test.00"
 
 def test_segments():
-    gold = {'end': [0.0, 0.0, 0.0], 
-            'length': 400000, 
-            'segid': 1, 
-            'start': [-1.0, 0.0, 0.0], 
-            'startid': 0}
-    result = client.get_structure(2)
-    print(result)
-    assert(False)
-    assert(result['segments'][0] == gold)
-
-
-'''
     tests = [
                 {
                     'note'      : 'Edge test: first segment is 0. Should return empty list',
-                    'sid'       : 0,
+                    'sid'       : -1,
                     'gold'      : []
+                    'index'     : None
                 },
                 {
-                    'note'      : 'correct query',
+                    'note'      : 'structure 1',
                     'sid'       : 0,
-                    'gold'      : ['Btbd35f23', 'Btbd35f24']
+                    'gold'      : {'end': [0.0, 0.0, 0.0], 
+                                   'length': 400000, 
+                                   'segid': 1, 
+                                   'start': [-1.0, 0.0, 0.0], 
+                                   'startid': 0}
+                    'index'     : 0
+                    
                 },
                 {
-                    'note'      : 'Edge test: last segment is < 100. Should return empty list',
+                    'note'      : 'structure 2',
+                    'sid'       : 1,
+                    'gold'      : {'end': [0.0, 0.0, 0.0], 
+                                   'length': 400000, 
+                                   'segid': 1, 
+                                   'start': [-1.0, 0.0, 0.0], 
+                                   'startid': 0}
+                    'index'     : 0
+                },
+                {
+                    'note'      : 'Edge test: Should return empty list',
                     'sid'       : 100,
                     'gold'      : []
+                    'index'     : None
                 }
             ]
 
     for t in tests:
-        result = client.get_genes_for_segment(t["structure"], t["segment"])
-        assert (result['segments'][0] == t["gold"])
-'''
+        result = client.get_structure(t[sid])
+        if t[index] == None:
+            #edge tests
+            assert(result['segments'] == t['gold'])
+        assert (result['segments']['index'] == t['gold'])
+
 
 
 def test_genes(): 
