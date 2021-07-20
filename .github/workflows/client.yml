@@ -46,6 +46,5 @@ jobs:
         echo 'running javascript test'
         cd ../../..
         npm run test testing/client.test.js
-        sleep 5
-        ll
+        ls -la
         more gtkclient_genes_test.json 
