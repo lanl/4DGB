@@ -45,7 +45,8 @@ def test_segments():
         if t['index'] == None:
             #edge tests
             assert(result['segments'] == t['gold'])
-        assert (result['segments'][t['index']] == t['gold'])
+        else:
+            assert (result['segments'][t['index']] == t['gold'])
 
 
 
