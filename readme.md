@@ -1,5 +1,6 @@
 # Repository for the 4D Genome Browser project
 ![client](https://github.com/lanl/4DGB/actions/workflows/client.yml/badge.svg)
+![client-js](https://github.com/lanl/4DGB/actions/workflows/client-js.yml/badge.svg)
 ![publisher](https://github.com/lanl/4DGB/actions/workflows/publisher.yml/badge.svg)
 
 ## To run the application locally
