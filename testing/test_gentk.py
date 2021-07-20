@@ -40,7 +40,7 @@ def test_segments():
                 }
             ]
 
-    for t in tests:
+    for t in tests: 
         result = client.get_structure(t['sid'])
         if t['index'] == None:
             #edge tests
