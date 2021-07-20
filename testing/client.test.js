@@ -39,7 +39,7 @@ test('client test', () => {
                             writeStream.end();
                         }, 0);
 
-    sleep(5000);
+    // sleep(5000);
     expect(true).toBe(true);
 
 });

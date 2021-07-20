@@ -45,7 +45,7 @@ jobs:
         pytest test_gentk.py 
         echo 'running javascript test'
         cd ../../..
-        npm run test testing/client.test.js
+        npm run test --detectOpenHandles testing/client.test.js
         ls -la
         more gtkclient_contactmap_test.json 
         more gtkclient_genes-for-segment_test.json 
