@@ -49,3 +49,5 @@ jobs:
         ls -la
         more gtkclient_genes_test.json 
         more gtkclient_genes-for-segment_test.json 
+        more gtkclient_genes-structure_test.json 
+        more gtkclient_genes-contactmap_test.json 

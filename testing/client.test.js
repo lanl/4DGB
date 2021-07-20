@@ -21,25 +21,19 @@ test('client test', () => {
                             writeStream.end();
                         }, 0, 100);
 
-    if (false) {
-        client.get_structure( (response) => {
-                                var writeStream = fs.createWriteStream(streamname, {flags: 'a'});
-                                writeStream.write("call: structure\n");
-                                writeStream.write(JSON.stringify(response));
-                                writeStream.write("\n");
-                                writeStream.end();
-                            }, 0);
-    }
+    client.get_structure( (response) => {
+                            var streamname = "gtkclient_structure_test.json";
+                            var writeStream = fs.createWriteStream(streamname, {flags: 'a'});
+                            writeStream.write(JSON.stringify(response));
+                            writeStream.end();
+                        }, 0);
 
-    if (false) {
-        client.get_contactmap( (response) => {
-                                var writeStream = fs.createWriteStream(streamname, {flags: 'a'});
-                                writeStream.write("call: contactmap\n");
-                                writeStream.write(JSON.stringify(response));
-                                writeStream.write("\n");
-                                writeStream.end();
-                            }, 0);
-    }
+    client.get_contactmap( (response) => {
+                            var streamname = "gtkclient_contactmap_test.json";
+                            var writeStream = fs.createWriteStream(streamname, {flags: 'a'});
+                            writeStream.write(JSON.stringify(response));
+                            writeStream.end();
+                        }, 0);
 
     expect(true).toBe(true);
 
