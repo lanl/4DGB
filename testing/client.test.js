@@ -15,6 +15,7 @@ test('client test', () => {
                             var streamname = "gtkclient_genes_test.json";
                             var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
                             writeStream.write(JSON.stringify(response));
+                            writeStream.write("\n");
                             writeStream.end();
                         });
 
@@ -22,6 +23,7 @@ test('client test', () => {
                             var streamname = "gtkclient_genes-for-segment_test.json";
                             var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
                             writeStream.write(JSON.stringify(response));
+                            writeStream.write("\n");
                             writeStream.end();
                         }, 0, 100);
 
@@ -29,6 +31,7 @@ test('client test', () => {
                             var streamname = "gtkclient_structure_test.json";
                             var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
                             writeStream.write(JSON.stringify(response));
+                            writeStream.write("\n");
                             writeStream.end();
                         }, 0);
 
@@ -36,6 +39,7 @@ test('client test', () => {
                             var streamname = "gtkclient_contactmap_test.json";
                             var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
                             writeStream.write(JSON.stringify(response));
+                            writeStream.write("\n");
                             writeStream.end();
                         }, 0);
 
