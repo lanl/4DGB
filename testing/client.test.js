@@ -7,15 +7,15 @@ test('client test', () => {
     // test.00
     client = new GTKClient("http://127.0.0.1", 8000);
 
-    var streamname = "gtkclient_genes_test.json";
     client.get_genes( (response) => {
+                            var streamname = "gtkclient_genes_test.json";
                             var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
                             writeStream.write(JSON.stringify(response));
                             writeStream.end();
                         });
 
-    var streamname = "gtkclient_genes-for-segment_test.json";
     client.get_genes_for_segment( (response) => {
+                            var streamname = "gtkclient_genes-for-segment_test.json";
                             var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
                             writeStream.write(JSON.stringify(response));
                             writeStream.end();
