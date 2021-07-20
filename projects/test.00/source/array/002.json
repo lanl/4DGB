@@ -1,0 +1,11 @@
+{
+"name"      : "epigenetics data",
+"type"      : "structure",
+"version"   : "0.1",
+"tags"      : ["epigenetics"], 
+"data"      : {
+    "type"    : "real",
+    "dim"     : 1,
+    "values"  : [2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11]
+}
+}

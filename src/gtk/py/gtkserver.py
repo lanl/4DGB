@@ -98,33 +98,23 @@ def GetArray(arrayID):
     query = conn.execute("SELECT url FROM array WHERE id == {}".format(arrayID))
     results = query.cursor.fetchall()
 
-    array = {"name": None, "type": None, "value-type": None, "values": {}}
+    array = {
+                "name"      : None, 
+                "type"      : None, 
+                "version"   : "0.1",
+                "tags"      : [],
+                "data"      : {
+                    "type"      : None, 
+                    "dim"       : None, 
+                    "values"    : []
+                }
+            }
     if (len(results) != 0):
         fname = PROJECT_HOME + "/" + results[0][0]
         with open(fname, "r") as jfile:
             array = json.load(jfile)
 
     return array
-
-#
-# return a data array defined on the segments 
-#
-@app.route('/data/segment-array/<arraytype>/<arrayID>')
-def GetSegmentArray(arraytype, arrayID):
-    conn  = db_connect.connect()
-    data  = []
-
-    # for now, this only works for epigenetics data
-    # a redesign is required for this to be more general
-    if (arraytype == "epigenetics"):
-        query = conn.execute("SELECT segid, \"{}\" FROM epigenetics WHERE \"{}\" IS NOT Null ORDER BY segid".format(arrayID, arrayID))
-        for b in query.cursor.fetchall():
-            data.append({ 
-                            'segment' : int(b[0]),
-                            'value' : float(b[1])
-                        })
-
-    return jsonify({ 'array': data, 'type' : arraytype })
 
 #
 # return the segments of a structure

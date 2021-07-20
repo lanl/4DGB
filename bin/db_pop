@@ -189,53 +189,6 @@ print("")
 # ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
-# EPIGENETICS table
-# ---------------------------------------------------------------------------
-    # start from scratch
-c.execute('''DROP TABLE IF EXISTS epigenetics''')
-    # create the table 
-c.execute('''CREATE TABLE epigenetics (segid INT)''')
-
-    # start from scratch
-c.execute('''DROP TABLE IF EXISTS epigenetics_desc''')
-    # create the table 
-c.execute('''CREATE TABLE epigenetics_desc (eid INT, varname TEXT)''')
-
-print("Creating epigenetics table ...")
-for e in jsondata["data"]["epigenetics"]:
-    print("    epigenetics: {}".format(os.path.join(project, e["summary"])))
-    c.execute("ALTER TABLE epigenetics ADD COLUMN \"{}\" REAL".format(e["id"]))
-    c.execute(  "INSERT INTO epigenetics_desc (eid, varname) VALUES(?,?)",
-                [e["id"], e["varname"]]
-             )
-
-    with open(os.path.join(project, e["summary"]), "r") as sfile:
-        lines = sfile.readlines()
-
-        for l in lines:
-            data = l.strip()
-            values = data.split(",")
-            # print("inserting {}:({}, {})".format(e["id"], values[0], values[1]))
-            c.execute(  "INSERT INTO epigenetics (segid, \"{}\") VALUES(?,?)".format(e["id"]),
-                        [int(values[0]), float(values[1])]
-                     )
-print("")
-
-# check that the inserts happened
-# c.execute("SELECT * FROM epigenetics")
-# print([member[0] for member in c.description])
-# check that the inserts happened
-# c.execute("SELECT * FROM epigenetics_desc")
-# print([member[0] for member in c.description])
-# results = c.execute("SELECT * FROM epigenetics")
-# for e in results.fetchall(): 
-#     print(e)
-
-# ---------------------------------------------------------------------------
-# end of EPIGENETICS table 
-# ---------------------------------------------------------------------------
-
-# ---------------------------------------------------------------------------
 # GENES table
 # ---------------------------------------------------------------------------
 if jsondata["data"]["annotations"]["url"] != "None":

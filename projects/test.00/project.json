@@ -25,12 +25,20 @@
     },
     "array" : [
         {
-            "id" : 0,
-            "url" : "source/array/0.json"
+            "id"  : 0,
+            "url" : "source/array/000.json"
         },
         {
-            "id" : 1,
-            "url" : "source/array/1.json"
+            "id"  : 1,
+            "url" : "source/array/001.json"
+        },
+        {
+            "id"  : 2,
+            "url" : "source/array/002.json"
+        },
+        {
+            "id"  : 3,
+            "url" : "source/array/003.json"
         }
     ],
     "hic" : [
@@ -87,22 +95,6 @@
             },
             "md-contact-map" : 1,
             "interval" : 400000
-        }
-    ],
-    "epigenetics": [
-        {
-            "id": 0,
-            "url" : "source/0/var000.txt",
-            "varname" : "var00",
-            "description" : "here is a description",
-            "summary" : "source/0/000.csv"
-        },
-        {
-            "id": 1,
-            "url" : "source/1/var001.txt",
-            "varname" : "var01",
-            "description" : "here is a description",
-            "summary" : "source/1/001.csv"
         }
     ]
 },

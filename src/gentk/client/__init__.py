@@ -43,19 +43,6 @@ class client:
 
         return jdata
 
-    #
-    # get an array of data that is defined on the segments
-    #
-    def get_segment_array(self, arraytype, arrayID):
-        # respect local proxy settings
-        session = PACSession()
-
-        # get the data from the server
-        response = session.get('{}:{}/data/segment-array/{}/{}'.format(self.url, self.port, arraytype, arrayID))
-        jdata = json.loads(response.text)
-
-        return jdata
-
     def get_genes(self):
         # respect local proxy settings
         session = PACSession()

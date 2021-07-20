@@ -25,25 +25,35 @@ def test_array():
                 {
                     'note'  : 'Edge test: first segment is 0. Should return empty dict',
                     'id'    : -1,
-                    'gold'  : {}
+                    'name'  : None,
+                    'type'  : None,
+                    'tags'  : [],
+                    'values': []
                 },
                 {
                     'note'  : 'correct query',
                     'id'    : 0,
-                    'gold'  : [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]
+                    'name'  : "compartment",
+                    'type'  : 'structure',
+                    'tags'  : [],
+                    'values': [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]
                 },
                 {
                     'note'  : 'Edge test: last array is < 10000. Should return empty dict',
                     'id'    : 10000,
-                    'gold'  : {} 
+                    'name'  : None,
+                    'type'  : None,
+                    'tags'  : [],
+                    'values': [] 
                 }
             ]
 
     for t in tests:
-        result = client.get_array(t["id"])
-        assert (result['values'] == t["gold"])
-    
-
+        result = client.get_array(t['id'])
+        assert (result['name'] == t['name'])
+        assert (result['type'] == t['type'])
+        assert (result['tags'] == t['tags'])
+        assert (result['data']['values'] == t['values'])
 
 def test_genes_for_segment():
     tests = [
@@ -83,9 +93,3 @@ def test_segments_for_gene():
     result2 = client.get_segments_for_gene(0, 'Btbd35f24')
     ogResult2 = 8
     assert (result2['segments'][0] == ogResult2) 
-
-def test_get_segment_array():
-    gold = {'array': [{'segment': 1, 'value': 0.1}, {'segment': 2, 'value': 0.2}, {'segment': 3, 'value': 0.3}, {'segment': 4, 'value': 0.4}, {'segment': 5, 'value': 0.5}, {'segment': 6, 'value': 0.6}, {'segment': 7, 'value': 0.7}, {'segment': 8, 'value': 0.8}, {'segment': 9, 'value': 0.9}, {'segment': 10, 'value': 0.1}, {'segment': 11, 'value': 0.11}], 'type': 'epigenetics'}
-
-    assert(client.get_segment_array('epigenetics', 0) == gold)
-
