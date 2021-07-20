@@ -7,10 +7,9 @@ test('client test', () => {
     // test.00
     client = new GTKClient("http://127.0.0.1", 8000);
 
-    var writeStream = fs.createWriteStream("client_genes.json", {flags: 'w'});
-    writeStream.end();
+    var streamname = "gtkclient_genes_test.json";
     client.get_genes( (response) => {
-                            var writeStream = fs.createWriteStream(streamname, {flags: 'a'});
+                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
                             writeStream.write(JSON.stringify(response));
                         });
 
