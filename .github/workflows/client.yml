@@ -47,7 +47,7 @@ jobs:
         cd ../../..
         npm run test testing/client.test.js
         ls -la
-        more gtkclient_genes_test.json 
+        more gtkclient_contactmap_test.json 
         more gtkclient_genes-for-segment_test.json 
-        more gtkclient_genes-structure_test.json 
-        more gtkclient_genes-contactmap_test.json 
+        more gtkclient_genes_test.json 
+        more gtkclient_structure_test.json 
