@@ -9,7 +9,7 @@ def test_segments():
             'segid': 1, 
             'start': [-1.0, 0.0, 0.0], 
             'startid': 0}
-    result = client.get_structure(50)
+    result = client.get_structure(1)
     print(result)
     assert(False)
     assert(result['segments'][0] == gold)
@@ -20,19 +20,16 @@ def test_segments():
                 {
                     'note'      : 'Edge test: first segment is 0. Should return empty list',
                     'sid'       : 0,
-                    'structure' : 0,
                     'gold'      : []
                 },
                 {
                     'note'      : 'correct query',
                     'sid'       : 0,
-                    'structure' : 0,
                     'gold'      : ['Btbd35f23', 'Btbd35f24']
                 },
                 {
                     'note'      : 'Edge test: last segment is < 100. Should return empty list',
                     'sid'       : 100,
-                    'structure' : 0,
                     'gold'      : []
                 }
             ]
