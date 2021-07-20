@@ -150,4 +150,4 @@ def test_segments_for_gene():
 
     for t in tests:
         result = client.get_segments_for_gene(t["structure"], t["gene"])
-        assert (result['segments'] == t["gold"])
+        assert (result['segments'] == t["gold"]) 
