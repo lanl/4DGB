@@ -9,10 +9,38 @@ def test_segments():
             'segid': 1, 
             'start': [-1.0, 0.0, 0.0], 
             'startid': 0}
-    result = client.get_structure(110)
+    result = client.get_structure(50)
     print(result)
     assert(False)
     assert(result['segments'][0] == gold)
+
+
+'''
+    tests = [
+                {
+                    'note'      : 'Edge test: first segment is 0. Should return empty list',
+                    'sid'       : 0,
+                    'structure' : 0,
+                    'gold'      : []
+                },
+                {
+                    'note'      : 'correct query',
+                    'sid'       : 0,
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f23', 'Btbd35f24']
+                },
+                {
+                    'note'      : 'Edge test: last segment is < 100. Should return empty list',
+                    'sid'       : 100,
+                    'structure' : 0,
+                    'gold'      : []
+                }
+            ]
+
+    for t in tests:
+        result = client.get_genes_for_segment(t["structure"], t["segment"])
+        assert (result['segments'][0] == t["gold"])
+'''
 
 
 def test_genes(): 
