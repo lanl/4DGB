@@ -49,7 +49,6 @@ def test_segments():
             assert (result['segments'][t['index']] == t['gold'])
 
 
-
 def test_genes(): 
     
     result = client.get_genes()
