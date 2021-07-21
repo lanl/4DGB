@@ -44,3 +44,4 @@ jobs:
         echo 'running javascript test'
         cd ../..
         npm run test --detectOpenHandles testing/client.test.js
+        pytest testing/test_client-js_output.py
