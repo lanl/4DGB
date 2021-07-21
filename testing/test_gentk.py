@@ -4,10 +4,11 @@ client = gentk.client.client("http://127.0.0.1", "8000")
 client.project = "test.00"
 
 def test_contactmap():
-    #
-    # TODO
-    #
-    assert(True)
+    result = client.get_contactmap(0)
+    print(result)
+    assert(False)
+    ogResult = '1700011M02Rik'
+    assert (result['genes'][0] == ogResult) 
 
 def test_structure():
     tests = [
