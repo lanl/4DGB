@@ -12,8 +12,8 @@ def test_contactmap():
                     'index' : None
                 },
                 {
-                    'note'  : 'structure 1',
-                    'cmID'  : 1,
+                    'note'  : 'correct',
+                    'cmID'  : 0,
                     'gold'  : {'value': 1.22803363763796, 
                                 'x': 5, 
                                 'y': 8},
