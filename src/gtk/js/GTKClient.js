@@ -61,13 +61,24 @@ class GTKClient {
     }
 
     //
-    // get the contactmap for an id 
+    // get segments for a gene 
     //
-    get_contactmap(callback, sid) {
+    get_segments_for_gene(callback, sid, gene) {
         this.getData(   (response) => {
                             callback(JSON.parse(response));
                         },
-                        this.url + ':' + this.port + '/data/contact-map/' + sid 
+                        this.url + ':' + this.port + '/gene/' + gene + '/data/structure/' + sid
+                    );
+    }
+
+    //
+    // get the contactmap for an id 
+    //
+    get_contactmap(callback, cmID) {
+        this.getData(   (response) => {
+                            callback(JSON.parse(response));
+                        },
+                        this.url + ':' + this.port + '/data/contact-map/' + cmID 
                     );
     }
 
@@ -80,6 +91,16 @@ class GTKClient {
                             callback(JSON.parse(response));
                         },
                         this.url + ':' + this.port + '/data/structure/' + sid + "/segments" );
+    }
+
+    //
+    // get an array 
+    //
+    get_array(callback, arrayID) {
+        this.getData(   (response) => {
+                            callback(JSON.parse(response));
+                        },
+                        this.url + ':' + this.port + '/data/array/' + arrayID );
     }
 
     getData(callback, url) {

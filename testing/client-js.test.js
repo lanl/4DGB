@@ -2,14 +2,28 @@ const GTKClient = require('../src/gtk/js/GTKClient.js');
 const GTKAppState  = require('../src/gtk/js/GTKAppState.js');
 var fs = require('fs');
 
-const sleep = (milliseconds) => {
-  return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
-
+//
+// run each of the calls, and produce a file on disc with the output
+//
 test('client test', () => {
-
     // test.00
     client = new GTKClient("http://127.0.0.1", 8000);
+
+    client.get_array( (response) => {
+                            var streamname = "gtkclient_array_test.json";
+                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
+                            writeStream.write(JSON.stringify(response));
+                            writeStream.write("\n");
+                            writeStream.end();
+                        }, 0);
+
+    client.get_contactmap( (response) => {
+                            var streamname = "gtkclient_contactmap_test.json";
+                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
+                            writeStream.write(JSON.stringify(response));
+                            writeStream.write("\n");
+                            writeStream.end();
+                        }, 0);
 
     client.get_genes( (response) => {
                             var streamname = "gtkclient_genes_test.json";
@@ -25,7 +39,15 @@ test('client test', () => {
                             writeStream.write(JSON.stringify(response));
                             writeStream.write("\n");
                             writeStream.end();
-                        }, 0, 100);
+                        }, 0, 8);
+
+    client.get_segments_for_gene( (response) => {
+                            var streamname = "gtkclient_segments-for-gene_test.json";
+                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
+                            writeStream.write(JSON.stringify(response));
+                            writeStream.write("\n");
+                            writeStream.end();
+                        }, 0, "Btbd35f23");
 
     client.get_structure( (response) => {
                             var streamname = "gtkclient_structure_test.json";
@@ -35,15 +57,6 @@ test('client test', () => {
                             writeStream.end();
                         }, 0);
 
-    client.get_contactmap( (response) => {
-                            var streamname = "gtkclient_contactmap_test.json";
-                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
-                            writeStream.write(JSON.stringify(response));
-                            writeStream.write("\n");
-                            writeStream.end();
-                        }, 0);
-
-    // sleep(5000);
     expect(true).toBe(true);
 
 });
