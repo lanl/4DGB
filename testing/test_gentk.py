@@ -15,8 +15,8 @@ def test_contactmap():
                     'note'  : 'correct',
                     'cmID'  : 0,
                     'gold'  : {'value': 1.22803363763796, 
-                                'x': 5, 
-                                'y': 8},
+                               'x': 5, 
+                               'y': 8},
                     'index' : 0
                     
                 },
