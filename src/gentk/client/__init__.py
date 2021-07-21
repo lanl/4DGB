@@ -82,3 +82,13 @@ class client:
         jdata = json.loads(response.text)
 
         return jdata
+
+    def get_contactmap(self, cmID):
+        # respect local proxy settings
+        session = PACSession()
+
+        # get the data from the server
+        response = session.get('{}:{}/data/contact-map/{}'.format(self.url, self.port, cmID))
+        jdata = json.loads(response.text)
+
+        return jdata

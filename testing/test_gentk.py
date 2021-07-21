@@ -3,40 +3,75 @@ import gentk
 client = gentk.client.client("http://127.0.0.1", "8000")
 client.project = "test.00"
 
-def test_structure():
+def test_contactmap():
     tests = [
                 {
-                    'note'      : 'Edge test: first segment is 0. Should return empty list', 
-                    'sid'       : -1,
-                    'gold'      : [],
-                    'index'     : None
+                    'note'  : 'Edge test: first segment is 0. Should return empty list', 
+                    'cmID'  : -1,
+                    'gold'  : [],
+                    'index' : None
                 },
                 {
-                    'note'      : 'structure 1',
-                    'sid'       : 0,
-                    'gold'      : {'end': [0.0, 0.0, 0.0], 
-                                   'length': 400000, 
-                                   'segid': 1, 
-                                   'start': [-1.0, 0.0, 0.0], 
-                                   'startid': 0},
-                    'index'     : 0
+                    'note'  : 'correct',
+                    'cmID'  : 0,
+                    'gold'  : {'value': 1.22803363763796, 
+                               'x': 5, 
+                               'y': 8},
+                    'index' : 0
                     
                 },
                 {
-                    'note'      : 'structure 2',
-                    'sid'       : 1,
-                    'gold'      : {'end': [0.0, 0.0, 0.0], 
-                                   'length': 400000, 
-                                   'segid': 1, 
-                                   'start': [-1.0, 0.0, 0.0], 
-                                   'startid': 0},
-                    'index'     : 0
+                    'note'   : 'Edge test: last segment is < 2. Should return empty list',
+                    'cmID'   : 2,
+                    'gold'   : [],
+                    'index'  : None
+                }
+            ]
+
+    for t in tests: 
+        result = client.get_contactmap(t['cmID'])
+        #returns a list of dictionaries 
+        if t['index'] == None:
+            #empty list
+            assert(result['contacts'] == t['gold'])
+        else:
+            #comparing a fraction of the list
+            assert (result['contacts'][t['index']] == t['gold'])
+
+def test_structure():
+    tests = [
+                {
+                    'note'   : 'Edge test: first segment is 0. Should return empty list', 
+                    'sid'    : -1,
+                    'gold'   : [],
+                    'index'  : None
                 },
                 {
-                    'note'      : 'Edge test: last segment is < 2. Should return empty list',
-                    'sid'       : 2,
-                    'gold'      : [],
-                    'index'     : None
+                    'note'   : 'structure 1',
+                    'sid'    : 0,
+                    'gold'   : {'end': [0.0, 0.0, 0.0], 
+                                'length': 400000, 
+                                'segid': 1, 
+                                'start': [-1.0, 0.0, 0.0], 
+                                'startid': 0},
+                    'index'  : 0
+                    
+                },
+                {
+                    'note'   : 'structure 2',
+                    'sid'    : 1,
+                    'gold'   : {'end': [0.0, 0.0, 0.0], 
+                                'length': 400000, 
+                                'segid': 1, 
+                                'start': [-1.0, 0.0, 0.0], 
+                                'startid': 0},
+                    'index'  : 0
+                },
+                {
+                    'note'   : 'Edge test: last segment is < 2. Should return empty list',
+                    'sid'    : 2,
+                    'gold'   : [],
+                    'index'  : None
                 }
             ]
 
