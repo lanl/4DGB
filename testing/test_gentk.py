@@ -3,6 +3,12 @@ import gentk
 client = gentk.client.client("http://127.0.0.1", "8000")
 client.project = "test.00"
 
+def test_contactmap():
+    #
+    # TODO
+    #
+    assert(True)
+
 def test_structure():
     tests = [
                 {
