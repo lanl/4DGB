@@ -11,4 +11,4 @@ def test_outputs():
             ]
 
     for o in outputs:
-        assert (filcmp.cmp(o, os.path.join(gold_dir, o)))
+        assert (filecmp.cmp(o, os.path.join(gold_dir, o)))
