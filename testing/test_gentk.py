@@ -4,9 +4,7 @@ client = gentk.client.client("http://127.0.0.1", "8000")
 client.project = "test.00"
 
 def test_contactmap():
-    result = client.get_contactmap(1)
-    print(result)
-    assert(False)
+    result = client.get_contactmap(0)
     gold = {'value': 1.22803363763796, 'x': 5, 'y': 8}
     assert (result['contacts'][0] == gold) 
 
