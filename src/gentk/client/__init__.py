@@ -1,7 +1,6 @@
 import json
 import sys
 import requests
-# from pypac import PACSession
 
 class client:
 
