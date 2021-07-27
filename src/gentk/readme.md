@@ -48,8 +48,8 @@ The main way to interact with the database is to create a client, then make call
 ```
 - **get_contactmap(mapID)** Get a contact map data structure.
 - **get_genes()** Get the list of genes for a project.
-- **get_genes_for_segment(structureID, segID)** Get the genes for a structure's segment.
-- **get_segments_for_gene(structureID, gene)** Get the structure segments that a gene intersects.
+- **get_genes_for_segment(structureID, segID)** Get a list of genes for a structure's segment.
+- **get_segments_for_gene(structureID, gene)** Get a list of structure segments that a gene intersects.
 - **get_structure(structureID)** Get a structure. Return value is a list of segments. 
 ```
     Example:
