@@ -26,19 +26,19 @@
     "array" : [
         {
             "id"  : 0,
-            "url" : "source/array/000.json"
+            "url" : "source/array/0000.json"
         },
         {
             "id"  : 1,
-            "url" : "source/array/001.json"
+            "url" : "source/array/0001.json"
         },
         {
             "id"  : 2,
-            "url" : "source/array/002.json"
+            "url" : "source/array/0002.json"
         },
         {
             "id"  : 3,
-            "url" : "source/array/003.json"
+            "url" : "source/array/0003.json"
         }
     ],
     "hic" : [

@@ -3,7 +3,7 @@ import gentk
 client = gentk.client.client("http://127.0.0.1", "8000")
 client.project = "test.00"
 
-def test_contactmap():
+def test_get_contactmap():
     tests = [
                 {
                     'note'  : 'Edge test: first segment is 0. Should return empty list', 
@@ -38,7 +38,7 @@ def test_contactmap():
             #comparing a fraction of the list
             assert (result['contacts'][t['index']] == t['gold'])
 
-def test_structure():
+def test_get_structure():
     tests = [
                 {
                     'note'   : 'Edge test: first segment is 0. Should return empty list', 
@@ -86,13 +86,13 @@ def test_structure():
             assert (result['segments'][t['index']] == t['gold'])
 
 
-def test_genes(): 
+def test_get_genes(): 
     
     result = client.get_genes()
     ogResult = '1700011M02Rik'
     assert (result['genes'][0] == ogResult) 
 
-def test_array():
+def test_get_array():
     tests = [
                 {
                     'note'  : 'Edge test: first segment is 0. Should return empty dict',
@@ -127,7 +127,7 @@ def test_array():
         assert (result['tags'] == t['tags'])
         assert (result['data']['values'] == t['values'])
 
-def test_genes_for_segment():
+def test_get_genes_for_segment():
     tests = [
                 {
                     'note'      : 'Edge test: first segment is 1. Should return empty list',
@@ -155,7 +155,7 @@ def test_genes_for_segment():
     
 
 
-def test_segments_for_gene():
+def test_get_segments_for_gene():
     tests = [
                 {
                     'note'      : 'Edge test: first structure is 0. Should return empty list',
@@ -186,3 +186,30 @@ def test_segments_for_gene():
     for t in tests:
         result = client.get_segments_for_gene(t["structure"], t["gene"])
         assert (result['segments'] == t["gold"]) 
+
+def test_get_set_array():
+    tests = [
+                {
+                    'metadata'  : {
+                                    "name": "test array", 
+                                    "type": "structure", 
+                                    "tags": [], 
+                                    "datatype": "int", 
+                                    "datadim": 1
+                                 },
+                    'values'     : [0, 1, 2, 3, 4],
+                    'arrayid'   :  4
+                }
+            ]
+
+    for t in tests:
+        arrayid = client.set_array(t['values'], t['metadata'])
+        assert(arrayid == t['arrayid'])
+
+        result = client.get_array(t['arrayid'])
+
+        assert (result['name'] == t['metadata']['name'])
+        assert (result['type'] == t['metadata']['type'])
+        assert (result['tags'] == t['metadata']['tags'])
+        assert (result['data']['values'] == t['values'])
+

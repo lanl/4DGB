@@ -1,6 +1,7 @@
 import bbi
 import yaml
 import sys
+import numpy
 
 from math import nan
 
@@ -104,17 +105,66 @@ def GetArray(arrayID):
                 "version"   : "0.1",
                 "tags"      : [],
                 "data"      : {
-                    "type"      : None, 
-                    "dim"       : None, 
-                    "values"    : []
+                    "type"  : None, 
+                    "dim"   : None, 
+                    "url"   : "",
+                    "values": []
                 }
             }
+
     if (len(results) != 0):
         fname = PROJECT_HOME + "/" + results[0][0]
+
         with open(fname, "r") as jfile:
             array = json.load(jfile)
 
+        values = numpy.load(PROJECT_HOME + "/" + array["data"]["url"])
+        array["data"]["values"] = values["data"].tolist() 
+
+    else:
+        print("GetArray FAIL: {}".format(arrayID))
+
     return array
+
+#
+# set a data array
+#
+@app.route('/data/setarray', methods=['POST'])
+def SetArray():
+    results = {}
+    if (request.method == "POST"):
+        # get the next IR
+        conn  = db_connect.connect()
+        query = conn.execute("SELECT COUNT(*) FROM array")
+        results = query.cursor.fetchall()
+        arrayID = results[0][0]
+        fid         = '{:04d}'.format(arrayID)
+        fname       = 'source/array/{}.json'.format(fid) 
+        fullname    = '{}/{}'.format(PROJECT_HOME, fname)
+        aname       = 'source/array/{}.npz'.format(fid) 
+        arrayfname  = '{}/{}'.format(PROJECT_HOME, aname) 
+
+        # save the file to the database
+        conn.execute('''INSERT INTO array (id,url) VALUES (?,?)''', [arrayID, fname])
+
+        data = request.get_json()
+        with open(fullname, 'w') as jfile:
+            jfile.write("{\n")
+            jfile.write("\"name\"      : \"{}\",\n".format(data["name"]))
+            jfile.write("\"type\"      : \"{}\",\n".format(data["type"]))
+            jfile.write("\"version\"   : \"0.1\",\n")
+            jfile.write("\"tags\"      : {},\n".format(data["tags"]))
+            jfile.write("\"data\"      : {\n")
+            jfile.write("    \"type\"  : \"{}\",\n".format(data["datatype"]))
+            jfile.write("    \"dim\"   : {},\n".format(data["datadim"]))
+            jfile.write("    \"url\"   : \"{}\"".format(aname))
+            jfile.write("}\n")
+            jfile.write("}\n")
+
+        numpy.savez_compressed(arrayfname, data=data["array"])
+
+    results = {'id': arrayID}        
+    return jsonify(results)
 
 #
 # return the segments of a structure
