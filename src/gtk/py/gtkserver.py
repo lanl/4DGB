@@ -121,9 +121,6 @@ def GetArray(arrayID):
         values = numpy.load(PROJECT_HOME + "/" + array["data"]["url"])
         array["data"]["values"] = values["data"].tolist() 
 
-    else:
-        print("GetArray FAIL: {}".format(arrayID))
-
     return array
 
 #
