@@ -58,38 +58,11 @@ function main( project ) {
     };
 }
 
-function setState() {
-    view.setSegmentStates( [10], GTKSegmentState.LIVE, GTKSegmentState.DEAD );
-    view.render();
-}
-
-function unSetState() {
-    view.setSegmentStates( [10], GTKSegmentState.DEAD, GTKSegmentState.LIVE );
-    view.render();
-}
-
-function setGhost() {
-    view.setSegmentStates( [10], GTKSegmentState.LIVE, GTKSegmentState.GHOST );
-    view.render();
-}
-
 //
 // create the project object and load data 
 //
 TheGTKProject = new GTKProject( GTKProjectName );
+TheGTKClient  = new GTKClient( "http://" + window.location.hostname, window.location.port);
 var view;
-
-// set up buttons
-var btn = document.getElementById("setState");
-btn.onclick = setState;
-
-// set up buttons
-var btn = document.getElementById("unSetState");
-btn.onclick = unSetState;
-
-// set up buttons
-var btn = document.getElementById("setGhost");
-btn.onclick = setGhost;
-
 
 main( TheGTKProject );

@@ -1,1 +1,1 @@
-{"data":{"dim":1,"type":"int","values":[1,1,1,1,1,2,2,2,2,2,2]},"name":"compartment","tags":[],"type":"structure","version":"0.1"}
+{"data":{"dim":1,"type":"int","url":"source/array/0000.npz","values":[1,1,1,1,1,2,2,2,2,2,2]},"name":"compartment","tags":[],"type":"structure","version":"0.1"}

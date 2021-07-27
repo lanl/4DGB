@@ -1,5 +1,7 @@
-var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest; 
-var fs = require('fs');
+// to be removed when node.js is included
+if (typeof process === 'object') {
+    var fetch = require('node-fetch');
+}
 
 class GTKClient {
     /**
@@ -42,44 +44,36 @@ class GTKClient {
     // get the genes for the current project 
     //
     get_genes(callback) {
-        this.getData(   (response) => {
-                            callback(JSON.parse(response));
-                        },
-                        this.url + ':' + this.port + '/genes'
-                    );
+        fetch( this.url + ':' + this.port + '/genes' )
+            .then(response => response.json())
+            .then(data => callback(data))
     }
 
     //
     // get the genes for a segment 
     //
     get_genes_for_segment(callback, sid, segid) {
-        this.getData(   (response) => {
-                            callback(JSON.parse(response));
-                        },
-                        this.url + ':' + this.port + '/data/structure/' + sid + '/segment/' + segid + '/genes'
-                    );
+        fetch( this.url + ':' + this.port + '/data/structure/' + sid + '/segment/' + segid + '/genes' )
+            .then(response => response.json())
+            .then(data => callback(data))
     }
 
     //
     // get segments for a gene 
     //
     get_segments_for_gene(callback, sid, gene) {
-        this.getData(   (response) => {
-                            callback(JSON.parse(response));
-                        },
-                        this.url + ':' + this.port + '/gene/' + gene + '/data/structure/' + sid
-                    );
+        fetch( this.url + ':' + this.port + '/gene/' + gene + '/data/structure/' + sid )
+            .then(response => response.json())
+            .then(data => callback(data))
     }
 
     //
     // get the contactmap for an id 
     //
     get_contactmap(callback, cmID) {
-        this.getData(   (response) => {
-                            callback(JSON.parse(response));
-                        },
-                        this.url + ':' + this.port + '/data/contact-map/' + cmID 
-                    );
+        fetch( this.url + ':' + this.port + '/data/contact-map/' + cmID )
+            .then(response => response.json())
+            .then(data => callback(data))
     }
 
 
@@ -87,34 +81,23 @@ class GTKClient {
     // get the structure for an ID
     //
     get_structure(callback, sid) {
-        this.getData(   (response) => {
-                            callback(JSON.parse(response));
-                        },
-                        this.url + ':' + this.port + '/data/structure/' + sid + "/segments" );
+        fetch( this.url + ':' + this.port + '/data/structure/' + sid + "/segments" )
+            .then(response => response.json())
+            .then(data => callback(data))
     }
 
     //
     // get an array 
     //
     get_array(callback, arrayID) {
-        this.getData(   (response) => {
-                            callback(JSON.parse(response));
-                        },
-                        this.url + ':' + this.port + '/data/array/' + arrayID );
-    }
-
-    getData(callback, url) {
-        const xobj = new XMLHttpRequest();
-        xobj.open('GET', url);
-        xobj.onreadystatechange = function() {
-            if (xobj.readyState == 4 && (xobj.status == 0 || xobj.status == 200)) {
-                // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-                callback(xobj.responseText);
-            }
-        };
-        xobj.send(null);
+        fetch( this.url + ':' + this.port + '/data/array/' + arrayID )
+            .then(response => response.json())
+            .then(data => callback(data))
     }
 
 }
 
-module.exports = GTKClient;
+// to be removed when node.js is included
+if (typeof process === 'object') {
+    module.exports = GTKClient;
+}

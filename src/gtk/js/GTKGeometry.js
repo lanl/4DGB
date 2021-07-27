@@ -117,9 +117,8 @@ class GTKGeometry {
         // used to compute the centroid
         var center = new THREE.Vector3(0.0, 0.0, 0.0);
 
-        this.loadData((response) => {
-            var data = JSON.parse(response);
-            for (var s of data["segments"]) {
+        TheGTKClient.get_structure( (response) => {
+            for (var s of response["segments"]) {
                 let startPoint = new THREE.Vector3(s['start'][0], s['start'][1], s['start'][2]);
                 let endPoint   = new THREE.Vector3(s['end'][0], s['end'][1], s['end'][2]);
                 center.add(endPoint);
@@ -135,24 +134,7 @@ class GTKGeometry {
             if (caller != "None") {
                 caller.postLoad(caller);
             }
-        });
+        }, this.geometry );
     }
-
-    //
-    // callback after load
-    //
-    loadData(callback) {
-        const xobj = new XMLHttpRequest();
-        xobj.overrideMimeType("application/json");
-        xobj.open('GET', '/data/structure/' + this.geometry + "/segments", true);
-        xobj.onreadystatechange = function() {
-            if (xobj.readyState == 4 && (xobj.status == 0 || xobj.status == 200)) {
-                // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-                callback(xobj.responseText);
-            }
-        };
-        xobj.send(null);
-    }
-
 }
 

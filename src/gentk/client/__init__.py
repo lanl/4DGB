@@ -1,6 +1,6 @@
 import json
 import sys
-from pypac import PACSession
+import requests
 
 class client:
 
@@ -34,61 +34,50 @@ class client:
         self._port = value
 
     def get_structure(self, sid):
-        # respect local proxy settings
-        session = PACSession()
-
-        # get the data from the server
-        response = session.get('{}:{}/data/structure/{}/segments'.format(self.url, self.port, sid))
+        response = requests.get('{}:{}/data/structure/{}/segments'.format(self.url, self.port, sid)) 
         jdata = json.loads(response.text)
 
         return jdata
 
     def get_genes(self):
-        # respect local proxy settings
-        session = PACSession()
-
-        # get the data from the server
-        response = session.get('{}:{}/genes'.format(self.url, self.port))
+        response = requests.get('{}:{}/genes'.format(self.url, self.port)) 
         jdata = json.loads(response.text)
 
         return jdata
 
     def get_genes_for_segment(self, structureID, segID):
-        # respect local proxy settings
-        session = PACSession()
-
         # get the data from the server
-        response = session.get('{}:{}/data/structure/{}/segment/{}/genes'.format(self.url, self.port, structureID, segID))
+        response = requests.get('{}:{}/data/structure/{}/segment/{}/genes'.format(self.url, self.port, structureID, segID))
         jdata = json.loads(response.text)
 
         return jdata
 
     def get_segments_for_gene(self, structureID, gene):
-        # respect local proxy settings
-        session = PACSession()
-
         # get the data from the server
-        response = session.get('{}:{}/gene/{}/data/structure/{}'.format(self.url, self.port, gene, structureID))
+        response = requests.get('{}:{}/gene/{}/data/structure/{}'.format(self.url, self.port, gene, structureID))
         jdata = json.loads(response.text)
 
         return jdata
 
     def get_array(self, arrayID):
-        # respect local proxy settings
-        session = PACSession()
-
         # get the data from the server
-        response = session.get('{}:{}/data/array/{}'.format(self.url, self.port, arrayID))
+        response = requests.get('{}:{}/data/array/{}'.format(self.url, self.port, arrayID))
         jdata = json.loads(response.text)
 
         return jdata
 
     def get_contactmap(self, cmID):
-        # respect local proxy settings
-        session = PACSession()
-
         # get the data from the server
-        response = session.get('{}:{}/data/contact-map/{}'.format(self.url, self.port, cmID))
+        response = requests.get('{}:{}/data/contact-map/{}'.format(self.url, self.port, cmID))
         jdata = json.loads(response.text)
 
         return jdata
+
+    def set_array(self, array, params):
+        # send the data to the server
+        data = params
+        data["array"] = array
+        response = requests.post('{}:{}/data/setarray'.format(self.url, self.port), json=data)
+        jdata = json.loads(response.text)
+
+        return jdata["id"]
