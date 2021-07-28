@@ -89,6 +89,23 @@ def root(path):
     return app.send_static_file(path)
 
 #
+# return a list of the variables available
+#
+@app.route('/data/arrays')
+def GetArrays():
+    conn  = db_connect.connect()
+    data  = []
+
+    query = conn.execute("SELECT name,id FROM array ORDER BY id")
+    for a in query.cursor.fetchall():
+        data.append({ 
+                        'id'  : a[1], 
+                        'name': a[0]
+                    })
+
+    return jsonify({ 'arrays': data })
+
+#
 # return a data array defined on the segments 
 #
 @app.route('/data/array/<arrayID>')
@@ -142,9 +159,9 @@ def SetArray():
         arrayfname  = '{}/{}'.format(PROJECT_HOME, aname) 
 
         # save the file to the database
-        conn.execute('''INSERT INTO array (id,url) VALUES (?,?)''', [arrayID, fname])
-
         data = request.get_json()
+        conn.execute('''INSERT INTO array (id,name,type,url) VALUES (?,?,?,?)''', [arrayID, data["name"], data["type"], fname])
+
         with open(fullname, 'w') as jfile:
             jfile.write("{\n")
             jfile.write("\"name\"      : \"{}\",\n".format(data["name"]))

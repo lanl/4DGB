@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+
+import bbi
+import sys
+import numpy
+
+bfile = ""
+if (len(sys.argv) != 2):
+    print("ERROR: must include file")
+    exit(0)
+
+bfile = sys.argv[1]
+bbifile = bbi.open(bfile)
+print(bbifile.schema)
+print(bbifile.info)
+print(bbifile.read_autosql())
+
+sizes = bbifile.chromsizes
+for c in sizes:
+    print("{}: {}".format(c, sizes[c]))
+
+values = bbi.fetch(bfile, "chrX", 0, 166600000, 833)
+numpy.savez_compressed("0004.npz", data=values)

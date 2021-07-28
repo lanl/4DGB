@@ -15,6 +15,25 @@ The main way to interact with the database is to create a client, then make call
 ```
 
 ## API
+- **get_arrays()** Get a list of arrays from the server. The list is made of key, value pairs:
+```
+    Example:
+    arrays = client.get_arrays()
+
+    return value has the following structure:
+    [
+        {
+            'id': int,
+            'name': string
+        },
+        {
+            'id': int,
+            'name': string
+        },
+        ,,,
+    ]
+``` 
+
 - **set_array(array, metadata)** Set a new array on the server. Returns the id of the new array (integer)
 
 ```
