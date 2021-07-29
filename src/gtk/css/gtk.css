@@ -140,7 +140,7 @@ div.gtk { padding: 5px;
     font-size: 12px;
 }
 
-.gtkgeometrytitle, .gtkglobalentrytitle, .gtkchartlisttitle {
+.gtktitle, .gtkgeometrytitle, .gtkglobalentrytitle, .gtkchartlisttitle {
     padding-top:    10px;
     padding-right:  5px;
     padding-bottom: 10px;

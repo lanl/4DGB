@@ -30,19 +30,24 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class GTKViewerPanel {
 
-    constructor(project, dataset, id ) {
-        var root = document.getElementById(id);
+    constructor(project, dataset, parent ) {
+        var root = document.getElementById(parent);
+        this.container = document.createElement("div");
+        this.container.className = "gtkviewerpanel";
+        root.appendChild(this.container);
+
         this.title = document.createElement("div");
-        this.title.innerHTML = "This is the title";
-        root.appendChild(this.title);
+        this.title.className = "gtktitle";
+        this.title.innerHTML = dataset['name'];
+        this.container.appendChild(this.title);
 
         var gc_elem = document.createElement("div");
-        gc_elem.id = "gc_elem-" + id;
-        root.appendChild(gc_elem);
+        gc_elem.id = "gc_elem-" + parent;
+        this.container.appendChild(gc_elem);
         this.geometrycanvas = new GTKGeometryCanvas( project, dataset, gc_elem.id );
         var cm_elem = document.createElement("div");
-        cm_elem.id = "cm_elem-" + id;
-        root.appendChild(cm_elem);
+        cm_elem.id = "cm_elem-" + parent;
+        this.container.appendChild(cm_elem);
         this.contactmapcanvas = new GTKContactMapCanvas( project, dataset, cm_elem.id )
 
         // Update view when selection in contact map changes

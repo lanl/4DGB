@@ -48,6 +48,9 @@ function link_cameras(a, b) {
 function main( project ) {
     var dset = project.getDatasets(); 
 
+    // control panel
+    var controls = new GTKControlPanel( project, "controlpanel" );
+
     var dataset = new GTKDataset(dset[0]);
     GTKPanels.push(new GTKViewerPanel( project, dataset, "leftpanel" ));
 

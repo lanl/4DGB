@@ -150,6 +150,20 @@
             "name": "viewer",
             "version" : "0.5"
         },
+        "controlpanel": {
+            "variable" : {
+                "current" : "curvar",
+                "favorites" : ["var 1", "var 2", "var 3"]
+            },
+            "gene" : {
+                "current" : "curgene",
+                "favorites" : ["gene 1", "gene 2", "gene 3", "gene 4"]
+            },
+            "location" : {
+                "current" : "curlocation",
+                "favorites" : ["location 1", "location 2", "location 3", "location 4", "location 5"]
+            }
+        },
         "contactmapcanvas": {
             "width": 500,
             "height": 500
