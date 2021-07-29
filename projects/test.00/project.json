@@ -155,7 +155,7 @@
             "height": 500
         },
         "geometrycanvas" : {
-            "width":  600, 
+            "width":  500, 
             "height": 500,
             "scene": {
                 "background" : "0x000000",

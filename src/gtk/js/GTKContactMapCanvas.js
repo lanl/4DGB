@@ -142,6 +142,7 @@ class GTKContactMapCanvas {
         this.contdiv.appendChild(this.canvas.node());
 
         /** A d3 selection of a text label displaying help to the user */
+        /**
         this.helpLabel = d3.create('span')
             .attr('style', `
                 position: absolute;
@@ -150,6 +151,7 @@ class GTKContactMapCanvas {
             `)
             .text("Click-and-drag to select. Hold Space to zoom & pan");
         this.contdiv.appendChild(this.helpLabel.node());
+        **/
 
         /** A d3 selection of the SVG handling brush selection */
         this.brushSVG = d3.create('svg').call(overlay)
