@@ -32,4 +32,9 @@
 <img src="img/test.00.png"></img>
 </div>
 
+- You can see the comparison app with the following URL `http://127.0.0.1:8000/compare.html?gtkproject=test.00`
+<div align="center">
+<img src="src/img/compare_test.00_thumb.png"></img>
+</div>
+
   
