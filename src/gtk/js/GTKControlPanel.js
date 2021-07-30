@@ -41,30 +41,17 @@ class GTKControlPanel {
         var table = document.createElement("table");
         root.appendChild(table);
 
-        // variable
-        var row = table.insertRow(0); 
+        // title
+        var cur_row = 0;
+        var row = table.insertRow(cur_row); 
         var name = row.insertCell(0);
-        name.innerHTML = "Variable";
-
-        var cell = row.insertCell(1);
-        this.variablechoice = document.createElement("select");
-        this.variablechoice.setAttribute("type", "text");
-        cell.appendChild(this.variablechoice);
-        for (const f of project.getApplicationData("gtk")['controlpanel']['variable']['favorites']) {
-            var option = document.createElement('option');
-            option.value = f;
-            option.innerHTML = f;
-            this.variablechoice.appendChild(option)
-        }
-
-        cell = row.insertCell(2);
-        this.variable = document.createElement("input");
-        this.variable.setAttribute("type", "text");
-        this.variable.value = project.getApplicationData("gtk")['controlpanel']['variable']['current']
-        cell.appendChild(this.variable);
+        name.innerHTML = "Selection";
+        name.className = "gtktitlecell";
+        name.colSpan = "3";
+        cur_row += 1;
 
         // location
-        row = table.insertRow(1);
+        row = table.insertRow(cur_row);
         name = row.insertCell(0);
         name.innerHTML = "Location";
 
@@ -84,9 +71,10 @@ class GTKControlPanel {
         this.location.setAttribute("type", "text");
         this.location.value = project.getApplicationData("gtk")['controlpanel']['location']['current']
         cell.appendChild(this.location);
+        cur_row += 1;
 
         // gene
-        row = table.insertRow(2);
+        row = table.insertRow(cur_row);
         name = row.insertCell(0);
         name.innerHTML = "Gene";
 
@@ -106,5 +94,38 @@ class GTKControlPanel {
         this.gene.setAttribute("type", "text");
         this.gene.value = project.getApplicationData("gtk")['controlpanel']['gene']['current']
         cell.appendChild(this.gene);
+        cur_row += 1; 
+
+        // title
+        // ----------------------------------------------------------------------------------------
+        var row = table.insertRow(cur_row); 
+        var name = row.insertCell(0);
+        name.innerHTML = "Structure";
+        name.className = "gtktitlecell";
+        name.colSpan = "3";
+        cur_row += 1;
+        
+        // variable
+        row = table.insertRow(cur_row); 
+        name = row.insertCell(0);
+        name.innerHTML = "Variable";
+
+        var cell = row.insertCell(1);
+        this.variablechoice = document.createElement("select");
+        this.variablechoice.setAttribute("type", "text");
+        cell.appendChild(this.variablechoice);
+        for (const f of project.getApplicationData("gtk")['controlpanel']['variable']['favorites']) {
+            var option = document.createElement('option');
+            option.value = f;
+            option.innerHTML = f;
+            this.variablechoice.appendChild(option)
+        }
+
+        cell = row.insertCell(2);
+        this.variable = document.createElement("input");
+        this.variable.setAttribute("type", "text");
+        this.variable.value = project.getApplicationData("gtk")['controlpanel']['variable']['current']
+        cell.appendChild(this.variable);
+
     }
 }

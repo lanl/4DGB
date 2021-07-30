@@ -29,20 +29,24 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-class GTKChartList {
-    constructor(doc, parent) {
+class GTKChartPanel {
+    constructor(parentID) {
         // container
-        this.container = doc.createElement("div"); 
+        this.container = document.createElement("div"); 
         this.container.className = "gtkchartlist";
+
         // title
-        this.title = doc.createElement("div");
+        this.title = document.createElement("div");
         this.title.className = "gtkchartlisttitle";
         this.container.appendChild(this.title);
+        this.setTitle("No Title")
+
         // charts
-        this.charts = doc.createElement("div");
+        this.charts = document.createElement("div");
         this.charts.className = "gtkchartlistcharts";
         this.container.appendChild(this.charts);
 
+        var parent = document.getElementById(parentID);
         parent.appendChild(this.container);
     }
 

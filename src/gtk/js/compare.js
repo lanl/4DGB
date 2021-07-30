@@ -51,6 +51,7 @@ function main( project ) {
     // control panel
     var controls = new GTKControlPanel( project, "controlpanel" );
 
+    // views
     var dataset = new GTKDataset(dset[0]);
     GTKPanels.push(new GTKViewerPanel( project, dataset, "leftpanel" ));
 
@@ -59,6 +60,8 @@ function main( project ) {
 
     link_cameras(GTKPanels[0], GTKPanels[1]);
 
+    // attribute charts
+    GTKCharts = new GTKChartPanel( "centerpanel" );
 }
 
 //

@@ -18,6 +18,12 @@ body {
 div.gtk { padding: 5px;
 }
 
+.gtktitlecell {
+    text-align: left;
+    color: black;
+    background-color: #D3D3D3;
+}
+
 .gtkheader {
     text-align: center;
     padding: 5px;
