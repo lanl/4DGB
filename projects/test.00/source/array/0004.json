@@ -5,6 +5,6 @@
 "tags"      : ["epigenetics"], 
 "data"      : {
     "chrom" : "chr21",
-    "url"   : "source/bigWigExample.bw"
+    "url"   : "source/test.bw"
 }
 }

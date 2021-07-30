@@ -19,5 +19,5 @@ sizes = bbifile.chromsizes
 for c in sizes:
     print("{}: {}".format(c, sizes[c]))
 
-values = bbi.fetch(bfile, "chr21", 0, 166600000, 833)
+values = bbi.fetch(bfile, "1", 0, 166600000, 833)
 numpy.savez_compressed("0004.npz", data=values)
