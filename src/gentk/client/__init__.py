@@ -87,3 +87,10 @@ class client:
         jdata = json.loads(response.text)
 
         return jdata["id"]
+
+    def get_sampled_array(self, arrayID, begin, end, numsamples ):
+        # get the data from the server
+        response = requests.get('{}:{}/data/samplearray/{}/{}/{}/{}'.format(self.url, self.port, arrayID, begin, end, numsamples))
+        jdata = json.loads(response.text)
+
+        return jdata

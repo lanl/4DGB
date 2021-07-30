@@ -49,30 +49,38 @@ def SegmentEpigeneticsData(identifier, state):
 
     return jsonify({'data': data})
 
-# ------------------------------------------------------------------------------------------------
-# CALLS TO BE UPDATED
-# ------------------------------------------------------------------------------------------------
-
-@app.route('/bbi/<state>/<ID>/<chrom>/<begin>/<end>')
-def BBIQuery(state, ID, chrom, begin, end):
-    conn = db_connect.connect()
-    query = conn.execute("SELECT file FROM datafiles WHERE state == ? AND type == ? AND ID == ?", state, "epigenetics", ID)
-    results = query.cursor.fetchone()
-    # TODO: update so query returns the entire value
-    fname = PROJECT_HOME + "/" + results[0]
-    # print("BBI file queried: {}".format(fname))
-
-    numbins = 100
-    data = bbi.fetch(fname, chrom, int(begin), int(end), numbins)
-    labels = [None] * numbins
-    labels[0]  = begin
-    labels[-1] = end
-
-    return jsonify({'labels': labels, 'series': list(data)})
 
 # ------------------------------------------------------------------------------------------------
 # UPDATED CALLS
 # ------------------------------------------------------------------------------------------------
+
+def get_array_metadata(arrayID):
+    conn  = db_connect.connect()
+    data  = []
+
+    query = conn.execute("SELECT url FROM array WHERE id == {}".format(arrayID))
+    results = query.cursor.fetchall()
+
+    array = {
+                "name"      : None, 
+                "type"      : None, 
+                "version"   : "0.1",
+                "tags"      : [],
+                "data"      : {
+                    "type"  : None, 
+                    "dim"   : None, 
+                    "url"   : "",
+                    "values": []
+                }
+            }
+
+    if (len(results) != 0):
+        fname = PROJECT_HOME + "/" + results[0][0]
+
+        with open(fname, "r") as jfile:
+            array = json.load(jfile)
+
+    return array
 
 #
 # default index path
@@ -110,31 +118,9 @@ def GetArrays():
 #
 @app.route('/data/array/<arrayID>')
 def GetArray(arrayID):
-    conn  = db_connect.connect()
-    data  = []
+    array = get_array_metadata(arrayID)
 
-    query = conn.execute("SELECT url FROM array WHERE id == {}".format(arrayID))
-    results = query.cursor.fetchall()
-
-    array = {
-                "name"      : None, 
-                "type"      : None, 
-                "version"   : "0.1",
-                "tags"      : [],
-                "data"      : {
-                    "type"  : None, 
-                    "dim"   : None, 
-                    "url"   : "",
-                    "values": []
-                }
-            }
-
-    if (len(results) != 0):
-        fname = PROJECT_HOME + "/" + results[0][0]
-
-        with open(fname, "r") as jfile:
-            array = json.load(jfile)
-
+    if (array['data']['url'] != ""):
         values = numpy.load(PROJECT_HOME + "/" + array["data"]["url"])
         array["data"]["values"] = values["data"].tolist() 
 
@@ -288,6 +274,21 @@ def SegmentsForGene(name, structureid):
         segments.append(b[0])
 
     return jsonify({'segments': segments})
+
+#
+# sample an array
+#
+@app.route('/data/samplearray/<arrayID>/<begin>/<end>/<numsamples>')
+def SampleArray(arrayID, begin, end, numsamples):
+    array = get_array_metadata(arrayID)
+
+    if ( array['type'] == 'sequence' ): 
+        data = bbi.fetch(PROJECT_HOME + "/" + array['data']['url'], array['data']['chrom'], int(begin), int(end), int(numsamples))
+        # labels = [None] * numsamples
+        # labels[0]  = begin
+        # labels[-1] = end
+
+    return jsonify({'data': list(data)})
 
 
 #
