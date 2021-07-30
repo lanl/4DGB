@@ -4,7 +4,7 @@
 "version"   : "0.1",
 "tags"      : ["epigenetics"], 
 "data"      : {
-    "chrom" : "chrX",
-    "url"   : "source/GSM2862886_ChIP_MEF_WT_H3K27me3_cas_Rep1.bw"
+    "chrom" : "chr21",
+    "url"   : "source/bigWigExample.bw"
 }
 }

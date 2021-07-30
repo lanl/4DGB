@@ -231,7 +231,7 @@ def test_get_arrays():
     for t in tests:
         assert(arrays['arrays'][t['id']] == t['array']) 
 
-def dont_test_get_sampled_array():
+def test_get_sampled_array():
     array = client.get_sampled_array(4, 100000, 200000, 100)
     assert(len(array['data']) == 100)
 
