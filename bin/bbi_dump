@@ -20,4 +20,5 @@ for c in sizes:
     print("{}: {}".format(c, sizes[c]))
 
 values = bbi.fetch(bfile, "1", 0, 166600000, 833)
-numpy.savez_compressed("0004.npz", data=values)
+print(values)
+# numpy.savez_compressed("0004.npz", data=values)
