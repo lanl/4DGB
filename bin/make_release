@@ -62,11 +62,13 @@ echo "Installing python module and creating package ..."
 mkdir python
 pushd python 2>&1 >/dev/null
 cp -rf ../../../src/gentk . 
+mv gentk/license.md .
+mv gentk/MANIFEST.in .
 mv gentk/setup.py .
 mv gentk/readme.md . 
 mv gentk/requirements.txt . 
 mv gentk/genex .
-python setup.py sdist
+python setup.py sdist -v
 echo "    to upload python module: twine upload dist/*"
 echo "    or: twine upload --repository testpypi dist/"
 cp -rf ../../../testing/test_gentk.py .

@@ -49,50 +49,12 @@ def SegmentEpigeneticsData(identifier, state):
 
     return jsonify({'data': data})
 
-# ------------------------------------------------------------------------------------------------
-# CALLS TO BE UPDATED
-# ------------------------------------------------------------------------------------------------
-
-@app.route('/bbi/<state>/<ID>/<chrom>/<begin>/<end>')
-def BBIQuery(state, ID, chrom, begin, end):
-    conn = db_connect.connect()
-    query = conn.execute("SELECT file FROM datafiles WHERE state == ? AND type == ? AND ID == ?", state, "epigenetics", ID)
-    results = query.cursor.fetchone()
-    # TODO: update so query returns the entire value
-    fname = PROJECT_HOME + "/" + results[0]
-    # print("BBI file queried: {}".format(fname))
-
-    numbins = 100
-    data = bbi.fetch(fname, chrom, int(begin), int(end), numbins)
-    labels = [None] * numbins
-    labels[0]  = begin
-    labels[-1] = end
-
-    return jsonify({'labels': labels, 'series': list(data)})
 
 # ------------------------------------------------------------------------------------------------
 # UPDATED CALLS
 # ------------------------------------------------------------------------------------------------
 
-#
-# default index path
-#
-@app.route('/')
-def home():
-    return app.send_static_file('index.html')
-
-#
-# default path
-#
-@app.route('/<path:path>')
-def root(path):
-    return app.send_static_file(path)
-
-#
-# return a data array defined on the segments 
-#
-@app.route('/data/array/<arrayID>')
-def GetArray(arrayID):
+def get_array_metadata(arrayID):
     conn  = db_connect.connect()
     data  = []
 
@@ -118,6 +80,47 @@ def GetArray(arrayID):
         with open(fname, "r") as jfile:
             array = json.load(jfile)
 
+    return array
+
+#
+# default index path
+#
+@app.route('/')
+def home():
+    return app.send_static_file('index.html')
+
+#
+# default path
+#
+@app.route('/<path:path>')
+def root(path):
+    return app.send_static_file(path)
+
+#
+# return a list of the variables available
+#
+@app.route('/data/arrays')
+def GetArrays():
+    conn  = db_connect.connect()
+    data  = []
+
+    query = conn.execute("SELECT name,id FROM array ORDER BY id")
+    for a in query.cursor.fetchall():
+        data.append({ 
+                        'id'  : a[1], 
+                        'name': a[0]
+                    })
+
+    return jsonify({ 'arrays': data })
+
+#
+# return a data array defined on the segments 
+#
+@app.route('/data/array/<arrayID>')
+def GetArray(arrayID):
+    array = get_array_metadata(arrayID)
+
+    if (array['data']['url'] != ""):
         values = numpy.load(PROJECT_HOME + "/" + array["data"]["url"])
         array["data"]["values"] = values["data"].tolist() 
 
@@ -142,9 +145,9 @@ def SetArray():
         arrayfname  = '{}/{}'.format(PROJECT_HOME, aname) 
 
         # save the file to the database
-        conn.execute('''INSERT INTO array (id,url) VALUES (?,?)''', [arrayID, fname])
-
         data = request.get_json()
+        conn.execute('''INSERT INTO array (id,name,type,url) VALUES (?,?,?,?)''', [arrayID, data["name"], data["type"], fname])
+
         with open(fullname, 'w') as jfile:
             jfile.write("{\n")
             jfile.write("\"name\"      : \"{}\",\n".format(data["name"]))
@@ -271,6 +274,21 @@ def SegmentsForGene(name, structureid):
         segments.append(b[0])
 
     return jsonify({'segments': segments})
+
+#
+# sample an array
+#
+@app.route('/data/samplearray/<arrayID>/<begin>/<end>/<numsamples>')
+def SampleArray(arrayID, begin, end, numsamples):
+    array = get_array_metadata(arrayID)
+
+    if ( array['type'] == 'sequence' ): 
+        data = bbi.fetch(PROJECT_HOME + "/" + array['data']['url'], array['data']['chrom'], int(begin), int(end), int(numsamples))
+        # labels = [None] * numsamples
+        # labels[0]  = begin
+        # labels[-1] = end
+
+    return jsonify({'data': list(data)})
 
 
 #
