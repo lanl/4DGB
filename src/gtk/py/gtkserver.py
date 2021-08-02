@@ -187,6 +187,19 @@ def SegmentData(identifier):
     return jsonify({ 'segments': data })
 
 #
+# return the segments of a structure
+#
+@app.route('/data/structure/<identifier>/segmentids')
+def SegmentIds(identifier):
+    conn    = db_connect.connect()
+    query   = conn.execute("SELECT segid FROM structure WHERE structureid == {} ORDER BY segid".format(identifier))
+    data    = []
+    for b in query.cursor.fetchall():
+        data.append(b[0])
+
+    return jsonify({ 'segmentids': data })
+
+#
 # return contact records (Hi-C data)
 #
 @app.route('/data/contact-map/<identifier>')

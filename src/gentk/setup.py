@@ -4,7 +4,7 @@ long_description = open('readme.md').read()
 
 setuptools.setup(
     name="gentk",
-    version="0.5.12",
+    version="0.5.13",
     author="David H. Rogers",
     author_email="dhr@lanl.gov",
     description="4D Genome Toolkit.",

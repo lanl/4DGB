@@ -94,3 +94,9 @@ class client:
         jdata = json.loads(response.text)
 
         return jdata
+
+    def get_segment_ids(self, sid ):
+        response = requests.get('{}:{}/data/structure/{}/segmentids'.format(self.url, self.port, sid)) 
+        jdata = json.loads(response.text)
+
+        return jdata

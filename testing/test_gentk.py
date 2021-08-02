@@ -237,3 +237,14 @@ def test_get_sampled_array():
 
     array = client.get_sampled_array(4, 100000, 200000, 52)
     assert(len(array['data']) == 52)
+
+def test_get_segment_ids():
+    tests = [
+                { 
+                    'id'    : 0,
+                    'ids'   : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] 
+                }
+            ]
+    for t in tests:
+        ids = client.get_segment_ids(0)
+        assert(t['ids'] == ids['segmentids'])
