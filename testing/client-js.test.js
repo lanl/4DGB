@@ -15,7 +15,7 @@ test('client test', () => {
                             writeStream.write(JSON.stringify(response));
                             writeStream.write("\n");
                             writeStream.end();
-                        });
+                        }, 'structure');
 
     client.get_array( (response) => {
                             var streamname = "gtkclient_array_test.json";

@@ -93,7 +93,7 @@ class GTKViewerPanel {
     }
 
     updateArrayNames() {
-        TheGTKClient.get_arrays( (response) => {
+        TheGTKClient.get_structure_arrays( (response) => {
             for (const f of response['arrays']) { 
                 var option = document.createElement('option');
                 option.value = f['name'];

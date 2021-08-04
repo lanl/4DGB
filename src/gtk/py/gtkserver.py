@@ -99,18 +99,21 @@ def root(path):
 #
 # return a list of the variables available
 #
-@app.route('/data/arrays')
-def GetArrays():
+@app.route('/data/arrays/<atype>')
+def GetArrays(atype):
     conn  = db_connect.connect()
     data  = []
+    print("atype: {}".format(atype))
 
-    query = conn.execute("SELECT name,id FROM array ORDER BY id")
+    query = conn.execute("SELECT name,id,type FROM array WHERE type == \'{}\' ORDER BY id".format(atype))
     for a in query.cursor.fetchall():
         data.append({ 
                         'id'  : a[1], 
-                        'name': a[0]
+                        'name': a[0],
+                        'type': a[2]
                     })
 
+    print(data)
     return jsonify({ 'arrays': data })
 
 #

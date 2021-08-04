@@ -15,7 +15,9 @@ The main way to interact with the database is to create a client, then make call
 ```
 
 ## API
-- **get_arrays()** Get a list of arrays from the server. The list is made of key, value pairs:
+- **get_structure_arrays()** Get a list of structure arrays from the server. The list is made of key, value pairs (see below).
+- **get_sequence_arrays()** Get a list of sequence arrays from the server. The list is made of key, value pairs (see below).
+- **get_arrays(type)** Get a list of all arrays from the server. The list is made of key, value pairs (see below).
 ```
     Example:
     arrays = client.get_arrays()
@@ -24,11 +26,13 @@ The main way to interact with the database is to create a client, then make call
     [
         {
             'id': int,
-            'name': string
+            'name': string,
+            'type': string
         },
         {
             'id': int,
-            'name': string
+            'name': string,
+            'type': string
         },
         ,,,
     ]

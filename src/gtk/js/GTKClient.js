@@ -96,10 +96,24 @@ class GTKClient {
     }
 
     //
-    // get an array 
+    // get all structure arrays
     //
-    get_arrays(callback) {
-        fetch( this.url + ':' + this.port + '/data/arrays' )
+    get_structure_arrays(callback) {
+        this.get_arrays(callback, 'structure')
+    }
+
+    //
+    // get all sequence arrays
+    //
+    get_sequence_arrays(callback) {
+        this.get_arrays(callback, 'sequence')
+    }
+
+    //
+    // get all arrays
+    //
+    get_arrays(callback, type) {
+        fetch( this.url + ':' + this.port + '/data/arrays/' + type )
             .then(response => response.json())
             .then(data => callback(data))
     }

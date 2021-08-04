@@ -59,8 +59,14 @@ class client:
 
         return jdata
 
-    def get_arrays(self):
-        response = requests.get('{}:{}/data/arrays'.format(self.url, self.port))
+    def get_structure_arrays(self):
+        return self.get_arrays('structure')
+
+    def get_sequence_arrays(self):
+        return self.get_arrays('sequence')
+
+    def get_arrays(self, atype):
+        response = requests.get('{}:{}/data/arrays/{}'.format(self.url, self.port, atype))
         jdata = json.loads(response.text)
 
         return jdata
