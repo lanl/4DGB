@@ -62,11 +62,23 @@ class GTKViewerPanel {
         cell.appendChild(this.variablechoice);
         this.variablechoice.addEventListener('change', (function (e) { this.onVariableSelect(e) }).bind(this));
 
-        cell = row.insertCell(2);
-        this.variable = document.createElement("input");
-        this.variable.setAttribute("type", "text");
-        this.variable.value = project.getApplicationData("gtk")['controlpanel']['variable']['current']
-        cell.appendChild(this.variable);
+            // colormap
+        var row = this.controls.insertRow(1); 
+        var name = row.insertCell(0);
+        name.innerHTML = "Colormap";
+
+        var cell = row.insertCell(1);
+        this.colormapchoice = document.createElement("select");
+        this.colormapchoice.setAttribute("type", "text");
+        cell.appendChild(this.colormapchoice);
+        this.colormapchoice.addEventListener('change', (function (e) { this.onColormapSelect(e) }).bind(this));
+        this.updateColormapNames();
+
+        // cell = row.insertCell(2);
+        // this.variable = document.createElement("input");
+        // this.variable.setAttribute("type", "text");
+        // this.variable.value = project.getApplicationData("gtk")['controlpanel']['variable']['current']
+        // cell.appendChild(this.variable);
 
         // contact map 
         var cm_elem = document.createElement("div");
@@ -105,6 +117,16 @@ class GTKViewerPanel {
         });
     }
 
+    updateColormapNames() {
+        var colormaps = [ 'cooltowarm', 'blackbody', 'grayscale', 'rainbow' ]
+        for (const c of colormaps) { 
+            var option = document.createElement('option');
+            option.value = c;
+            option.innerHTML = c;
+            this.colormapchoice.appendChild(option)
+        }
+    }
+
     //
     // get the array from the server
     //
@@ -115,7 +137,16 @@ class GTKViewerPanel {
                 // get min/max of variables
                 this.geometrycanvas.geometry.setLUTParameters( 1, 11 ); 
                 this.geometrycanvas.geometry.colorBy( response['name'], response['data']['values']);
+                this.geometrycanvas.render();
             }, varID);
+    }
+
+    //
+    // set a new colormap 
+    //
+    onColormapSelect(e) {
+        var colormap = e.target.value;
+        this.geometrycanvas.geometry.setLUT( e.target.value );
     }
 }
 

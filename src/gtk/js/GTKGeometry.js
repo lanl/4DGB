@@ -149,6 +149,11 @@ class GTKGeometry {
         }
     }
 
+    setLUT( name ) {
+        var numdivs = 512;
+        this.LUT = new THREE.Lut( name, numdivs ); 
+    }
+
     setLUTParameters( min, max )
     {
         this.LUT.setMin(min);

@@ -105,8 +105,6 @@ def root(path):
 def GetArrays(atype):
     conn  = db_connect.connect()
     data  = []
-    print("atype: {}".format(atype))
-
     query = conn.execute("SELECT name,id,type FROM array WHERE type == \'{}\' ORDER BY id".format(atype))
     for a in query.cursor.fetchall():
         data.append({ 
@@ -115,7 +113,6 @@ def GetArrays(atype):
                         'type': a[2]
                     })
 
-    print(data)
     return jsonify({ 'arrays': data })
 
 #
