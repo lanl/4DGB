@@ -60,6 +60,7 @@ class GTKViewerPanel {
         this.variablechoice = document.createElement("select");
         this.variablechoice.setAttribute("type", "text");
         cell.appendChild(this.variablechoice);
+        this.variablechoice.addEventListener('change', (function (e) { this.onVariableSelect(e) }).bind(this));
 
         cell = row.insertCell(2);
         this.variable = document.createElement("input");
@@ -97,10 +98,24 @@ class GTKViewerPanel {
             for (const f of response['arrays']) { 
                 var option = document.createElement('option');
                 option.value = f['name'];
+                option.varID = f['id'];
                 option.innerHTML = f['name'];
                 this.variablechoice.appendChild(option)
             }
         });
+    }
+
+    //
+    // get the array from the server
+    //
+    onVariableSelect(e) {
+        var varID = e.target.options[e.target.selectedIndex].varID;
+        TheGTKClient.get_array( (response) => {
+                // TODO: check response
+                // get min/max of variables
+                this.geometrycanvas.geometry.setLUTParameters( 1, 11 ); 
+                this.geometrycanvas.geometry.colorBy( response['name'], response['data']['values']);
+            }, varID);
     }
 }
 

@@ -136,5 +136,23 @@ class GTKGeometry {
             }
         }, this.geometry );
     }
+
+    //
+    // the 'values' array is zero-based, and the segments is ID-based
+    //
+    colorBy( varname, values ) {
+        this.varname = varname;
+        var numsegs = this.getNumSegments();
+        for (var i = 1; i <= numsegs; i++) {
+            // this.segments[i].setAttributeValue( this.varname, values[i] ); 
+            this.segments[i].setColor(this.LUT.getColor(values[i-1]));
+        }
+    }
+
+    setLUTParameters( min, max )
+    {
+        this.LUT.setMin(min);
+        this.LUT.setMax(max);
+    }
 }
 

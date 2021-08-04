@@ -49,16 +49,12 @@
         {
             "id"        : 0,
             "url"       : "source/0/file.hic",
-            "unmapped-segments": [
-                            [3,5]
-                        ]
+            "unmapped-segments": [ ]
         },
         {
             "id"        : 1,
             "url"       : "source/1/file.hic",
-            "unmapped-segments": [
-                            [6,8]
-                        ]
+            "unmapped-segments": [ ]
         }
     ],
     "md-contact-map": [
@@ -176,7 +172,7 @@
             "width":  500, 
             "height": 500,
             "scene": {
-                "background" : "0x000000",
+                "background" : "0xD3D3D3",
                 "camera":   { 
                     "fov":      10, 
                     "aspect":   1, 

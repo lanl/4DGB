@@ -69,6 +69,8 @@ def get_array_metadata(arrayID):
                 "data"      : {
                     "type"  : None, 
                     "dim"   : None, 
+                    "min"   : None,
+                    "max"   : None,
                     "url"   : "",
                     "values": []
                 }
