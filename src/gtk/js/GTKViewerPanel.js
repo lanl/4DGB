@@ -132,13 +132,7 @@ class GTKViewerPanel {
     //
     onVariableSelect(e) {
         var varID = e.target.options[e.target.selectedIndex].varID;
-        TheGTKClient.get_array( (response) => {
-                // TODO: check response
-                // get min/max of variables
-                this.geometrycanvas.geometry.setLUTParameters( 1, 11 ); 
-                this.geometrycanvas.geometry.colorBy( response['name'], response['data']['values']);
-                this.geometrycanvas.render();
-            }, varID);
+        this.setVariable( varID );
     }
 
     //
@@ -147,6 +141,17 @@ class GTKViewerPanel {
     onColormapSelect(e) {
         var colormap = e.target.value;
         this.geometrycanvas.geometry.setLUT( e.target.value );
+        this.setVariable( this.variablechoice.selectedIndex );
+    }
+
+    setVariable( id ) {
+        TheGTKClient.get_array( (response) => {
+                // TODO: check response
+                // get min/max of variables
+                this.geometrycanvas.geometry.setLUTParameters( 1, 11 ); 
+                this.geometrycanvas.geometry.colorBy( response['name'], response['data']['values']);
+                this.geometrycanvas.render();
+            }, id);
     }
 }
 
