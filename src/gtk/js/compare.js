@@ -34,13 +34,19 @@ var GTKPanels = [];
 function link_cameras(a, b) {
     // link the cameras
     a.geometrycanvas.controls.addEventListener( 'change', () => {
-        b.geometrycanvas.camera.position.copy( a.geometrycanvas.camera.position );
-        b.geometrycanvas.camera.rotation.copy( a.geometrycanvas.camera.rotation );
+        // b.geometrycanvas.camera.position.copy( a.geometrycanvas.camera.position );
+        // b.geometrycanvas.camera.rotation.copy( a.geometrycanvas.camera.rotation );
+        b.geometrycanvas.camera.copy( a.geometrycanvas.camera, true );
+        b.geometrycanvas.camera.updateMatrix();
+        b.geometrycanvas.controls.target = a.geometrycanvas.controls.target;
         b.geometrycanvas.render();
     });
     b.geometrycanvas.controls.addEventListener( 'change', () => {
-        a.geometrycanvas.camera.position.copy( b.geometrycanvas.camera.position );
-        a.geometrycanvas.camera.rotation.copy( b.geometrycanvas.camera.rotation );
+        // a.geometrycanvas.camera.position.copy( b.geometrycanvas.camera.position );
+        // a.geometrycanvas.camera.rotation.copy( b.geometrycanvas.camera.rotation );
+        a.geometrycanvas.camera.copy( b.geometrycanvas.camera, true );
+        a.geometrycanvas.camera.updateMatrix();
+        a.geometrycanvas.controls.target = b.geometrycanvas.controls.target;
         a.geometrycanvas.render();
     });
 }
