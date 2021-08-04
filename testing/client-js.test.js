@@ -9,6 +9,14 @@ test('client test', () => {
     // test.00
     client = new GTKClient("http://127.0.0.1", 8000);
 
+    client.get_arrays( (response) => {
+                            var streamname = "gtkclient_get-arrays_test.json";
+                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
+                            writeStream.write(JSON.stringify(response));
+                            writeStream.write("\n");
+                            writeStream.end();
+                        });
+
     client.get_array( (response) => {
                             var streamname = "gtkclient_array_test.json";
                             var writeStream = fs.createWriteStream(streamname, {flags: 'w'});

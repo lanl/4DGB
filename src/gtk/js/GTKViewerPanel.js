@@ -45,6 +45,29 @@ class GTKViewerPanel {
         gc_elem.id = "gc_elem-" + parent;
         this.container.appendChild(gc_elem);
         this.geometrycanvas = new GTKGeometryCanvas( project, dataset, gc_elem.id );
+
+        // controls
+        this.controls = document.createElement("table");
+        this.container.appendChild(this.controls);
+
+            // variable
+        var row = this.controls.insertRow(0); 
+        var name = row.insertCell(0);
+        name.innerHTML = "Variable";
+        this.updateArrayNames();
+
+        var cell = row.insertCell(1);
+        this.variablechoice = document.createElement("select");
+        this.variablechoice.setAttribute("type", "text");
+        cell.appendChild(this.variablechoice);
+
+        cell = row.insertCell(2);
+        this.variable = document.createElement("input");
+        this.variable.setAttribute("type", "text");
+        this.variable.value = project.getApplicationData("gtk")['controlpanel']['variable']['current']
+        cell.appendChild(this.variable);
+
+        // contact map 
         var cm_elem = document.createElement("div");
         cm_elem.id = "cm_elem-" + parent;
         this.container.appendChild(cm_elem);
@@ -68,4 +91,16 @@ class GTKViewerPanel {
             this.geometrycanvas.render();
         }).bind(this);
     }
+
+    updateArrayNames() {
+        TheGTKClient.get_arrays( (response) => {
+            for (const f of response['arrays']) { 
+                var option = document.createElement('option');
+                option.value = f['name'];
+                option.innerHTML = f['name'];
+                this.variablechoice.appendChild(option)
+            }
+        });
+    }
 }
+

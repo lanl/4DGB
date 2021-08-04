@@ -95,6 +95,15 @@ class GTKClient {
             .then(data => callback(data))
     }
 
+    //
+    // get an array 
+    //
+    get_arrays(callback) {
+        fetch( this.url + ':' + this.port + '/data/arrays' )
+            .then(response => response.json())
+            .then(data => callback(data))
+    }
+
 }
 
 // to be removed when node.js is included

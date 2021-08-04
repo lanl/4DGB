@@ -61,7 +61,7 @@ function main( project ) {
     link_cameras(GTKPanels[0], GTKPanels[1]);
 
     // attribute charts
-    GTKCharts = new GTKChartPanel( "centerpanel" );
+    GTKCharts = new GTKChartPanel( "detailpanel" );
 }
 
 //
