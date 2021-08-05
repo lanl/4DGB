@@ -144,7 +144,7 @@ print("")
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS array''')
     # create the table 
-c.execute('''CREATE TABLE array (id INT, name TEXT, type TEXT, url TEXT)''')
+c.execute('''CREATE TABLE array (id INT, name TEXT, type TEXT, min TEXT, max TEXT, url TEXT)''')
 
 print("Creating array table")
 if "array" in jsondata["data"]: 
@@ -153,7 +153,8 @@ if "array" in jsondata["data"]:
         arraydata = {}
         with open(os.path.join(project, a["url"]), 'r') as afile:
             adata = json.load(afile)
-        c.execute('''INSERT INTO array (id,name,type,url) VALUES (?,?,?,?)''', [a["id"], adata["name"], adata["type"], a["url"]])
+        c.execute('''INSERT INTO array (id,name,type,min,max,url) VALUES (?,?,?,?,?,?)''', 
+                    [a["id"], adata["name"], adata["type"], adata['data']['min'], adata['data']['max'], a["url"]])
 
 print("")
 

@@ -105,10 +105,10 @@ def test_get_array():
                 {
                     'note'  : 'correct query',
                     'id'    : 0,
-                    'name'  : "compartment",
+                    'name'  : 'increasing',
                     'type'  : 'structure',
                     'tags'  : [],
-                    'values': [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]
+                    'values': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
                 },
                 {
                     'note'  : 'Edge test: last array is < 10000. Should return empty dict',
@@ -195,7 +195,9 @@ def test_set_array():
                                     "type": "structure", 
                                     "tags": [], 
                                     "datatype": "int", 
-                                    "datadim": 1
+                                    "datadim": 1,
+                                    "datamin": 0,
+                                    "datamax": 4
                                  },
                     'values'     : [0, 1, 2, 3, 4],
                     'arrayid'   :  5
@@ -212,22 +214,22 @@ def test_set_array():
         assert (result['tags'] == t['metadata']['tags'])
         assert (result['data']['values'] == t['values'])
 
-    arrays = client.get_arrays()
-    assert(arrays['arrays'][5] == {'id': 5, 'name': 'test set array'})
+    arrays = client.get_arrays('structure')
+    assert(arrays['arrays'][4] == {'id': 5, 'max': None, 'min': None, 'type': 'structure', 'name': 'test set array'})
 
 def test_get_arrays():
     tests = [
                 { 
                     'id'    : 0,
-                    'array' : {'id': 0, 'name': 'compartment'}
+                    'array' : {'id': 0, 'min': '1', 'max': '11', 'type': 'structure', 'name': 'increasing'}
                 },
                 {
                     'id'    : 1,
-                    'array' : {'id': 1, 'name': 'second variable'}
+                    'array' : {'id': 1, 'min': '1', 'max': '11', 'type': 'structure', 'name': 'decreasing'}
                 }
             ]
 
-    arrays = client.get_arrays()
+    arrays = client.get_arrays('structure')
     for t in tests:
         assert(arrays['arrays'][t['id']] == t['array']) 
 

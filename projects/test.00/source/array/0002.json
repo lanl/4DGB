@@ -4,8 +4,10 @@
 "version"   : "0.1",
 "tags"      : ["epigenetics"], 
 "data"      : {
-    "type"  : "real",
+    "type"  : "float",
     "dim"   : 1,
+    "min"   : 110.0,
+    "max"   : 210.0,
     "url"   : "source/array/0002.npz" 
 }
 }

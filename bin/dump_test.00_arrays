@@ -12,3 +12,13 @@ afile = "projects/test.00/source/array/0001.npz"
 values = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 print("saving file to: {}".format(afile))
 numpy.savez_compressed(afile, data=values)
+
+afile = "projects/test.00/source/array/0002.npz"
+values = [110.0, 120.0, 130.0, 140.0, 150.0, 160.0, 170.0, 180.0, 190.0, 200.0, 210.0]
+print("saving file to: {}".format(afile))
+numpy.savez_compressed(afile, data=values)
+
+afile = "projects/test.00/source/array/0003.npz"
+values = [210.0, 200.0, 190.0, 180.0, 170.0, 160.0, 150.0, 140.0, 130.0, 120.0, 110.0]
+print("saving file to: {}".format(afile))
+numpy.savez_compressed(afile, data=values)
