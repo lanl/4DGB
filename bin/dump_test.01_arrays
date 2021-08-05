@@ -1,0 +1,33 @@
+#!/usr/bin/env python
+
+import sys
+import numpy
+import decimal
+
+def float_range(start, numvalues, step):
+    curval = 0
+    while curval < numvalues: 
+        yield float(start)
+        start += decimal.Decimal(step)
+        curval += 1
+
+afile = "projects/test.01/source/array/0000.npz"
+values = list(range(1,834)) 
+print("saving file to: {}".format(afile))
+numpy.savez_compressed(afile, data=values)
+
+afile = "projects/test.01/source/array/0001.npz"
+print("saving file to: {}".format(afile))
+values.reverse()
+numpy.savez_compressed(afile, data=values)
+
+afile = "projects/test.01/source/array/0002.npz"
+values = list(float_range(100, 833, '10.1'))
+print("saving file to: {}".format(afile))
+print(values)
+numpy.savez_compressed(afile, data=values)
+
+afile = "projects/test.01/source/array/0003.npz"
+print("saving file to: {}".format(afile))
+values.reverse()
+numpy.savez_compressed(afile, data=values)
