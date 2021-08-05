@@ -190,7 +190,7 @@ def test_get_segments_for_gene():
         result = client.get_segments_for_gene(t["structure"], t["gene"])
         assert (result['segments'] == t["gold"]) 
 
-def dont_test_set_array():
+def test_set_array():
     tests = [
                 {
                     'metadata'  : {
@@ -201,9 +201,11 @@ def dont_test_set_array():
                                     "datadim": 1,
                                     "datamin": 0,
                                     "datamax": 4
-                                 },
-                    'values'     : [0, 1, 2, 3, 4],
-                    'arrayid'   :  5
+                                },
+                    'values'    : [0, 1, 2, 3, 4, 5],
+                    'wrongvals' : [10, 11, 12, 13, 14, 15],
+                    'arrayid'   : 5,
+                    'sliceids'  : [0, 1]
                 }
             ]
 
@@ -211,11 +213,13 @@ def dont_test_set_array():
         arrayid = client.set_array(t['values'], t['metadata'])
         assert(arrayid == t['arrayid'])
 
-        result = client.get_array(t['arrayid'])
-        assert (result['name'] == t['metadata']['name'])
-        assert (result['type'] == t['metadata']['type'])
-        assert (result['tags'] == t['metadata']['tags'])
-        assert (result['data']['values'] == t['values'])
+        for i in t['sliceids']:
+            result = client.get_array(t['arrayid'], i)
+            assert (result['name'] == t['metadata']['name'])
+            assert (result['type'] == t['metadata']['type'])
+            assert (result['tags'] == t['metadata']['tags'])
+            assert (result['data']['values'] == t['values'])
+            assert (result['data']['values'] != t['wrongvals'])
 
     arrays = client.get_arrays('structure')
     assert(arrays['arrays'][4] == {'id': 5, 'max': None, 'min': None, 'type': 'structure', 'name': 'test set array'})
@@ -224,11 +228,11 @@ def test_get_arrays():
     tests = [
                 { 
                     'id'    : 0,
-                    'array' : {'id': 0, 'min': 1, 'max': 12, 'type': 'structure', 'name': 'increasing int'}
+                    'array' : {'id': 0, 'min': 1, 'max': 22, 'type': 'structure', 'name': 'increasing int'}
                 },
                 {
                     'id'    : 1,
-                    'array' : {'id': 1, 'min': 1, 'max': 12, 'type': 'structure', 'name': 'decreasing int'}
+                    'array' : {'id': 1, 'min': 1, 'max': 22, 'type': 'structure', 'name': 'decreasing int'}
                 }
             ]
 
@@ -253,3 +257,14 @@ def test_get_segment_ids():
     for t in tests:
         ids = client.get_segment_ids(0)
         assert(t['ids'] == ids['segmentids'])
+
+def test_get_datset_ids():
+    tests = [
+                { 
+                    'ids'   : [0, 1]
+                }
+            ]
+    for t in tests:
+        ids = client.get_dataset_ids()
+        assert(t['ids'] == ids)
+

@@ -118,6 +118,15 @@ class GTKClient {
             .then(data => callback(data))
     }
 
+    //
+    // get dataset ids 
+    //
+    get_dataset_ids(callback) {
+        fetch( this.url + ':' + this.port + '/datasets' )
+            .then(response => response.json())
+            .then(data => callback(data))
+    }
+
 }
 
 // to be removed when node.js is included

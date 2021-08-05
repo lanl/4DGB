@@ -106,3 +106,9 @@ class client:
         jdata = json.loads(response.text)
 
         return jdata
+
+    def get_dataset_ids(self):
+        response = requests.get('{}:{}/datasets'.format(self.url, self.port)) 
+        jdata = json.loads(response.text)
+
+        return jdata
