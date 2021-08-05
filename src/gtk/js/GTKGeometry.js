@@ -143,6 +143,10 @@ class GTKGeometry {
     colorBy( varname, values ) {
         this.varname = varname;
         var numsegs = this.getNumSegments();
+        // iterate over all the segments, and color
+        // note that this should not assume that the segment IDs increase 
+        // linearly - all functions should be written to iterate over the ids, 
+        // not a value for the id
         for (var i = 1; i <= numsegs; i++) {
             // this.segments[i].setAttributeValue( this.varname, values[i] ); 
             this.segments[i].setColor(this.LUT.getColor(values[i-1]));

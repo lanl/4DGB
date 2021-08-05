@@ -47,11 +47,39 @@ class GTKViewerPanel {
         this.geometrycanvas = new GTKGeometryCanvas( project, dataset, gc_elem.id );
 
         // controls
+        var cur_row = 0;
         this.controls = document.createElement("table");
         this.container.appendChild(this.controls);
 
+            // location
+        var row = this.controls.insertRow(cur_row); 
+        cur_row += 1;
+        var name = row.insertCell(0);
+        name.innerHTML = "Location";
+
+        var cell = row.insertCell(1);
+        this.locationchoice = document.createElement("select");
+        this.locationchoice.setAttribute("type", "text");
+        cell.appendChild(this.locationchoice);
+        this.updateLocationNames(project);
+        // this.variablechoice.addEventListener('change', (function (e) { this.onVariableSelect(e) }).bind(this));
+        
+            // location
+        var row = this.controls.insertRow(cur_row); 
+        cur_row += 1;
+        var name = row.insertCell(0);
+        name.innerHTML = "Gene";
+
+        var cell = row.insertCell(1);
+        this.genechoice = document.createElement("select");
+        this.genechoice.setAttribute("type", "text");
+        cell.appendChild(this.genechoice);
+        this.updateGeneNames(project);
+        // this.variablechoice.addEventListener('change', (function (e) { this.onVariableSelect(e) }).bind(this));
+
             // variable
-        var row = this.controls.insertRow(0); 
+        var row = this.controls.insertRow(cur_row); 
+        cur_row += 1;
         var name = row.insertCell(0);
         name.innerHTML = "Variable";
         this.updateArrayNames();
@@ -63,7 +91,8 @@ class GTKViewerPanel {
         this.variablechoice.addEventListener('change', (function (e) { this.onVariableSelect(e) }).bind(this));
 
             // colormap
-        var row = this.controls.insertRow(1); 
+        var row = this.controls.insertRow(cur_row); 
+        cur_row += 1;
         var name = row.insertCell(0);
         name.innerHTML = "Colormap";
 
@@ -127,6 +156,24 @@ class GTKViewerPanel {
         }
     }
 
+    updateGeneNames(project) {
+        for (const f of project.getApplicationData("gtk")['controlpanel']['gene']['favorites']) {
+            var option = document.createElement('option');
+            option.value = f;
+            option.innerHTML = f;
+            this.genechoice.appendChild(option)
+        }
+    }
+
+    updateLocationNames(project) {
+        for (const f of project.getApplicationData("gtk")['controlpanel']['location']['favorites']) {
+            var option = document.createElement('option');
+            option.value = f;
+            option.innerHTML = f;
+            this.locationchoice.appendChild(option)
+        }
+    }
+
     //
     // get the array from the server
     //
@@ -144,6 +191,9 @@ class GTKViewerPanel {
         this.setVariable( this.variablechoice.selectedIndex );
     }
 
+    //
+    // update after a variable has been set
+    //
     setVariable( id ) {
         TheGTKClient.get_array( (response) => {
                 // TODO: check response
