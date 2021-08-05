@@ -24,7 +24,6 @@ numpy.savez_compressed(afile, data=values)
 afile = "projects/test.01/source/array/0002.npz"
 values = list(float_range(100, 833, '10.1'))
 print("saving file to: {}".format(afile))
-print(values)
 numpy.savez_compressed(afile, data=values)
 
 afile = "projects/test.01/source/array/0003.npz"
