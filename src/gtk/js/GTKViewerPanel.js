@@ -187,9 +187,8 @@ class GTKViewerPanel {
     // set a new colormap 
     //
     onColormapSelect(e) {
-        var colormap = e.target.value;
         this.geometrycanvas.geometry.setLUT( e.target.value );
-        this.setVariable( this.variablechoice.selectedIndex );
+        this.setVariable(this.variablechoice.options[this.variablechoice.selectedIndex].varID);
     }
 
     //

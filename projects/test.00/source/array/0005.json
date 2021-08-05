@@ -1,0 +1,13 @@
+{
+"name"      : "category",
+"type"      : "structure",
+"version"   : "0.1",
+"tags"      : [],
+"data"      : {
+    "type"  : "int",
+    "dim"   : 1,
+    "min"   : 1,
+    "max"   : 2,
+    "url"   : "source/array/0005.npz"
+}
+}

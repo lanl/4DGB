@@ -204,7 +204,8 @@ def test_set_array():
                                 },
                     'values'    : [0, 1, 2, 3, 4, 5],
                     'wrongvals' : [10, 11, 12, 13, 14, 15],
-                    'arrayid'   : 5,
+                    'arrayid'   : 6,
+                    'structurearrayid'  : 5,
                     'sliceids'  : [0, 1]
                 }
             ]
@@ -222,7 +223,7 @@ def test_set_array():
             assert (result['data']['values'] != t['wrongvals'])
 
     arrays = client.get_arrays('structure')
-    assert(arrays['arrays'][4] == {'id': 5, 'max': None, 'min': None, 'type': 'structure', 'name': 'test set array'})
+    assert(arrays['arrays'][t['structurearrayid']] == {'id': 6, 'max': None, 'min': None, 'type': 'structure', 'name': 'test set array'})
 
 def test_get_arrays():
     tests = [

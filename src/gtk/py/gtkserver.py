@@ -139,7 +139,7 @@ def GetArray(arrayID, arraySlice):
         values = numpy.load(PROJECT_HOME + "/" + array["data"]["url"])
         array["data"]["values"] = values[sliceID].tolist() 
 
-    return array
+    return jsonify(array)
 
 #
 # set a data array
