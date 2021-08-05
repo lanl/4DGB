@@ -12,21 +12,25 @@ def float_range(start, numvalues, step):
         curval += 1
 
 afile = "projects/test.01/source/array/0000.npz"
-values = list(range(1,834)) 
+values_0 = list(range(1,834)) 
+values_1 = list(range(834, 1667)) 
 print("saving file to: {}".format(afile))
-numpy.savez_compressed(afile, data=values)
+numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
 
 afile = "projects/test.01/source/array/0001.npz"
+values_0.reverse()
+values_1.reverse()
 print("saving file to: {}".format(afile))
-values.reverse()
-numpy.savez_compressed(afile, data=values)
+numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
 
 afile = "projects/test.01/source/array/0002.npz"
-values = list(float_range(100, 833, '10.1'))
+values_0 = list(float_range(100, 833, '10.1'))
+values_1 = list(float_range(9000, 833, '10.1'))
 print("saving file to: {}".format(afile))
-numpy.savez_compressed(afile, data=values)
+numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
 
 afile = "projects/test.01/source/array/0003.npz"
 print("saving file to: {}".format(afile))
-values.reverse()
-numpy.savez_compressed(afile, data=values)
+values_0.reverse()
+values_1.reverse()
+numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
