@@ -221,7 +221,7 @@
                             "radius-end": 0.01
                         },
                         "ghost" : {
-                            "opacity" : 0.5
+                            "opacity" : 0.3
                         },
                         "skeleton" : {
                         }
