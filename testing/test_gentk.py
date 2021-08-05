@@ -105,7 +105,7 @@ def test_get_array():
                 {
                     'note'  : 'correct query',
                     'id'    : 0,
-                    'name'  : 'increasing',
+                    'name'  : 'increasing int',
                     'type'  : 'structure',
                     'tags'  : [],
                     'values': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -221,11 +221,11 @@ def test_get_arrays():
     tests = [
                 { 
                     'id'    : 0,
-                    'array' : {'id': 0, 'min': '1', 'max': '11', 'type': 'structure', 'name': 'increasing'}
+                    'array' : {'id': 0, 'min': 1, 'max': 11, 'type': 'structure', 'name': 'increasing int'}
                 },
                 {
                     'id'    : 1,
-                    'array' : {'id': 1, 'min': '1', 'max': '11', 'type': 'structure', 'name': 'decreasing'}
+                    'array' : {'id': 1, 'min': 1, 'max': 11, 'type': 'structure', 'name': 'decreasing int'}
                 }
             ]
 

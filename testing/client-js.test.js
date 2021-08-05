@@ -25,6 +25,14 @@ test('client test', () => {
                             writeStream.end();
                         });
 
+    client.get_arrays( (response) => {
+                            var streamname = "gtkclient_get-arrays_test.json";
+                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
+                            writeStream.write(JSON.stringify(response));
+                            writeStream.write("\n");
+                            writeStream.end();
+                        }, 'structure');
+
     client.get_array( (response) => {
                             var streamname = "gtkclient_array_test.json";
                             var writeStream = fs.createWriteStream(streamname, {flags: 'w'});

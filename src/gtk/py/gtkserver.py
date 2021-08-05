@@ -107,13 +107,23 @@ def GetArrays(atype):
     data  = []
     query = conn.execute("SELECT name,id,type,min,max FROM array WHERE type == \'{}\' ORDER BY id".format(atype))
     for a in query.cursor.fetchall():
-        data.append({ 
-                        'name': a[0],
-                        'id'  : a[1], 
-                        'type': a[2],
-                        'min' : a[3],
-                        'max' : a[4]
-                    })
+        element = { 
+                    'name': a[0],
+                    'id'  : a[1], 
+                    'type': a[2],
+                    'min' : a[3],
+                    'max' : a[4]
+                  }
+
+        # min
+        if a[3] != None:
+            element['min'] = float(a[3])
+
+        # max
+        if a[4] != None:
+            element['max'] = float(a[4])
+
+        data.append(element)
 
     return jsonify({ 'arrays': data })
 

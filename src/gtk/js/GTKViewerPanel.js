@@ -147,8 +147,7 @@ class GTKViewerPanel {
     setVariable( id ) {
         TheGTKClient.get_array( (response) => {
                 // TODO: check response
-                // get min/max of variables
-                this.geometrycanvas.geometry.setLUTParameters( 1, 11 ); 
+                this.geometrycanvas.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
                 this.geometrycanvas.geometry.colorBy( response['name'], response['data']['values']);
                 this.geometrycanvas.render();
             }, id);

@@ -144,7 +144,7 @@ print("")
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS array''')
     # create the table 
-c.execute('''CREATE TABLE array (id INT, name TEXT, type TEXT, min TEXT, max TEXT, url TEXT)''')
+c.execute('''CREATE TABLE array (id INT, name TEXT, type TEXT, min REAL, max REAL, url TEXT)''')
 
 print("Creating array table")
 if "array" in jsondata["data"]: 
