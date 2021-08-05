@@ -97,6 +97,7 @@ def test_get_array():
                 {
                     'note'  : 'Edge test: first segment is 0. Should return empty dict',
                     'id'    : -1,
+                    'slice' : -1,
                     'name'  : None,
                     'type'  : None,
                     'tags'  : [],
@@ -105,6 +106,7 @@ def test_get_array():
                 {
                     'note'  : 'correct query',
                     'id'    : 0,
+                    'slice' : 0,
                     'name'  : 'increasing int',
                     'type'  : 'structure',
                     'tags'  : [],
@@ -113,6 +115,7 @@ def test_get_array():
                 {
                     'note'  : 'Edge test: last array is < 10000. Should return empty dict',
                     'id'    : 10000,
+                    'slice' : 10000,
                     'name'  : None,
                     'type'  : None,
                     'tags'  : [],
@@ -121,7 +124,7 @@ def test_get_array():
             ]
 
     for t in tests:
-        result = client.get_array(t['id'])
+        result = client.get_array(t['id'], t['slice'])
         assert (result['name'] == t['name'])
         assert (result['type'] == t['type'])
         assert (result['tags'] == t['tags'])
@@ -198,9 +201,12 @@ def test_set_array():
                                     "datadim": 1,
                                     "datamin": 0,
                                     "datamax": 4
-                                 },
-                    'values'     : [0, 1, 2, 3, 4],
-                    'arrayid'   :  5
+                                },
+                    'values'    : [0, 1, 2, 3, 4, 5],
+                    'wrongvals' : [10, 11, 12, 13, 14, 15],
+                    'arrayid'   : 6,
+                    'structurearrayid'  : 5,
+                    'sliceids'  : [0, 1]
                 }
             ]
 
@@ -208,24 +214,26 @@ def test_set_array():
         arrayid = client.set_array(t['values'], t['metadata'])
         assert(arrayid == t['arrayid'])
 
-        result = client.get_array(t['arrayid'])
-        assert (result['name'] == t['metadata']['name'])
-        assert (result['type'] == t['metadata']['type'])
-        assert (result['tags'] == t['metadata']['tags'])
-        assert (result['data']['values'] == t['values'])
+        for i in t['sliceids']:
+            result = client.get_array(t['arrayid'], i)
+            assert (result['name'] == t['metadata']['name'])
+            assert (result['type'] == t['metadata']['type'])
+            assert (result['tags'] == t['metadata']['tags'])
+            assert (result['data']['values'] == t['values'])
+            assert (result['data']['values'] != t['wrongvals'])
 
     arrays = client.get_arrays('structure')
-    assert(arrays['arrays'][4] == {'id': 5, 'max': None, 'min': None, 'type': 'structure', 'name': 'test set array'})
+    assert(arrays['arrays'][t['structurearrayid']] == {'id': 6, 'max': None, 'min': None, 'type': 'structure', 'name': 'test set array'})
 
 def test_get_arrays():
     tests = [
                 { 
                     'id'    : 0,
-                    'array' : {'id': 0, 'min': 1, 'max': 11, 'type': 'structure', 'name': 'increasing int'}
+                    'array' : {'id': 0, 'min': 1, 'max': 22, 'type': 'structure', 'name': 'increasing int'}
                 },
                 {
                     'id'    : 1,
-                    'array' : {'id': 1, 'min': 1, 'max': 11, 'type': 'structure', 'name': 'decreasing int'}
+                    'array' : {'id': 1, 'min': 1, 'max': 22, 'type': 'structure', 'name': 'decreasing int'}
                 }
             ]
 
@@ -250,3 +258,14 @@ def test_get_segment_ids():
     for t in tests:
         ids = client.get_segment_ids(0)
         assert(t['ids'] == ids['segmentids'])
+
+def test_get_datset_ids():
+    tests = [
+                { 
+                    'ids'   : [0, 1]
+                }
+            ]
+    for t in tests:
+        ids = client.get_dataset_ids()
+        assert(t['ids'] == ids)
+

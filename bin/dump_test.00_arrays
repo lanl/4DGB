@@ -3,22 +3,34 @@
 import sys
 import numpy
 
+# 0
 afile = "projects/test.00/source/array/0000.npz"
-values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+values_0 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+values_1 = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
 print("saving file to: {}".format(afile))
-numpy.savez_compressed(afile, data=values)
+numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
 
 afile = "projects/test.00/source/array/0001.npz"
-values = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+values_0.reverse()
+values_1.reverse()
 print("saving file to: {}".format(afile))
-numpy.savez_compressed(afile, data=values)
+numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
 
 afile = "projects/test.00/source/array/0002.npz"
-values = [110.1, 120.2, 130.3, 140.4, 150.5, 160.6, 170.7, 180.8, 190.9, 200.0, 210.1]
+values_0 = [110.1, 120.2, 130.3, 140.4, 150.5, 160.6, 170.7, 180.8, 190.9, 200.0, 210.1]
+values_1 = [220.2, 230.3, 240.4, 250.5, 260.6, 270.7, 280.8, 290.9, 300.0, 310.1, 320.2]
 print("saving file to: {}".format(afile))
-numpy.savez_compressed(afile, data=values)
+numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
 
 afile = "projects/test.00/source/array/0003.npz"
-values = [210.1, 200.0, 190.9, 180.8, 170.7, 160.6, 150.5, 140.4, 130.3, 120.2, 110.1]
+values_0.reverse()
+values_1.reverse()
 print("saving file to: {}".format(afile))
-numpy.savez_compressed(afile, data=values)
+numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
+
+# category variable
+afile = "projects/test.00/source/array/0005.npz"
+values_0 = [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]
+values_1 = [2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1]
+print("saving file to: {}".format(afile))
+numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 

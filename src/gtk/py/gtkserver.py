@@ -8,7 +8,6 @@ from math import nan
 from flask import Flask, request, jsonify, render_template, url_for
 from flask_restful import Resource, Api
 from sqlalchemy import create_engine
-# from json import dumps
 import json
 
 data = {}
@@ -31,28 +30,22 @@ print("")
 # initialize
 #
 PROJECT_HOME = data["project_home"] 
+PROJECT_FILE = PROJECT_HOME + "/project.json"
 db_connect = create_engine(data["db_connect"])
 app = Flask(__name__)
 api = Api(app)
 
-# ------------------------------------------------------------------------------------------------
-# CALLS TO BE DEPRICATED (I THINK)
-# ------------------------------------------------------------------------------------------------
+def get_dataset_ids():
+    datasets = []
+    with open(PROJECT_FILE, 'r') as pfile:
+        data = json.load(pfile)
 
-@app.route('/segepi/<identifier>/<state>')
-def SegmentEpigeneticsData(identifier, state):
-    conn = db_connect.connect()
-    query = conn.execute("SELECT {} FROM segepigenetics WHERE state == ? ORDER BY id".format(identifier), state)
-    data = []
-    for b in query.cursor.fetchall():
-        data.append(b[0])
+        for d in data["datasets"]:
+            datasets.append(d['id'])
+    datasets.sort()
 
-    return jsonify({'data': data})
+    return datasets
 
-
-# ------------------------------------------------------------------------------------------------
-# UPDATED CALLS
-# ------------------------------------------------------------------------------------------------
 
 def get_array_metadata(arrayID):
     conn  = db_connect.connect()
@@ -128,17 +121,25 @@ def GetArrays(atype):
     return jsonify({ 'arrays': data })
 
 #
+# return a list of the project IDs
+#
+@app.route('/datasets')
+def GetDatasetIDs():
+    return jsonify(get_dataset_ids())
+
+#
 # return a data array defined on the segments 
 #
-@app.route('/data/array/<arrayID>')
-def GetArray(arrayID):
+@app.route('/data/array/<arrayID>/<arraySlice>')
+def GetArray(arrayID, arraySlice):
     array = get_array_metadata(arrayID)
 
+    sliceID = "arr_{}".format(arraySlice)
     if (array['data']['url'] != ""):
         values = numpy.load(PROJECT_HOME + "/" + array["data"]["url"])
-        array["data"]["values"] = values["data"].tolist() 
+        array["data"]["values"] = values[sliceID].tolist() 
 
-    return array
+    return jsonify(array)
 
 #
 # set a data array
@@ -175,7 +176,14 @@ def SetArray():
             jfile.write("}\n")
             jfile.write("}\n")
 
-        numpy.savez_compressed(arrayfname, data=data["array"])
+        # TODO:
+        # for this call, we save the same array information for each dataset
+        # we must provide another call to save different arrays for each dataset 
+        kwargs = {} 
+        for d in get_dataset_ids():
+            kwargs["arr_{}".format(d)] = data["array"]
+
+        numpy.savez_compressed(arrayfname, **kwargs) 
 
     results = {'id': arrayID}        
     return jsonify(results)

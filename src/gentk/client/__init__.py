@@ -71,9 +71,9 @@ class client:
 
         return jdata
 
-    def get_array(self, arrayID):
+    def get_array(self, arrayID, arraySlice):
         # get the data from the server
-        response = requests.get('{}:{}/data/array/{}'.format(self.url, self.port, arrayID))
+        response = requests.get('{}:{}/data/array/{}/{}'.format(self.url, self.port, arrayID, arraySlice))
         jdata = json.loads(response.text)
 
         return jdata
@@ -103,6 +103,12 @@ class client:
 
     def get_segment_ids(self, sid ):
         response = requests.get('{}:{}/data/structure/{}/segmentids'.format(self.url, self.port, sid)) 
+        jdata = json.loads(response.text)
+
+        return jdata
+
+    def get_dataset_ids(self):
+        response = requests.get('{}:{}/datasets'.format(self.url, self.port)) 
         jdata = json.loads(response.text)
 
         return jdata
