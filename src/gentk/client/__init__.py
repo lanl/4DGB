@@ -71,9 +71,9 @@ class client:
 
         return jdata
 
-    def get_array(self, arrayID):
+    def get_array(self, arrayID, arraySlice):
         # get the data from the server
-        response = requests.get('{}:{}/data/array/{}'.format(self.url, self.port, arrayID))
+        response = requests.get('{}:{}/data/array/{}/{}'.format(self.url, self.port, arrayID, arraySlice))
         jdata = json.loads(response.text)
 
         return jdata

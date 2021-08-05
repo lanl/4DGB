@@ -39,7 +39,7 @@ test('client test', () => {
                             writeStream.write(JSON.stringify(response));
                             writeStream.write("\n");
                             writeStream.end();
-                        }, 0);
+                        }, 0, 0);
 
     client.get_contactmap( (response) => {
                             var streamname = "gtkclient_contactmap_test.json";

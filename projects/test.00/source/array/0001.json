@@ -7,7 +7,7 @@
     "type"  : "int",
     "dim"   : 1,
     "min"   : 1,
-    "max"   : 11,
+    "max"   : 12,
     "url"   : "source/array/0001.npz"
 }
 }

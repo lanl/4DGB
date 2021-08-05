@@ -89,8 +89,8 @@ class GTKClient {
     //
     // get an array 
     //
-    get_array(callback, arrayID) {
-        fetch( this.url + ':' + this.port + '/data/array/' + arrayID )
+    get_array(callback, arrayID, arraySlice) {
+        fetch( this.url + ':' + this.port + '/data/array/' + arrayID + '/' + arraySlice)
             .then(response => response.json())
             .then(data => callback(data))
     }

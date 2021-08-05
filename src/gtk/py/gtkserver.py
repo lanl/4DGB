@@ -130,13 +130,14 @@ def GetArrays(atype):
 #
 # return a data array defined on the segments 
 #
-@app.route('/data/array/<arrayID>')
-def GetArray(arrayID):
+@app.route('/data/array/<arrayID>/<aSlice>')
+def GetArray(arrayID, aSlice):
     array = get_array_metadata(arrayID)
 
+    sliceID = "arr_{}".format(aSlice)
     if (array['data']['url'] != ""):
         values = numpy.load(PROJECT_HOME + "/" + array["data"]["url"])
-        array["data"]["values"] = values["data"].tolist() 
+        array["data"]["values"] = values[sliceID].tolist() 
 
     return array
 
