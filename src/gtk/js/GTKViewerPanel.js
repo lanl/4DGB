@@ -17,8 +17,7 @@ are met:
        this software without specific prior written permission.
     
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS CONTRIBUTORS "AS IS" AND 
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
 DISCLAIMED. IN NO EVENT SHALL LOS ALAMOS NATIONAL SECURITY, LLC OR CONTRIBUTORS 
 BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
 CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
@@ -31,6 +30,8 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class GTKViewerPanel {
 
     constructor(project, dataset, parent ) {
+        this.datasetID = dataset['id']
+
         var root = document.getElementById(parent);
         this.container = document.createElement("div");
         this.container.className = "gtkviewerpanel";
@@ -200,7 +201,7 @@ class GTKViewerPanel {
                 this.geometrycanvas.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
                 this.geometrycanvas.geometry.colorBy( response['name'], response['data']['values']);
                 this.geometrycanvas.render();
-            }, id);
+            }, id, this.datasetID);
     }
 }
 
