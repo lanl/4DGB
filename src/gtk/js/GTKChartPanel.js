@@ -70,7 +70,7 @@ class GTKChartPanel {
     }
 
     add(state, chrom, start, end) {
-        var chart = new GTKAttributeChart(document, this.charts);
+        var chart = new GTKTrackChart(document, this.charts);
         chart.loadData(state, chrom, start, end);
     }
 
@@ -85,7 +85,7 @@ class GTKChartPanel {
         var max = -1000000.0;
         var charts = [];
         for (var i=0;i < states.length; i++) {
-            charts.push(new GTKAttributeChart(document, pair)); 
+            charts.push(new GTKTrackChart(document, pair)); 
             charts[i].loadData(states[i], chrom, start, end);
             var curMin = charts[i].getMin();
             var curMax = charts[i].getMax();

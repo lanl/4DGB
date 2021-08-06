@@ -29,16 +29,28 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+function createTrack ( data ) {
+    var track   = new GTKTrackChart( "detailpanel" );
+    var start   = 0;
+    var end     = 100;
+    var numbins = 10;
+    var incr    = Math.trunc((end-start)/numbins);
+    var labels  = [];
+    var values  = [];
+    for (var i = 0; i < numbins; i++) { 
+        labels.push(start + i*incr); 
+        values.push(start + i*incr);
+    }
+    track.make( labels, values );
+}
+
 function main( project ) {
     var dset = project.getDatasets(); 
 
     // control panel
     var controls = new GTKControlPanel( project, "controlpanel" );
 
-    // attribute charts
-    GTKCharts = new GTKChartPanel( "detailpanel" );
-
-    controls.addEventListener( "createTrack", GTKCharts.receive );
+    controls.addEventListener( "createTrack", createTrack ); 
 }
 
 //
