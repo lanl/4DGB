@@ -61,4 +61,6 @@ class GTKPublisher {
 
 }
 
-module.exports = GTKPublisher;
+if (typeof process === 'object') {
+    module.exports = GTKPublisher;
+}
