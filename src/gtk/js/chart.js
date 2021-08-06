@@ -29,36 +29,23 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-class GTKPublisher {
-    /**
-     * Class GTKPublisher
-     *
-     * Maintains a list of callbacks to publish to
-     * for an arbitrary number of named events
-     *
-     */
+function main( project ) {
+    var dset = project.getDatasets(); 
 
-    constructor() {
-        this.listeners = {};
-    }
+    // control panel
+    var controls = new GTKControlPanel( project, "controlpanel" );
 
-    addEventListener( eventname, callback ) {
-        if (eventname in this.listeners) {
-            this.listeners[eventname].push(callback)
-        } else {
-            this.listeners[eventname] = []
-            this.listeners[eventname].push(callback)
-        }
-    }
+    // attribute charts
+    GTKCharts = new GTKChartPanel( "detailpanel" );
 
-    notify( eventname, message) {
-        if (eventname in this.listeners) {
-            for (const listener of this.listeners[eventname]) {
-                listener(message)
-            }
-        }
-    }
-
+    controls.addEventListener( "createTrack", GTKCharts.receive );
 }
 
-// module.exports = GTKPublisher;
+//
+// create the project object and load data 
+//
+TheGTKProject = new GTKProject( GTKProjectName );
+TheGTKClient  = new GTKClient( "http://" + window.location.hostname, window.location.port);
+var view;
+
+main( TheGTKProject );

@@ -50,6 +50,10 @@ class GTKChartPanel {
         parent.appendChild(this.container);
     }
 
+    receive(e) {
+        var something = e;
+    }
+
     clear() {
         while (this.charts.firstChild) {
             this.charts.removeChild(this.charts.firstChild);
