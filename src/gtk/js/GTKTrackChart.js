@@ -37,6 +37,7 @@ class GTKTrackChart {
             showLine: true,
             showPoint: false,
             lineSmooth: true,
+            fullwidth: true,
             width:  GTKTrackChartWidth, 
             height: GTKTrackChartHeight,
             chartPadding: {
@@ -47,6 +48,7 @@ class GTKTrackChart {
             },
             axisX: {
                 showLabel: true,
+                showGrid: false,
                 offset: 0
             },
             borderColor: 'rgba(0,0,0,0)'
