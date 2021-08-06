@@ -61,4 +61,4 @@ class GTKPublisher {
 
 }
 
-// module.exports = GTKPublisher;
+module.exports = GTKPublisher;
