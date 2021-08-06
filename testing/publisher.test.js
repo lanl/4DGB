@@ -23,9 +23,9 @@ function updated( message ) {
 test('publish test', () => {
     pub = new GTKPublisher();
 
-    pub.addListener( "report", report );
-    pub.addListener( "report", report );
-    pub.addListener( "reload", reload );
+    pub.addEventListener( "report", report );
+    pub.addEventListener( "report", report );
+    pub.addEventListener( "reload", reload );
     pub.notify( "report", "something" );
     pub.notify( "reload", "something" );
 
@@ -33,16 +33,16 @@ test('publish test', () => {
     expect(reload_total).toBe(1);
 
     appState = new GTKAppState();
-    appState.addListener( "report", report );
-    appState.addListener( "reload", reload );
+    appState.addEventListener( "report", report );
+    appState.addEventListener( "reload", reload );
     appState.notify( "report", "something" );
     appState.notify( "reload", "something" );
 
     expect(report_total).toBe(3);
     expect(reload_total).toBe(2);
 
-    appState.addListener( "updated", updated );
-    appState.addListener( "updated", updated );
+    appState.addEventListener( "updated", updated );
+    appState.addEventListener( "updated", updated );
     appState.range = [0, 10]
 
     expect(updated_total).toBe(2);
