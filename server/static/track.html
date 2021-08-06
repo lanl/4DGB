@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>4D Genome Browser</title>
+    <meta charset="utf-8">
+
+    <!-- charts -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+    <script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+
+    <script src="gtk/js/gtk.min.js"></script>
+
+    <link rel="stylesheet" href="gtk/css/ct-custom.css">
+    <link rel="stylesheet" href="gtk/css/gtk.css">
+    <link rel="stylesheet" href="gtk/css/gtkslider.css">
+</head>
+
+<body>
+
+<div class="gtkpage">
+<div class="gtkcolumn">
+
+<div class="gtkheader" id="gtkheadertitle">
+    <img class="gtkicon" src="gtk/img/logo_25x25.png"></img>
+    4DGenomeBrowser
+</div>
+
+<center>
+<div id="gtkbody">
+    <div class="gtkrow" style="justify-content: center;">
+        <div id="controlpanel"></div>
+        <div id="leftpanel"></div>
+        <div id="rightpanel"></div>
+        <div id="detailpanel"></div>
+    </div>
+
+</div> <!-- gtkbody -->
+</center>
+
+
+<div class="gtkfooter">
+    Copyright (c) 2020 Los Alamos National Laboratory
+</div>
+
+</div> <!-- gtkcolumn -->
+</div> <!-- gtkpage -->
+
+<script>
+    var url = new URL(window.location.href);
+    var params = new URLSearchParams(url.search);
+    // TODO: recover if this is not present
+    var GTKProjectName = params.get("gtkproject"); 
+
+    // add the version number to the title
+    document.getElementById("gtkheadertitle").innerHTML = "4DGenomeBrowser (" + GTKProjectName + ")"; 
+</script>
+
+<script src="gtk/js/track.js"></script>
+
+</body>
+
+</html>

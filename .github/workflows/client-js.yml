@@ -22,24 +22,19 @@ jobs:
         python-version: ${{ matrix.python-version }} 
     - name: Make the release 
       run: |
-        ./bin/make_release test.00 8000
+        ./bin/make_release test.00
     - name: Install dependencies
       run: |
         echo 'installing python dependencies'
-        pip install -r requirements.txt
-        cd release/test.00
         python -m pip install --upgrade pip
-        pip install pytest
-        cd python
         pip install -r requirements.txt
+        pip install pytest
         echo ''
         echo 'installing javascript dependencies'
-        npm install jest
-        npm install xmlhttprequest
+        npm install
     - name: Run the server and test with client 
       run: |
-        cd release/test.00
-        python gtkserver.py localhost.yaml &
+        python3 release/test.00/server/gtkserver.py &
         sleep 5
         echo 'running javascript test'
         cd ../..

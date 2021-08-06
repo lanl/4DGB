@@ -1,5 +1,5 @@
-const GTKPublisher = require('../src/gtk/js/GTKPublisher.js');
-const GTKAppState  = require('../src/gtk/js/GTKAppState.js');
+const Publisher = require('../client-js/GTK/Publisher.js');
+const AppState  = require('../client-js/GTK/AppState.js');
 
 var report_total    = 0;
 var reload_total    = 0;
@@ -21,7 +21,7 @@ function updated( message ) {
 }
 
 test('publish test', () => {
-    pub = new GTKPublisher();
+    pub = new Publisher();
 
     pub.addEventListener( "report", report );
     pub.addEventListener( "report", report );
@@ -32,9 +32,9 @@ test('publish test', () => {
     expect(report_total).toBe(2);
     expect(reload_total).toBe(1);
 
-    appState = new GTKAppState();
-    appState.addEventListener( "report", report );
-    appState.addEventListener( "reload", reload );
+    appState = new AppState();
+    appState.addListener( "report", report );
+    appState.addListener( "reload", reload );
     appState.notify( "report", "something" );
     appState.notify( "reload", "something" );
 

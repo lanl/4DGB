@@ -8,3 +8,9 @@ venv/
 node_modules/
 .vscode/
 venv*/
+client-py/dist/
+client-py/build/
+client-py/*.egg-info
+client-js/gtk-dist/
+gtk.min.js
+gtkclient_*_test.json

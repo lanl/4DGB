@@ -1,4 +1,0 @@
-project_home: static/projects/<project>
-db_connect: sqlite:///static/projects/<project>/generated/generated-project.db
-host: 0.0.0.0
-port: <port>
