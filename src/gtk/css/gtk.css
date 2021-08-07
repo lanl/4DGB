@@ -2,6 +2,10 @@
     font-family: helvetica !important;
 }
 
+.gtklinkimage {
+    border: 1px solid gray;
+}
+
 div.gtkpage {
     width: 100%;
     border: 1px solid gray;
