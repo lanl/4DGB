@@ -30,25 +30,40 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 var geometry;
+var controls;
+var TheDatasetID = 0;
 
-function variableChanged(e) {
+function setVariable( id ) {
+    TheGTKClient.get_array( (response) => {
+            // TODO: check response
+            geometry.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
+            geometry.geometry.colorBy( response['data']['values']);
+            geometry.render();
+        }, id, TheDatasetID); 
+}
+
+function loadNewCamera() {
     var cJSON  = geometry.camera.toJSON();
     var loader = new THREE.ObjectLoader();
     var camera = loader.parse( cJSON );
+}
 
-    alert(camera);
+function variableChanged(e) {
+    setVariable(e);
 }
 
 function colormapChanged(e) {
-    alert(e);
+    geometry.geometry.setLUT(e);
+    geometry.render();
+    setVariable(controls.getCurrentVariableID());
 }
 
 function main( project ) {
     var dset = project.getDatasets(); 
+    var dataset  = new GTKDataset(dset[TheDatasetID]);
 
     // control panel
-    var controls = new GTKControlPanel( project, "controlpanel" );
-    var dataset  = new GTKDataset(dset[0]);
+    controls = new GTKControlPanel( project, "controlpanel" );
     geometry = new GTKGeometryCanvas( project, dataset, "leftpanel" );
 
     controls.addEventListener( "variableChanged", variableChanged ); 
