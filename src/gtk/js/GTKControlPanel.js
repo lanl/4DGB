@@ -85,6 +85,26 @@ class GTKControlPanel extends GTKPublisher{
         this.createTrack.onclick = (function (e) { this.onCreateTrack(e) }).bind(this);
     }
 
+    getCurrentLocation() {
+        return this.locationchoice.options[this.locationchoice.selectedIndex].value;
+    }
+
+    getCurrentGene() {
+        return this.genechoice.options[this.genechoice.selectedIndex].value;
+    }
+
+    getCurrentVariableID() {
+        return this.variablechoice.options[this.variablechoice.selectedIndex].varID;
+    }
+
+    getCurrentVariableName() {
+        return this.variablechoice.options[this.variablechoice.selectedIndex].value;
+    }
+
+    getCurrentColormapName() {
+        return this.colormapchoice.options[this.colormapchoice.selectedIndex].value;
+    }
+
     updateArrayNames() {
         TheGTKClient.get_structure_arrays( (response) => {
             for (const f of response['arrays']) { 
@@ -143,6 +163,6 @@ class GTKControlPanel extends GTKPublisher{
     }
 
     onCreateTrack(e) {
-        super.notify("createTrack", this.variablechoice.options[this.variablechoice.selectedIndex].value)
+        super.notify("createTrack", this.getCurrentVariableName())
     }
 }
