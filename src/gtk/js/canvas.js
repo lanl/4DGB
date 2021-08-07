@@ -29,21 +29,41 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-var geometry;
+var left;
+var right;
 var controls;
-var TheDatasetID = 0;
+var leftDatasetID = 0;
+var rightDatasetID = 1;
+
+function linkCameras(a, b) {
+    // link the cameras
+    a.controls.addEventListener( 'change', () => {
+        b.camera.copy( a.camera, true );
+        b.controls.target = a.controls.target;
+        b.render();
+    });
+    b.controls.addEventListener( 'change', () => {
+        a.camera.copy( b.camera, true );
+        a.controls.target = b.controls.target;
+        a.render();
+    });
+}
 
 function setVariable( id ) {
     TheGTKClient.get_array( (response) => {
-            // TODO: check response
-            geometry.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
-            geometry.geometry.colorBy( response['data']['values']);
-            geometry.render();
-        }, id, TheDatasetID); 
+            left.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
+            left.geometry.colorBy( response['data']['values']);
+            left.render();
+        }, id, leftDatasetID); 
+    TheGTKClient.get_array( (response) => {
+            right.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
+            right.geometry.colorBy( response['data']['values']);
+            right.render();
+        }, id, rightDatasetID); 
 }
 
 function loadNewCamera() {
-    var cJSON  = geometry.camera.toJSON();
+    var cJSON  = left.camera.toJSON();
     var loader = new THREE.ObjectLoader();
     var camera = loader.parse( cJSON );
 }
@@ -53,18 +73,22 @@ function variableChanged(e) {
 }
 
 function colormapChanged(e) {
-    geometry.geometry.setLUT(e);
-    geometry.render();
+    left.geometry.setLUT(e);
+    right.geometry.setLUT(e);
     setVariable(controls.getCurrentVariableID());
 }
 
 function main( project ) {
     var dset = project.getDatasets(); 
-    var dataset  = new GTKDataset(dset[TheDatasetID]);
 
     // control panel
     controls = new GTKControlPanel( project, "controlpanel" );
-    geometry = new GTKGeometryCanvas( project, dataset, "leftpanel" );
+    var leftdataset  = new GTKDataset(dset[leftDatasetID]);
+    var rightdataset = new GTKDataset(dset[rightDatasetID]);
+    left  = new GTKGeometryCanvas( project, leftdataset, "leftpanel" );
+    right = new GTKGeometryCanvas( project, rightdataset, "rightpanel" );
+
+    linkCameras(left, right);
 
     controls.addEventListener( "variableChanged", variableChanged ); 
     controls.addEventListener( "colormapChanged", colormapChanged ); 
