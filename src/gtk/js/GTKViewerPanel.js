@@ -198,7 +198,7 @@ class GTKViewerPanel {
         TheGTKClient.get_array( (response) => {
                 // TODO: check response
                 this.geometrycanvas.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
-                this.geometrycanvas.geometry.colorBy( response['name'], response['data']['values']);
+                this.geometrycanvas.geometry.colorBy( response['data']['values']);
                 this.geometrycanvas.render();
             }, id, this.datasetID);
     }
