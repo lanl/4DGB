@@ -30,26 +30,50 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 var GTKPanels = [];
+var controls;
 
-function link_cameras(a, b) {
+function linkCameras(a, b) {
     // link the cameras
-    a.geometrycanvas.controls.addEventListener( 'change', () => {
-        b.geometrycanvas.camera.copy( a.geometrycanvas.camera, true );
-        b.geometrycanvas.controls.target = a.geometrycanvas.controls.target;
-        b.geometrycanvas.render();
+    a.controls.addEventListener( 'change', () => {
+        b.camera.copy( a.camera, true );
+        b.controls.target = a.controls.target;
+        b.render();
     });
-    b.geometrycanvas.controls.addEventListener( 'change', () => {
-        a.geometrycanvas.camera.copy( b.geometrycanvas.camera, true );
-        a.geometrycanvas.controls.target = b.geometrycanvas.controls.target;
-        a.geometrycanvas.render();
+    b.controls.addEventListener( 'change', () => {
+        a.camera.copy( b.camera, true );
+        a.controls.target = b.controls.target;
+        a.render();
     });
+}
+
+function setVariable( id ) {
+    TheGTKClient.get_array( (response) => {
+            GTKPanels[0].geometrycanvas.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
+            GTKPanels[0].geometrycanvas.geometry.colorBy( response['data']['values']);
+            GTKPanels[0].geometrycanvas.render();
+        }, id, 0); 
+    TheGTKClient.get_array( (response) => {
+            GTKPanels[1].geometrycanvas.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
+            GTKPanels[1].geometrycanvas.geometry.colorBy( response['data']['values']);
+            GTKPanels[1].geometrycanvas.render();
+        }, id, 1); 
+}
+
+function variableChanged(e) {
+    setVariable(e);
+}
+
+function colormapChanged(e) {
+    GTKPanels[0].geometrycanvas.geometry.setLUT(e);
+    GTKPanels[1].geometrycanvas.geometry.setLUT(e);
+    setVariable(controls.getCurrentVariableID());
 }
 
 function main( project ) {
     var dset = project.getDatasets(); 
 
     // control panel
-    var controls = new GTKControlPanel( project, "controlpanel" );
+    controls = new GTKControlPanel( project, "controlpanel" );
 
     // views
     var dataset = new GTKDataset(dset[0]);
@@ -58,10 +82,16 @@ function main( project ) {
     var dataset = new GTKDataset(dset[1]);
     GTKPanels.push(new GTKViewerPanel( project, dataset, "rightpanel" ));
 
-    link_cameras(GTKPanels[0], GTKPanels[1]);
-
     // attribute charts
     GTKCharts = new GTKChartPanel( "detailpanel" );
+
+
+    // connections
+        // camera
+    linkCameras(GTKPanels[0].geometrycanvas, GTKPanels[1].geometrycanvas);
+        // events
+    controls.addEventListener( "variableChanged", variableChanged );
+    controls.addEventListener( "colormapChanged", colormapChanged );
 }
 
 //
