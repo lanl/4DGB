@@ -29,8 +29,17 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-var GTKPanels = [];
-var controls;
+var ThePanels = [];
+var TheControls;
+var TheChartPanel;
+
+function addTrackCallback() {
+    alert("track clicked")
+}
+
+function createTrack ( data ) {
+    TheCharts.addTracks( "label", addTrackCallback, [0, 1], "chrX", 0, 100);
+}
 
 function linkCameras(a, b) {
     // link the cameras
@@ -48,14 +57,14 @@ function linkCameras(a, b) {
 
 function setVariable( id ) {
     TheGTKClient.get_array( (response) => {
-            GTKPanels[0].geometrycanvas.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
-            GTKPanels[0].geometrycanvas.geometry.colorBy( response['data']['values']);
-            GTKPanels[0].geometrycanvas.render();
+            ThePanels[0].geometrycanvas.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
+            ThePanels[0].geometrycanvas.geometry.colorBy( response['data']['values']);
+            ThePanels[0].geometrycanvas.render();
         }, id, 0); 
     TheGTKClient.get_array( (response) => {
-            GTKPanels[1].geometrycanvas.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
-            GTKPanels[1].geometrycanvas.geometry.colorBy( response['data']['values']);
-            GTKPanels[1].geometrycanvas.render();
+            ThePanels[1].geometrycanvas.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
+            ThePanels[1].geometrycanvas.geometry.colorBy( response['data']['values']);
+            ThePanels[1].geometrycanvas.render();
         }, id, 1); 
 }
 
@@ -64,34 +73,35 @@ function variableChanged(e) {
 }
 
 function colormapChanged(e) {
-    GTKPanels[0].geometrycanvas.geometry.setLUT(e);
-    GTKPanels[1].geometrycanvas.geometry.setLUT(e);
-    setVariable(controls.getCurrentVariableID());
+    ThePanels[0].geometrycanvas.geometry.setLUT(e);
+    ThePanels[1].geometrycanvas.geometry.setLUT(e);
+    setVariable(TheControls.getCurrentVariableID());
 }
 
 function main( project ) {
     var dset = project.getDatasets(); 
 
     // control panel
-    controls = new GTKControlPanel( project, "controlpanel" );
+    TheControls = new GTKControlPanel( project, "controlpanel" );
 
     // views
     var dataset = new GTKDataset(dset[0]);
-    GTKPanels.push(new GTKViewerPanel( project, dataset, "leftpanel" ));
+    ThePanels.push(new GTKViewerPanel( project, dataset, "leftpanel" ));
 
     var dataset = new GTKDataset(dset[1]);
-    GTKPanels.push(new GTKViewerPanel( project, dataset, "rightpanel" ));
+    ThePanels.push(new GTKViewerPanel( project, dataset, "rightpanel" ));
 
     // attribute charts
-    GTKCharts = new GTKChartPanel( "detailpanel" );
+    TheCharts = new GTKChartPanel( "chartpanel" );
 
 
     // connections
         // camera
-    linkCameras(GTKPanels[0].geometrycanvas, GTKPanels[1].geometrycanvas);
+    linkCameras(ThePanels[0].geometrycanvas, ThePanels[1].geometrycanvas);
         // events
-    controls.addEventListener( "variableChanged", variableChanged );
-    controls.addEventListener( "colormapChanged", colormapChanged );
+    TheControls.addEventListener( "variableChanged", variableChanged );
+    TheControls.addEventListener( "colormapChanged", colormapChanged );
+    TheControls.addEventListener( "createTrack", createTrack );
 }
 
 //

@@ -71,7 +71,7 @@ div.gtk { padding: 5px;
     justify-content: flex-start;
 }
 
-.gtkgeometrycontainer, .gtkglobalentrycontainer, .gtkchartlist {
+.gtkgeometrycontainer, .gtkglobalentrycontainer, .gtkchartpanel {
     order: 1;
     padding-top: 5px;
     padding-right: 5px;
@@ -93,13 +93,13 @@ div.gtk { padding: 5px;
     left: 0;
 }
 
-.gtkchartlistcharts {
+.gtkchartpanelcharts {
     width: 430px;
     height: 500px;
     overflow-y: auto;
 }
 
-.gtkchartlistpaircontainer {
+.gtkchartpanelpaircontainer {
     vertical-align: top;
     font-size: 10px;
     text-align: left;
@@ -150,7 +150,7 @@ div.gtk { padding: 5px;
     font-size: 12px;
 }
 
-.gtktitle, .gtkgeometrytitle, .gtkglobalentrytitle, .gtkchartlisttitle {
+.gtktitle, .gtkgeometrytitle, .gtkglobalentrytitle, .gtkchartpaneltitle {
     padding-top:    10px;
     padding-right:  5px;
     padding-bottom: 10px;

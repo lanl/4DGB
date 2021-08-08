@@ -29,21 +29,24 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+
+var GTKChartPanelCurID = 0;
+
 class GTKChartPanel {
     constructor(parentID) {
         // container
         this.container = document.createElement("div"); 
-        this.container.className = "gtkchartlist";
+        this.container.className = "gtkchartpanel";
 
         // title
         this.title = document.createElement("div");
-        this.title.className = "gtkchartlisttitle";
+        this.title.className = "gtkchartpaneltitle";
         this.container.appendChild(this.title);
-        this.setTitle("No Title")
+        this.setTitle("Tracks")
 
         // charts
         this.charts = document.createElement("div");
-        this.charts.className = "gtkchartlistcharts";
+        this.charts.className = "gtkchartpanelcharts";
         this.container.appendChild(this.charts);
 
         var parent = document.getElementById(parentID);
@@ -74,31 +77,40 @@ class GTKChartPanel {
         chart.loadData(state, chrom, start, end);
     }
 
-    addPair(label, callback, states, chrom, start, end) {
+    generateCurIDName () {
+        GTKChartPanelCurID += 1;
+        return "gtkchartpanelpaircontainer_" + GTKChartPanelCurID;
+    }
+
+    addTracks(label, callback, datasets, chrom, start, end) {
         // pair container
         var pair = document.createElement("div");
-        pair.className = "gtkchartlistpaircontainer";
+        pair.className = "gtkchartpanelpaircontainer";
+        pair.id = this.generateCurIDName(); 
         this.charts.insertBefore(pair, this.charts.firstChild);
         pair.innerHTML = `${label} Position: ${start}-${end}`;
         pair.callbackdata = pair.innerHTML;
         var min =  1000000.0;
         var max = -1000000.0;
         var charts = [];
-        for (var i=0;i < states.length; i++) {
-            charts.push(new GTKTrackChart(document, pair)); 
-            charts[i].loadData(states[i], chrom, start, end);
-            var curMin = charts[i].getMin();
-            var curMax = charts[i].getMax();
-            if (curMin < min) {
-                min = curMin; 
-            }
-            if (curMax > max) {
-                max = curMax; 
-            }
+
+        // make a set of dummy values
+        var numbins = 10;
+        var incr    = Math.trunc((end-start)/numbins);
+        var labels  = [];
+        var values  = [];
+        for (var i = 0; i < numbins; i++) {
+            labels.push(start + i*incr);
+            values.push(start + i*incr);
         }
-        for (var i=0;i < states.length; i++) {
+        min = start;
+        max = end;
+
+        // create a chart for each dataset
+        for (var i=0;i < datasets.length; i++) {
+            charts.push(new GTKTrackChart(pair.id)); 
             charts[i].setYValLimits( min, max );
-            charts[i].makeChart();
+            charts[i].make( labels, values );
         }
 
         pair.addEventListener("click", function(){callback(this);} );
