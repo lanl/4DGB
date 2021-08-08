@@ -53,7 +53,6 @@ function main( project ) {
 // create the project object and load data 
 //
 TheGTKProject = new GTKProject( GTKProjectName );
-TheGTKClient  = new GTKClient( "http://" + window.location.hostname, window.location.port);
-var view;
+TheClient  = new GTKClient( "http://" + window.location.hostname, window.location.port);
 
 main( TheGTKProject );

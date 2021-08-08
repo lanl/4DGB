@@ -33,7 +33,7 @@ var geometry;
 var TheDatasetID = 0;
 
 function setVariable( id ) {
-    TheGTKClient.get_array( (response) => {
+    TheClient.get_array( (response) => {
             // TODO: check response
             geometry.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
             geometry.geometry.colorBy( response['data']['values']);
@@ -60,7 +60,7 @@ function main( project ) {
 // create the project object and load data 
 //
 TheGTKProject = new GTKProject( GTKProjectName );
-TheGTKClient  = new GTKClient( "http://" + window.location.hostname, window.location.port);
+TheClient  = new GTKClient( "http://" + window.location.hostname, window.location.port);
 var view;
 
 main( TheGTKProject );

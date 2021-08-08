@@ -106,7 +106,7 @@ class GTKControlPanel extends GTKPublisher{
     }
 
     updateArrayNames() {
-        TheGTKClient.get_structure_arrays( (response) => {
+        TheClient.get_structure_arrays( (response) => {
             for (const f of response['arrays']) { 
                 var option = document.createElement('option');
                 option.value = f['name'];

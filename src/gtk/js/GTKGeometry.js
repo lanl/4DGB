@@ -116,7 +116,7 @@ class GTKGeometry {
         // used to compute the centroid
         var center = new THREE.Vector3(0.0, 0.0, 0.0);
 
-        TheGTKClient.get_structure( (response) => {
+        TheClient.get_structure( (response) => {
             for (var s of response["segments"]) {
                 let startPoint = new THREE.Vector3(s['start'][0], s['start'][1], s['start'][2]);
                 let endPoint   = new THREE.Vector3(s['end'][0], s['end'][1], s['end'][2]);

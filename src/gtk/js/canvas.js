@@ -50,12 +50,12 @@ function linkCameras(a, b) {
 }
 
 function setVariable( id ) {
-    TheGTKClient.get_array( (response) => {
+    TheClient.get_array( (response) => {
             left.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
             left.geometry.colorBy( response['data']['values']);
             left.render();
         }, id, leftDatasetID); 
-    TheGTKClient.get_array( (response) => {
+    TheClient.get_array( (response) => {
             right.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
             right.geometry.colorBy( response['data']['values']);
             right.render();
@@ -98,7 +98,7 @@ function main( project ) {
 // create the project object and load data 
 //
 TheGTKProject = new GTKProject( GTKProjectName );
-TheGTKClient  = new GTKClient( "http://" + window.location.hostname, window.location.port);
+TheClient  = new GTKClient( "http://" + window.location.hostname, window.location.port);
 var view;
 
 main( TheGTKProject );
