@@ -30,23 +30,23 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-var GTKChartPanelCurID = 0;
+var GTKTrackPanelCurID = 0;
 
-class GTKChartPanel {
+class GTKTrackPanel {
     constructor(parentID) {
         // container
         this.container = document.createElement("div"); 
-        this.container.className = "gtkchartpanel";
+        this.container.className = "gtktrackpanel";
 
         // title
         this.title = document.createElement("div");
-        this.title.className = "gtkchartpaneltitle";
+        this.title.className = "gtktrackpaneltitle";
         this.container.appendChild(this.title);
         this.setTitle("Tracks")
 
         // charts
         this.charts = document.createElement("div");
-        this.charts.className = "gtkchartpanelcharts";
+        this.charts.className = "gtktrackpanelcharts";
         this.container.appendChild(this.charts);
 
         var parent = document.getElementById(parentID);
@@ -78,14 +78,14 @@ class GTKChartPanel {
     }
 
     generateCurIDName () {
-        GTKChartPanelCurID += 1;
-        return "gtkchartpanelpaircontainer_" + GTKChartPanelCurID;
+        GTKTrackPanelCurID += 1;
+        return "gtktrackpanelpaircontainer_" + GTKTrackPanelCurID;
     }
 
     addTracks(label, callback, datasets, chrom, start, end) {
         // pair container
         var pair = document.createElement("div");
-        pair.className = "gtkchartpanelpaircontainer";
+        pair.className = "gtktrackpanelpaircontainer";
         pair.id = this.generateCurIDName(); 
         this.charts.insertBefore(pair, this.charts.firstChild);
         pair.innerHTML = `${label} Position: ${start}-${end}`;

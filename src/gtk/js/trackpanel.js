@@ -44,7 +44,7 @@ function main( project ) {
 
     // panels 
     var controls = new GTKControlPanel( project, "controlpanel" );
-    TheCharts   = new GTKChartPanel( "chartpanel" );
+    TheCharts   = new GTKTrackPanel( "trackpanel" );
 
     controls.addEventListener( "createTrack", createTrack ); 
 }

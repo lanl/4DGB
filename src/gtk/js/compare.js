@@ -31,7 +31,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 var ThePanels = [];
 var TheControls;
-var TheChartPanel;
+var TheTrackPanel;
 
 function addTrackCallback() {
     alert("track clicked")
@@ -92,7 +92,7 @@ function main( project ) {
     ThePanels.push(new GTKViewerPanel( project, dataset, "rightpanel" ));
 
     // attribute charts
-    TheCharts = new GTKChartPanel( "chartpanel" );
+    TheCharts = new GTKTrackPanel( "trackpanel" );
 
 
     // connections
