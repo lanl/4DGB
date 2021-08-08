@@ -242,10 +242,10 @@ def test_get_arrays():
         assert(arrays['arrays'][t['id']] == t['array']) 
 
 def test_get_sampled_array():
-    array = client.get_sampled_array(4, 100000, 200000, 100)
+    array = client.get_sampled_array(4, 0, 100000, 200000, 100)
     assert(len(array['data']) == 100)
 
-    array = client.get_sampled_array(4, 100000, 200000, 52)
+    array = client.get_sampled_array(4, 0, 100000, 200000, 52)
     assert(len(array['data']) == 52)
 
 def test_get_segment_ids():
