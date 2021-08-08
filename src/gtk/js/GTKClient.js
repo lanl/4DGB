@@ -130,11 +130,11 @@ class GTKClient {
     //
     //
     //
-//  get_sampled_array(arrayID, arraySlice, begin, end, numsamples) {
-//      fetch( this.url + ':' + this.port + '/data/samplearray/' + arrayID + '/' arraySlice + '/' + begin + '/' + end + '/' + numsamples)
-//          .then(response => response.json())
-//          .then(data => callback(data))
-//  }
+    get_sampled_array(callback, arrayID, arraySlice, begin, end, numsamples) {
+        fetch( this.url + ':' + this.port + '/data/samplearray/' + arrayID + '/' + arraySlice + '/' + begin + '/' + end + '/' + numsamples )
+            .then(response => response.json())
+            .then(data => callback(data))
+    }
 
 }
 

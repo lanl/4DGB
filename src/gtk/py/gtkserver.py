@@ -311,10 +311,10 @@ def SegmentsForGene(name, structureid):
     return jsonify({'segments': segments})
 
 #
-# sample an array
+# get a sampled array 
 #
-@app.route('/data/samplearray/<arrayID>/<begin>/<end>/<numsamples>')
-def SampleArray(arrayID, begin, end, numsamples):
+@app.route('/data/samplearray/<arrayID>/<arraySlice>/<begin>/<end>/<numsamples>')
+def SampleArray(arrayID, arraySlice, begin, end, numsamples):
     array = get_array_metadata(arrayID)
 
     if ( array['type'] == 'sequence' ): 
