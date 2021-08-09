@@ -119,6 +119,7 @@ div.gtk { padding: 5px;
 
 .gtkgeometrycanvas, .gtkviewcanvas {
     border: 1px solid black;
+    border-radius: 5px;
 }
 
 .gtktrackscontainer {
