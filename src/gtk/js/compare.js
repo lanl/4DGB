@@ -37,8 +37,27 @@ function addTrackCallback() {
     alert("track clicked")
 }
 
+function generateTrackLabels (start, end, numbins) {
+    var labels = [];
+    var incr   = Math.trunc((end-start)/numbins);
+    for (var i = 0; i < numbins; i++) { 
+        labels.push(start + i*incr); 
+    }
+    return labels;
+}
+
 function createTrack ( data ) {
-    TheCharts.addTracks( "label", addTrackCallback, [0, 1], "chrX", 0, 100);
+    TheTrackPanel.pushContainer( "Here it is", addTrackCallback );
+    TheClient.get_sampled_array( (response) => {
+            var labels = generateTrackLabels( 0, 1000000, 200); 
+            TheTrackPanel.addTrack( labels, response["data"]);
+            var data = response["data"];
+        }, 4, 0, 0, 1000000, 200); 
+    TheClient.get_sampled_array( (response) => {
+            var labels = generateTrackLabels( 0, 1000000, 200); 
+            TheTrackPanel.addTrack( labels, response["data"]);
+            var data = response["data"];
+        }, 4, 0, 0, 1000000, 200); 
 }
 
 function linkCameras(a, b) {
@@ -56,12 +75,12 @@ function linkCameras(a, b) {
 }
 
 function setVariable( id ) {
-    TheGTKClient.get_array( (response) => {
+    TheClient.get_array( (response) => {
             ThePanels[0].geometrycanvas.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
             ThePanels[0].geometrycanvas.geometry.colorBy( response['data']['values']);
             ThePanels[0].geometrycanvas.render();
         }, id, 0); 
-    TheGTKClient.get_array( (response) => {
+    TheClient.get_array( (response) => {
             ThePanels[1].geometrycanvas.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
             ThePanels[1].geometrycanvas.geometry.colorBy( response['data']['values']);
             ThePanels[1].geometrycanvas.render();
@@ -92,7 +111,7 @@ function main( project ) {
     ThePanels.push(new GTKViewerPanel( project, dataset, "rightpanel" ));
 
     // attribute charts
-    TheCharts = new GTKTrackPanel( "trackpanel" );
+    TheTrackPanel = new GTKTrackPanel( "trackpanel" );
 
 
     // connections
@@ -108,7 +127,7 @@ function main( project ) {
 // create the project object and load data 
 //
 TheGTKProject = new GTKProject( GTKProjectName );
-TheGTKClient  = new GTKClient( "http://" + window.location.hostname, window.location.port);
+TheClient  = new GTKClient( "http://" + window.location.hostname, window.location.port);
 var view;
 
 main( TheGTKProject );

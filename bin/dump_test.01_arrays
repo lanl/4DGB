@@ -34,3 +34,20 @@ print("saving file to: {}".format(afile))
 values_0.reverse()
 values_1.reverse()
 numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
+
+afile = "projects/test.01/source/array/0005.npz"
+print("saving file to: {}".format(afile))
+low  = [1] * 417
+high = [2] * 416
+values_0 = low + high
+values_1 = high + low
+numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
+
+afile = "projects/test.01/source/array/0006.npz"
+print("saving file to: {}".format(afile))
+low  = [1] * 278
+mid  = [2] * 277
+high = [3] * 278
+values_0 = low + mid + high
+values_1 = high + mid + low
+numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 

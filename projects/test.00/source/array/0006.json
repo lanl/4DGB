@@ -1,5 +1,5 @@
 {
-"name"      : "domain",
+"name"      : "domain II",
 "type"      : "structure",
 "version"   : "0.1",
 "tags"      : [],
@@ -7,7 +7,7 @@
     "type"  : "int",
     "dim"   : 1,
     "min"   : 1,
-    "max"   : 2,
-    "url"   : "source/array/0005.npz"
+    "max"   : 3,
+    "url"   : "source/array/0006.npz"
 }
 }

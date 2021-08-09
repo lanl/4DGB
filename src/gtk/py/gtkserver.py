@@ -317,11 +317,10 @@ def SegmentsForGene(name, structureid):
 def SampleArray(arrayID, arraySlice, begin, end, numsamples):
     array = get_array_metadata(arrayID)
 
+    data = []
     if ( array['type'] == 'sequence' ): 
-        data = bbi.fetch(PROJECT_HOME + "/" + array['data']['url'], array['data']['chrom'], int(begin), int(end), int(numsamples))
-        # labels = [None] * numsamples
-        # labels[0]  = begin
-        # labels[-1] = end
+        url = "{}/{}".format(PROJECT_HOME, array['data']['url'])
+        data = bbi.fetch(url, array['data']['chrom'], int(begin), int(end), int(numsamples))
 
     return jsonify({'data': list(data)})
 

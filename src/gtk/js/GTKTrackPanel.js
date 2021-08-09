@@ -53,10 +53,6 @@ class GTKTrackPanel {
         parent.appendChild(this.container);
     }
 
-    receive(e) {
-        var something = e;
-    }
-
     clear() {
         while (this.charts.firstChild) {
             this.charts.removeChild(this.charts.firstChild);
@@ -72,48 +68,34 @@ class GTKTrackPanel {
         this.container.style.height = h;
     }
 
-    add(state, chrom, start, end) {
-        var chart = new GTKTrackChart(document, this.charts);
-        chart.loadData(state, chrom, start, end);
-    }
-
+    //
+    // generate a unique ID name
+    //
     generateCurIDName () {
         GTKTrackPanelCurID += 1;
         return "gtktrackpanelpaircontainer_" + GTKTrackPanelCurID;
     }
 
-    addTracks(label, callback, datasets, chrom, start, end) {
-        // pair container
+    //
+    // push a new container on the top of the stack
+    //
+    pushContainer(label, callback) {
         var pair = document.createElement("div");
         pair.className = "gtktrackpanelpaircontainer";
         pair.id = this.generateCurIDName(); 
-        this.charts.insertBefore(pair, this.charts.firstChild);
-        pair.innerHTML = `${label} Position: ${start}-${end}`;
-        pair.callbackdata = pair.innerHTML;
-        var min =  1000000.0;
-        var max = -1000000.0;
-        var charts = [];
-
-        // make a set of dummy values
-        var numbins = 10;
-        var incr    = Math.trunc((end-start)/numbins);
-        var labels  = [];
-        var values  = [];
-        for (var i = 0; i < numbins; i++) {
-            labels.push(start + i*incr);
-            values.push(start + i*incr);
-        }
-        min = start;
-        max = end;
-
-        // create a chart for each dataset
-        for (var i=0;i < datasets.length; i++) {
-            charts.push(new GTKTrackChart(pair.id)); 
-            charts[i].setYValLimits( min, max );
-            charts[i].make( labels, values );
-        }
-
+        pair.innerHTML = label; 
         pair.addEventListener("click", function(){callback(this);} );
         pair.addEventListener("contextmenu", function(ev) { ev.preventDefault(); alert('success!'); return false; }, false);
+
+        this.charts.insertBefore(pair, this.charts.firstChild);
+    }
+
+    //
+    // add track data to the top of the current container
+    //
+    addTrack(labels, values) { 
+        var track = new GTKTrackChart(this.charts.firstChild.id);
+        // charts[i].setYValLimits( min, max );
+        track.make( labels, values );
     }
 }

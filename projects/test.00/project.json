@@ -47,6 +47,10 @@
         {
             "id"  : 5,
             "url" : "source/array/0005.json"
+        },
+        {
+            "id"  : 6,
+            "url" : "source/array/0006.json"
         }
     ],
     "hic" : [

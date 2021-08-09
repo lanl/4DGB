@@ -28,9 +28,16 @@ values_1.reverse()
 print("saving file to: {}".format(afile))
 numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
 
-# category variable
+# domain variable
 afile = "projects/test.00/source/array/0005.npz"
 values_0 = [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2]
 values_1 = [2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1]
+print("saving file to: {}".format(afile))
+numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
+
+# domain variable
+afile = "projects/test.00/source/array/0006.npz"
+values_0 = [1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3]
+values_1 = [3, 3, 3, 3, 2, 2, 2, 1, 1, 1, 1]
 print("saving file to: {}".format(afile))
 numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
