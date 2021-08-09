@@ -22,6 +22,7 @@ jobs:
         python-version: ${{ matrix.python-version }} 
     - name: Make the release 
       run: |
+        npm install
         ./bin/make_release test.00
     - name: Install dependencies
       run: |
@@ -31,12 +32,10 @@ jobs:
         pip install pytest
         echo ''
         echo 'installing javascript dependencies'
-        npm install
     - name: Run the server and test with client 
       run: |
         python3 release/test.00/server/gtkserver.py &
         sleep 5
         echo 'running javascript test'
-        cd ../..
         npm run test --detectOpenHandles testing/client-js.test.js
         pytest testing/test_client-js_output.py

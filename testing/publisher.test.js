@@ -33,8 +33,8 @@ test('publish test', () => {
     expect(reload_total).toBe(1);
 
     appState = new AppState();
-    appState.addListener( "report", report );
-    appState.addListener( "reload", reload );
+    appState.addEventListener( "report", report );
+    appState.addEventListener( "reload", reload );
     appState.notify( "report", "something" );
     appState.notify( "reload", "something" );
 
