@@ -5,22 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "test.00",
+            "name": "Firefox",
             "type": "firefox",
             "request": "launch",
             "reAttach": true,
-            "url": "http://localhost:8000/viewer.html?gtkproject=test.00",
+            "url": "http://localhost:8000/",
             "clearConsoleOnReload": true,
-            "webRoot": "${workspaceFolder}/src/"
+            "pathMappings": [
+                {
+                    "url": "webpack://gtk",
+                    "path": "${workspaceFolder}"
+                },
+                {
+                    "url": "http://localhost:8000",
+                    "path": "${workspaceFolder}/server/static"
+                }
+            ]
         },
-        {
-            "name": "test.01",
-            "type": "firefox",
-            "request": "launch",
-            "reAttach": true,
-            "url": "http://localhost:8000/viewer.html?gtkproject=test.01",
-            "clearConsoleOnReload": true,
-            "webRoot": "${workspaceFolder}/src/"
-        }
     ]
 }

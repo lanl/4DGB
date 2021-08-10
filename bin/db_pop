@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sqlite3
 import re
@@ -48,7 +48,7 @@ with open(os.path.join(project, "project.json")) as jdata:
 # ---------------------------------------------------------------------------
 # get the current version
 gtkversion = None
-with open("src/version.md", "r") as vfile:
+with open("server/version.md", "r") as vfile:
     gtkversion = vfile.readline().strip()
 
     # start from scratch

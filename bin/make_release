@@ -1,77 +1,94 @@
 #!/bin/bash
 
-PROJECT=nothing
+read -r -d '' HELPTEXT<<'ENDHELP'
+    make_release
 
-if [ $# -ne 2 ]; then
-    echo "ERROR: must provide 'project' and 'port' arguments"
-    echo "Example:"
-    echo " "
-    echo "   make_release <project> <port>" 
-    echo " "
+    Build a project and place a ready-to-go release in the 'release' directory.
+
+    Usage:
+        make_release [--help|-h] PROJECT
+
+    PROJECT is the name of a project directory (in the 'projects' directory).
+
+    Options:
+        --help, -h      Print this help and exit
+ENDHELP
+
+# Reset IFS (newline, space, tab)
+IFS='
+ 	'
+
+set -eu
+
+if [ $# -lt 1 ] ; then
+    echo "ERROR: Must provide project directory:" >&2
+    echo "Example:" >&2
+    echo "" >&2
+    echo "    make_release <project>" >&2
+    echo "" >&2
+    exit 1
+fi
+
+if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
+    echo "$HELPTEXT";
     exit
-else
-    PROJECT=$1
-    PORT=$2
+fi
+
+if ! [ -d "projects" ] ; then
+    echo "ERROR: Could not find projects directory. Are you running this from the repository root?" >&2
+    exit 1
+fi
+
+PROJECT="${1%/}"
+SRC="projects/$PROJECT"
+DEST="release/$PROJECT"
+
+if ! [ -d "$SRC" ] || [ -z "$PROJECT" ] ; then
+    echo "ERROR: Could not find project '$PROJECT'" >&2
+    echo "Available projects are:" >&2
+    for DIR in projects/* ; do
+        [ -d "$DIR" ] && echo "    $(basename "$DIR")" >&2
+    done
+    exit 1
 fi
 
 echo ""
-echo "Making a release for project '$PROJECT' ..." 
+echo "Making a release for project '$PROJECT'"
 
 # initialize the database
 echo ""
 echo "Initializing database ..."
-./bin/db_pop projects/$PROJECT
+./bin/db_pop "$SRC"
 
 echo ""
 echo "Cleaning release ..."
 # clean up
-rm -rf release/$PROJECT
+rm -rf "$DEST"
 
 echo ""
 echo "Creating new release ..."
 # new install
-mkdir release
-mkdir release/$PROJECT
-mkdir release/$PROJECT/static
+mkdir -p "$DEST/server" "$DEST/gentk"
 
-pushd release/$PROJECT 2>&1 >/dev/null
-pwd
-cp ../../src/gtk/py/gtkserver.py .
-
-# update settings to be this project
-cp ../../src/settings/template.webhost.yaml webhost.yaml
-sed -i.bak "s/<project>/${PROJECT}/" webhost.yaml
-sed -i.bak "s/<port>/${PORT}/" webhost.yaml
-rm -f webhost.yaml.bak
-
-# update settings to be this project
-cp ../../src/settings/template.localhost.yaml localhost.yaml
-sed -i.bak "s/<project>/${PROJECT}/" localhost.yaml
-sed -i.bak "s/<port>/${PORT}/" localhost.yaml
-rm -f localhost.yaml.bak
-
-cp ../../src/*html static
-cp -rf ../../src/gtk static
-cp -rf ../../src/img static
-cp -rf ../../projects static
-cp -rf ../../src/third_party static
-
-# install the python module and test script
 echo ""
-echo "Installing python module and creating package ..."
-mkdir python
-pushd python 2>&1 >/dev/null
-cp -rf ../../../src/gentk . 
-mv gentk/license.md .
-mv gentk/MANIFEST.in .
-mv gentk/setup.py .
-mv gentk/readme.md . 
-mv gentk/requirements.txt . 
-mv gentk/genex .
-python setup.py sdist -v
-echo "    to upload python module: twine upload dist/*"
-echo "    or: twine upload --repository testpypi dist/"
-cp -rf ../../../testing/test_gentk.py .
-popd 2>&1 >/dev/null
+echo "Building Javascript library ..."
+npx webpack --config client-js/webpack.config.js
+cp  client-js/gtk-dist/gtk.min.js server/static/gtk/js/gtk.min.js
 
-popd 2>&1 >/dev/null
+echo ""
+echo "Copying files ..."
+
+# Server and served content
+cp -a server/static "$DEST/server/static"
+cp server/gtkserver.py "$DEST/server"
+cp -a "$SRC" "$DEST/server/static/project"
+
+cp server/license.md "$DEST"
+
+echo ""
+echo "Copying gentk python package ..."
+cp -a client-py/gentk "$DEST/gentk"
+cp client-py/requirements.txt client-py/genex "$DEST"
+
+echo ""
+echo "Done!"
