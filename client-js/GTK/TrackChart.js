@@ -74,3 +74,6 @@ class TrackChart {
         // this.titlediv.innerHTML = `<table><tr><td>chrom:</td><td>${chrom}</td></tr><tr><td>position:</td><td>${start}-${end}</td></tr></table>`;
     }
 }
+
+
+module.exports = TrackChart;

@@ -278,23 +278,22 @@ def SegmentsForGene(name, structureid):
     conn = db_connect.connect()
     query = conn.execute("SELECT start, end FROM genes WHERE gene_name == ?", name)
     results = query.cursor.fetchone()
-    g_start = results[0]
-    g_end   = results[1]
 
-    # print("gene   : {}".format(name))
-    # print("  start: {}".format(g_start))
-    # print("  end  : {}".format(g_end))
-
-    #
-    # query-based solution
-    #
-    query = conn.execute("SELECT segid from structure WHERE structureid = ? AND \
-                              ( ( startid BETWEEN ? AND ? ) OR ( endid BETWEEN ? AND ? ) OR \
-                                ( startid > ? AND endid < ? ) OR ( startid < ? AND endid > ? ) ) ORDER BY segid", 
-                              structureid, g_start, g_end, g_start, g_end, g_start, g_end, g_start, g_end)
+    # if the query returns nothing, we return an empty list
     segments = []
-    for b in query.cursor.fetchall():
-        segments.append(b[0])
+
+    if (results != None) :
+        g_start = results[0]
+        g_end   = results[1]
+
+        query = conn.execute("SELECT segid from structure WHERE structureid = ? AND \
+                                  ( ( startid BETWEEN ? AND ? ) OR ( endid BETWEEN ? AND ? ) OR \
+                                    ( startid > ? AND endid < ? ) OR ( startid < ? AND endid > ? ) ) ORDER BY segid", 
+                                  structureid, g_start, g_end, g_start, g_end, g_start, g_end, g_start, g_end)
+        for b in query.cursor.fetchall():
+            segments.append(b[0])
+    else:
+        print("SegmentsForGene did not find gene: ({})".format(name))
 
     return jsonify({'segments': segments})
 

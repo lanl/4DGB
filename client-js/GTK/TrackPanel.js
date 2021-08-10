@@ -28,6 +28,9 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+const TrackChart = require('./TrackChart');
+
 class TrackPanel {
 
     static CurID = 0;
@@ -93,7 +96,7 @@ class TrackPanel {
     // add track data to the top of the current container
     //
     addTrack(labels, values) { 
-        var track = new GTKTrackChart(this.charts.firstChild.id);
+        var track = new TrackChart(this.charts.firstChild.id);
         // charts[i].setYValLimits( min, max );
         track.make( labels, values );
     }

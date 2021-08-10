@@ -30,6 +30,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 var ThePanels = [];
+var TheNumPanels = 2;
 var TheControls;
 var TheTrackPanel;
 
@@ -87,6 +88,19 @@ function setVariable( id ) {
         }, id, 1); 
 }
 
+function locationChanged(e) {
+    alert("location changed (" + e + ")")
+}
+
+function geneChanged(e) {
+    for (let i = 0; i < TheNumPanels; i++) {
+        GTK.Client.TheClient.get_segments_for_gene( (response) => {
+                ThePanels[i].geometrycanvas.geometry.setSegmentStates( response["segments"], SegmentState.LIVE, SegmentState.GHOST );
+                ThePanels[i].geometrycanvas.render();
+            }, i, e); 
+    }
+}
+
 function variableChanged(e) {
     setVariable(e);
 }
@@ -118,6 +132,8 @@ function main( project ) {
         // camera
     linkCameras(ThePanels[0].geometrycanvas, ThePanels[1].geometrycanvas);
         // events
+    TheControls.addEventListener( "locationChanged", locationChanged );
+    TheControls.addEventListener( "geneChanged", geneChanged );
     TheControls.addEventListener( "variableChanged", variableChanged );
     TheControls.addEventListener( "colormapChanged", colormapChanged );
     TheControls.addEventListener( "createTrack", createTrack );
