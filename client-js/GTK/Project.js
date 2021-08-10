@@ -67,6 +67,10 @@ class Project {
         ArrowSegment.Color          = new THREE.Color(parseInt(g["color"]));
     }
 
+    getInterval() {
+        return this.project["project"]["interval"]
+    }
+
     getProjectDir() {
         return this.ppath
     }

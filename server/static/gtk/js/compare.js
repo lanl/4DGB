@@ -33,6 +33,30 @@ var ThePanels = [];
 var TheNumPanels = 2;
 var TheControls;
 var TheTrackPanel;
+var TheInterval;
+
+function getSegmentsForLocationRange( IDs ) {
+    var start = Math.ceil(IDs[0]/TheInterval);
+    var end   = Math.ceil(IDs[1]/TheInterval);
+    var size  = parseInt(end - start);
+    var segments = [];
+    if (size == 0) {
+        // begin and end are the same, and we need at least one
+        segments.append(start);
+    } else {
+        // special case: endpoint was on a segment boundary
+        if (start*TheInterval == IDs[0]) {
+            for (var i=1; i < size+1; i++) {
+                segments[i] = start + i;
+            }
+        } else {
+            for (var i=0; i < size+1; i++) {
+                segments[i] = start + i;
+            }
+        }
+    }
+    return segments;
+}
 
 function addTrackCallback() {
     alert("track clicked")
@@ -89,7 +113,13 @@ function setVariable( id ) {
 }
 
 function locationChanged(e) {
-    alert("location changed (" + e + ")")
+    // split the string and convert to ints
+    var lrange = e.split("-").map(Number);
+    var segments = getSegmentsForLocationRange( lrange );
+    for (let i = 0; i < TheNumPanels; i++) {
+        ThePanels[i].geometrycanvas.geometry.setSegmentStates( segments, SegmentState.LIVE, SegmentState.GHOST );
+        ThePanels[i].geometrycanvas.render();
+    }
 }
 
 function geneChanged(e) {
@@ -113,6 +143,7 @@ function colormapChanged(e) {
 
 function main( project ) {
     var dset = project.getDatasets(); 
+    TheInterval = project.getInterval();
 
     // control panel
     TheControls = new GTK.ControlPanel( project, "controlpanel" );
