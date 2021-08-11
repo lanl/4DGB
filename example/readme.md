@@ -18,10 +18,10 @@ conda install -c conda-forge jupyterlab
 
 Use the GUI to navigate to the directory of your notebook "4DGB", go to the folder "example", and then click on "test00.ipynb"
 
-Use the arrow to run the entire notebook to view the 3D plot:
+Run the entire notebook to view the 3D plot:
 
 <div align="center">
-<img src="example/structure.png" width="40" height="50">
+<img src="structure.png" width="500" height="500">
 
 </div>
 
