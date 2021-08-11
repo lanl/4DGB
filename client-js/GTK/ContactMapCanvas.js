@@ -223,8 +223,13 @@ class ContactMapCanvas {
         /**
          * colormap for rendering data
          */
-        this.lutNumBins = 256;
+        this.lutNumBins   = 256;
         this.lut = new THREE.Lut( "grayscale", this.lutNumBins ); 
+        this.lut.min = 0.1;
+        this.lut.max = 1.0;
+            // the color value is of the form 0xCCCCCC, so we must convert it to 
+            // #CCCCCC in order to use it with the canvas context 
+        this.background = "#" + this.displayOpts["background"].substring(2); 
 
         /**
          * Another class can set this property to enable a listener for when the selection changes.
@@ -397,16 +402,22 @@ class ContactMapCanvas {
 
         for (let i = 0; i < pixels.length; i+= 4) {
             const val = cm.data[i/4];
-
             const normalized = (val - cm.minValue) / (cm.maxValue - cm.minValue) * magnification;
 
-            const color = this.lut.getColor(normalized);
+            if (normalized <= this.lut.min) {
+                pixels[i]   = this.lutNumBins-1; 
+                pixels[i+1] = this.lutNumBins-1;
+                pixels[i+2] = this.lutNumBins-1; 
+                pixels[i+3] = 0;
+            } else {
+                const color = this.lut.getColor(normalized);
 
-            // color using the lut 
-            pixels[i]   = color.r*(this.lutNumBins-1);
-            pixels[i+1] = color.g*(this.lutNumBins-1);
-            pixels[i+2] = color.b*(this.lutNumBins-1); 
-            pixels[i+3] = 255;
+                // color using the lut 
+                pixels[i]   = color.r*(this.lutNumBins-1);
+                pixels[i+1] = color.g*(this.lutNumBins-1);
+                pixels[i+2] = color.b*(this.lutNumBins-1); 
+                pixels[i+3] = this.lutNumBins-1;
+            }
         }
 
         return new ImageData(pixels, cm.bounds.width, cm.bounds.height);
@@ -426,7 +437,9 @@ class ContactMapCanvas {
         tempCanvas.getContext('2d').putImageData(img, 0, 0);
 
         const ctx = this.canvas.node().getContext('2d');
-        ctx.clearRect(0, 0, this.margin.innerWidth, this.margin.innerHeight);
+        ctx.fillStyle = this.background; 
+        ctx.fillRect(0, 0, this.margin.innerWidth, this.margin.innerHeight);
+        // ctx.clearRect(0, 0, this.margin.innerWidth, this.margin.innerHeight);
         ctx.save();
 
         const trans = d3.zoomTransform(this.zoomSVG.node());
