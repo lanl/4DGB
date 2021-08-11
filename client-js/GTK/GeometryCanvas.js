@@ -122,14 +122,19 @@ class GeometryCanvas {
         for (var l in Object.keys(lights)) {
             curLight = lights[l];
             if (curLight["type"] == "directional") {
-                var dirLight = new THREE.DirectionalLight(parseInt(curLight["color"], 16));
-                dirLight.position.set(curLight["position"][0], curLight["position"][1], curLight["position"][2] );
-                dirLight.castShadow = curLight["castshadow"] ;
-                this.scene.add(dirLight);
+                var light = new THREE.DirectionalLight(curLight["color"], curLight["intensity"]);
+                light.position.set(curLight["position"][0], curLight["position"][1], curLight["position"][2] );
+                light.castShadow = curLight["castshadow"] ;
+                this.scene.add(light);
                 
+            } else if (curLight["type"] == "point") {
+                var light = new THREE.PointLight(curLight["color"], curLight["intensity"], curLight["distance"], curLight["decay"]);
+                light.position.set(curLight["position"][0], curLight["position"][1], curLight["position"][2] );
+                this.scene.add(light);
+
             } else if (curLight["type"] == "ambient") {
-                var ambientLight = new THREE.AmbientLight(parseInt(curLight["color"]));
-                this.scene.add(ambientLight);
+                var light = new THREE.AmbientLight(curLight["color"], curLight["intensity"]);
+                this.scene.add(light);
             }
         }
 

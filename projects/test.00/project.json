@@ -190,15 +190,19 @@
                     "position": [0.0, 0.0, 100.0] 
                 },
                 "lights": [
-                    { "label": "Directional Light 0",
-                      "type": "directional",
-                      "color": "0xffffff", 
-                      "position": [10,10,10], 
-                      "castshadow": true 
+                    { "label": "point Light 0",
+                      "type"        : "point",
+                      "color"       : "0x404040",
+                      "old_color"   : "0xFDF4DC", 
+                      "intensity"   : 1.0,
+                      "distance"    : 0,
+                      "decay"       : 1,
+                      "position"    : [10,10,10] 
                     },
                     { "label": "Ambient Light 0",
-                      "type": "ambient",
-                      "color": "0x888888" 
+                      "type"        : "ambient",
+                      "color"       : "0x404040",
+                      "intensity"   : 0.25
                     }
                 ]
             },
