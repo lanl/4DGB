@@ -221,6 +221,12 @@ class ContactMapCanvas {
         this.zoom = null;
 
         /**
+         * colormap for rendering data
+         */
+        this.lutNumBins = 256;
+        this.lut = new THREE.Lut( "grayscale", this.lutNumBins ); 
+
+        /**
          * Another class can set this property to enable a listener for when the selection changes.
          * This will be called as the selection changes with an array of arrays as an argument
          * formatted like so:
@@ -394,11 +400,13 @@ class ContactMapCanvas {
 
             const normalized = (val - cm.minValue) / (cm.maxValue - cm.minValue) * magnification;
 
-            // color scale from white to red
-            pixels[i]   = 255;                // red
-            pixels[i+1] = (1-normalized)*255; // green
-            pixels[i+2] = pixels[i+1];        // blue (same as green)
-            pixels[i+3] = 255;                // alpha
+            const color = this.lut.getColor(normalized);
+
+            // color using the lut 
+            pixels[i]   = color.r*(this.lutNumBins-1);
+            pixels[i+1] = color.g*(this.lutNumBins-1);
+            pixels[i+2] = color.b*(this.lutNumBins-1); 
+            pixels[i+3] = 255;
         }
 
         return new ImageData(pixels, cm.bounds.width, cm.bounds.height);
