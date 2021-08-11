@@ -1,23 +1,27 @@
-To run the example locally
+# To run the Jupyter Notebook locally
 
 You will need jupyter lab, ipympl, and pypac.
-To install:
-In a terminal run the following conda and pip commands:
-    conda install -c conda-forge ipympl
-    pip install pypac
-    conda install -c conda-forge jupyterlab
 
-After that, close that terminal.
+### To install:
+```sh
+conda install -c conda-forge ipympl
+pip install pypac
+conda install -c conda-forge jupyterlab
+```
 
-Activate a jupyter lab in a terminal with the command:
-    jupyter lab
-
-Use the GUI to navigate to the directory of your notebook (4DGB), and then go to the folder "example", then click on "test00.ipynb"
-"Image"
-
-Before running the notebook, we need to make a release locally
-
+### To run the `test.00` project in this repository:
     ./bin/make_release test.00
     python3 release/test.00/server/gtkserver.py --port 8000
 
-Use the arrow to run the notebook, you should see this  3D plot
+### Activate a jupyter Notebook in a different terminal:
+    jupyter notebook
+
+Use the GUI to navigate to the directory of your notebook "4DGB", go to the folder "example", and then click on "test00.ipynb"
+
+Use the arrow to run the entire notebook to view the 3D plot:
+
+<div align="center">
+<img src="example/structure.png" width="40" height="50">
+
+</div>
+
