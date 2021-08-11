@@ -2,7 +2,7 @@
 
 You will need jupyter lab, ipympl, and pypac.
 
-### To install:
+### To install: 
 ```sh
 conda install -c conda-forge ipympl
 pip install pypac
