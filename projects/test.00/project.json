@@ -10,7 +10,8 @@
         "givenName" : "David",
         "familyName" : "Rogers"
     },
-    "created" : "2021-04-20T20:20:39+00:00"
+    "interval"  : 400000,
+    "created"   : "2021-04-20T20:20:39+00:00"
 },
 
 "data" : {
@@ -233,7 +234,7 @@
                             "radius-end": 0.01
                         },
                         "ghost" : {
-                            "opacity" : 0.3
+                            "opacity" : 0.1
                         },
                         "skeleton" : {
                         }

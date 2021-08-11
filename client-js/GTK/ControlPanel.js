@@ -44,13 +44,21 @@ class ControlPanel extends Publisher {
         // title
         this.title = document.createElement("div");
         this.title.className = "gtktitle";
-        this.title.innerHTML = "Global Controls";
+        this.title.innerHTML = "&nbsp";
         this.container.appendChild(this.title);
 
         // controls
         var cur_row = 0;
         this.controls = document.createElement("table");
         this.container.appendChild(this.controls);
+
+            // title
+        var row = this.controls.insertRow(cur_row); 
+        cur_row += 1;
+        var name = row.insertCell(0);
+        name.colSpan = 2;
+        name.innerHTML = "Selection";
+        name.className = "gtktitlecell";
 
             // location
         var row = this.controls.insertRow(cur_row); 
@@ -78,6 +86,14 @@ class ControlPanel extends Publisher {
         this.genechoice.addEventListener('change', (function (e) { this.onGeneSelect(e) }).bind(this));
         this.updateGeneNames(project);
 
+            // title
+        var row = this.controls.insertRow(cur_row); 
+        cur_row += 1;
+        var name = row.insertCell(0);
+        name.colSpan = 2;
+        name.innerHTML = "Coloring";
+        name.className = "gtktitlecell";
+
             // variable
         var row = this.controls.insertRow(cur_row); 
         cur_row += 1;
@@ -103,6 +119,14 @@ class ControlPanel extends Publisher {
         cell.appendChild(this.colormapchoice);
         this.colormapchoice.addEventListener('change', (function (e) { this.onColormapSelect(e) }).bind(this));
         this.updateColormapNames();
+
+            // title
+        var row = this.controls.insertRow(cur_row); 
+        cur_row += 1;
+        var name = row.insertCell(0);
+        name.colSpan = 2;
+        name.innerHTML = "Data Track";
+        name.className = "gtktitlecell";
 
         // create detail button
         var row = this.controls.insertRow(cur_row); 
