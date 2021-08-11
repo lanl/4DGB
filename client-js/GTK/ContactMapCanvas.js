@@ -224,8 +224,8 @@ class ContactMapCanvas {
          * colormap for rendering data
          */
         this.lutNumBins   = 256;
-        this.lut = new THREE.Lut( "grayscale", this.lutNumBins ); 
-        this.lut.min = 0.1;
+        this.lut = new THREE.Lut( this.displayOpts["colormap"], this.lutNumBins ); 
+        this.lut.min = this.displayOpts["threshold"]; 
         this.lut.max = 1.0;
             // the color value is of the form 0xCCCCCC, so we must convert it to 
             // #CCCCCC in order to use it with the canvas context 
