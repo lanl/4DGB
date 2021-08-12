@@ -47,11 +47,58 @@ class ControlPanel extends Publisher {
         this.title.innerHTML = "&nbsp";
         this.container.appendChild(this.title);
 
-        // controls
-        var cur_row = 0;
-        this.controls = document.createElement("table");
-        this.container.appendChild(this.controls);
+        // tabs
+        this.tabdiv = document.createElement("div");
+        this.tabdiv.className = "tab";
+        root.appendChild(this.tabdiv);
 
+        // control tab
+        this.globaltab = document.createElement("button");
+        this.globaltab.className = "tablinks";
+        this.globaltab.innerHTML = "Global";
+        this.globaltab.onclick = (function (e) { this.openTab(e, "globaltab") }).bind(this);
+        this.tabdiv.appendChild(this.globaltab);
+        this.globaltabcontent = document.createElement("div");
+        this.globaltabcontent.className = "tabcontent";
+        this.globaltabcontent.id = "globaltab";
+        root.appendChild(this.globaltabcontent);
+            // table
+        this.controls = document.createElement("table");
+        this.controls.className = "gtkcontroltable";
+        this.globaltabcontent.appendChild(this.controls);
+
+        // info 
+        this.infotab = document.createElement("button");
+        this.infotab.className = "tablinks";
+        this.infotab.innerHTML = "Info";
+        this.infotab.onclick = (function (e) { this.openTab(e, "infotab") }).bind(this);
+        this.tabdiv.appendChild(this.infotab);
+        this.infotabcontent = document.createElement("div");
+        this.infotabcontent.className = "tabcontent";
+        this.infotabcontent.id = "infotab";
+        root.appendChild(this.infotabcontent);
+            // table
+        this.info = document.createElement("table");
+        this.info.className = "gtkcontroltable";
+        this.infotabcontent.appendChild(this.info);
+
+        // settings
+        this.settingstab = document.createElement("button");
+        this.settingstab.className = "tablinks";
+        this.settingstab.innerHTML = "Settings";
+        this.settingstab.onclick = (function (e) { this.openTab(e, "settingstab") }).bind(this);
+        this.tabdiv.appendChild(this.settingstab);
+        this.settingstabcontent = document.createElement("div");
+        this.settingstabcontent.className = "tabcontent";
+        this.settingstabcontent.id = "settingstab";
+        root.appendChild(this.settingstabcontent);
+            // table
+        this.settings = document.createElement("table");
+        this.settings.className = "gtkcontroltable";
+        this.settingstabcontent.appendChild(this.settings);
+
+            // global controls
+        var cur_row = 0;
             // title
         var row = this.controls.insertRow(cur_row); 
         cur_row += 1;
@@ -139,6 +186,9 @@ class ControlPanel extends Publisher {
         this.createTrack.innerHTML = "Create";
         cell.appendChild(this.createTrack);
         this.createTrack.onclick = (function (e) { this.onCreateTrack(e) }).bind(this);
+
+        // select the default tab
+        this.globaltab.click();
     }
 
     getCurrentLocation() {
@@ -220,6 +270,28 @@ class ControlPanel extends Publisher {
 
     onCreateTrack(e) {
         super.notify("createTrack", this.getCurrentVariableName())
+    }
+
+    openTab(e, tabname) {
+        // Declare all variables
+        var i, tabcontent, tablinks;
+
+        // Get all elements with class="tabcontent" and hide them
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        // Get all elements with class="tablinks" and remove the class "active"
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Show the current tab, and add an "active" class to the button that opened the tab
+        var tab = document.getElementById(tabname);
+        tab.style.display = "block";
+        e.currentTarget.className += " active";
     }
 }
 

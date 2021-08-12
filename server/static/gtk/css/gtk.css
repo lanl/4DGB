@@ -184,3 +184,7 @@ div.gtk { padding: 5px;
     border-color: steelblue;
     cursor: grab;
 }
+
+.gtkcontroltable {
+    width: 300px;
+}

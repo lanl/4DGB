@@ -18,7 +18,9 @@
     "sequence": {
         "url"  : "http://www.nothing.com",
         "type" : "nothing",
-        "name" : "nothing"
+        "name" : "nothing",
+        "citation": "This is the citation",
+        "license": "This is the license"
     },
     "annotations": {
         "url"       : "source/Mus_musculus.GRCm39.104.chromosome.X.gff3",
@@ -175,7 +177,10 @@
         },
         "contactmapcanvas": {
             "width": 500,
-            "height": 500
+            "height": 500,
+            "threshold" : 0.1,
+            "background" : "0xD3D3D3",
+            "colormap" : "rainbow"
         },
         "geometrycanvas" : {
             "width":  500, 
