@@ -72,17 +72,23 @@ function generateTrackLabels (start, end, numbins) {
 }
 
 function createTrack ( data ) {
-    TheTrackPanel.pushContainer( "Here it is", addTrackCallback );
-    GTK.Client.TheClient.get_sampled_array( (response) => {
-            var labels = generateTrackLabels( 0, 1000000, 200); 
-            TheTrackPanel.addTrack( labels, response["data"]);
-            var data = response["data"];
-        }, 4, 0, 0, 1000000, 200); 
-    GTK.Client.TheClient.get_sampled_array( (response) => {
-            var labels = generateTrackLabels( 0, 1000000, 200); 
-            TheTrackPanel.addTrack( labels, response["data"]);
-            var data = response["data"];
-        }, 4, 0, 0, 1000000, 200); 
+    var start   = 0;
+    var end     = 73000000;
+    var numbins = 200;
+    var vid     = TheControls.getCurrentVariableID();
+    var vname   = TheControls.getCurrentVariableName();
+
+    // create a title for the track
+    var title =  "Var: " + vname + " Range: (" + start + ", " + end + ")"
+    TheTrackPanel.pushContainer( title, addTrackCallback );
+
+    for (let i = 0; i < TheNumPanels; i++) {
+        GTK.Client.TheClient.get_sampled_array( (response) => {
+                var labels = generateTrackLabels( 0, 1000000, 200); 
+                TheTrackPanel.addTrack( labels, response["data"]);
+                var data = response["data"];
+            }, vid, i, start, end, numbins); 
+    }
 }
 
 function linkCameras(a, b) {

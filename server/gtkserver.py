@@ -66,7 +66,6 @@ def get_array_metadata(arrayID):
                     "dim"   : None, 
                     "min"   : None,
                     "max"   : None,
-                    "url"   : "",
                     "values": []
                 }
             }
@@ -122,10 +121,9 @@ def GetDatasetIDs():
 def GetArray(arrayID, arraySlice):
     array = get_array_metadata(arrayID)
 
-    sliceID = "arr_{}".format(arraySlice)
-    if (array['data']['url'] != ""):
-        values = numpy.load(PROJECT_HOME + "/" + array["data"]["url"])
-        array["data"]["values"] = values[sliceID].tolist() 
+    if (array['data']['values'][int(arraySlice)]['url'] != ""):
+        values = numpy.load(PROJECT_HOME + "/" + array['data']['values'][int(arraySlice)]['url'])
+        array['data']['values'] = values[array['data']['values'][int(arraySlice)]['id']].tolist() 
 
     return jsonify(array)
 
@@ -305,9 +303,13 @@ def SampleArray(arrayID, arraySlice, begin, end, numsamples):
     array = get_array_metadata(arrayID)
 
     data = []
-    if ( array['type'] == 'sequence' ): 
-        url = "{}/{}".format(PROJECT_HOME, array['data']['url'])
-        data = bbi.fetch(url, array['data']['chrom'], int(begin), int(end), int(numsamples))
+    if ( 'sequence' in array['data']['values'][int(arraySlice)] ):
+        # there is a sequence array
+        adata = array['data']['values'][int(arraySlice)]
+        url = "{}/{}".format(PROJECT_HOME, adata['sequence']['url'])
+        data = bbi.fetch(url, adata['sequence']['chrom'], int(begin), int(end), int(numsamples))
+    else:
+        data = [0, 1, 2, 3, 4, 5, 6]
 
     return jsonify({'data': list(data)})
 

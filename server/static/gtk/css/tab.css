@@ -11,8 +11,8 @@
   border: none;
   outline: none;
   cursor: pointer;
-  padding: 14px 16px;
-  transition: 0.3s;
+  padding: 10px 10px;
+  border-radius: 5px;
 }
 
 /* Change background color of buttons on hover */
