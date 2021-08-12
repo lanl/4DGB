@@ -8,6 +8,15 @@
     "dim"   : 1,
     "min"   : 1,
     "max"   : 22,
-    "url"   : "source/array/0001.npz"
+    "values" : [
+        {
+            "id"  : "arr_0",
+            "url" : "source/array/0001.npz"
+        },
+        {
+            "id"  : "arr_1",
+            "url" : "source/array/0001.npz"
+        }
+    ]
 }
 }
