@@ -80,7 +80,7 @@ echo "Copying files ..."
 
 # Server and served content
 cp -a server/static "$DEST/server/static"
-cp server/gtkserver.py "$DEST/server"
+cp server/{gtkserver.py,requirements.txt,Dockerfile,apache_config.conf} "$DEST/server"
 cp -a "$SRC" "$DEST/server/static/project"
 
 cp server/license.md "$DEST"

@@ -36,7 +36,12 @@ DB_PATH = path.abspath(
 app = Flask(__name__)
 api = Api(app)
 
-db_connect = None
+# If not running as the test server, we can run connect
+# to the database now (for the test server, the connection
+# is made at the bottom of the file after DB_PATH has had
+# a chance to be overwritten by command-line arguments)
+if __file__ != '__main__':
+    db_connect = create_engine('sqlite:///'+DB_PATH)
 
 #
 # get the interval of the datasets for this project
@@ -108,6 +113,17 @@ def load_array_data(arrayID, arraySlice):
             # TODO: determine the correct behavior
 
     return array
+
+#
+# routes for serving static files
+#
+@app.route('/')
+def home():
+    return app.send_static_file('index.html')
+
+@app.route('/<path:path>')
+def root(path):
+    return app.send_static_file(path)
 
 #
 # return a list of the variables available
@@ -484,15 +500,6 @@ def getGenesForLocationRange( start, end ):
 if __name__ == '__main__':
     import argparse
 
-    # Add routes for serving static files
-    @app.route('/')
-    def home():
-        return app.send_static_file('index.html')
-
-    @app.route('/<path:path>')
-    def root(path):
-        return app.send_static_file(path)
-
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
         description="gtkserver.py: GTK Testing Server"
@@ -516,10 +523,10 @@ if __name__ == '__main__':
     DB_PATH      = path.abspath(args.database)
     PROJECT_HOME = path.abspath(args.project)
 
+    db_connect = create_engine('sqlite:///'+DB_PATH)
+
     # cd to server directory
     chdir( path.dirname(__file__) )
-
-    db_connect = create_engine('sqlite:///'+DB_PATH)
 
     app.run(host=args.host, port=args.port)
 
