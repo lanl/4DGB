@@ -1,6 +1,6 @@
 # To run the Jupyter Notebook locally
 
-You will need jupyter lab, ipympl, and the module gentk.
+You will need jupyter lab, ipympl, and the gentk module.
 
 ### To install: 
 ```sh
