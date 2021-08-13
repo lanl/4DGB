@@ -16,7 +16,7 @@ pip install -i https://test.pypi.org/simple/ gentk
 ### Activate a jupyter Notebook in a different terminal:
     jupyter notebook
 
-Use the GUI to navigate to the directory of your notebook "4DGB", go to the folder "example", and then click on "test00.ipynb" 
+Use the GUI to navigate to the directory of your notebook "4DGB", go to Doc/examples/001/test00.ipynb
 
 Run the entire notebook to view the 3D plot:
 
