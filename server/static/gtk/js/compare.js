@@ -40,9 +40,10 @@ function getSegmentsForLocationRange( IDs ) {
     var end   = Math.ceil(IDs[1]/TheInterval);
     var size  = parseInt(end - start);
     var segments = [];
+
     if (size == 0) {
         // begin and end are the same, and we need at least one
-        segments.append(start);
+        segments[1] = start;
     } else {
         // special case: endpoint was on a segment boundary
         if (start*TheInterval == IDs[0]) {
@@ -117,6 +118,13 @@ function setVariable( id ) {
             ThePanels[1].geometrycanvas.render();
         }, id, 1); 
 }
+function segmentChanged(e) {
+    var segments = e.map(i=>Number(i)); 
+    for (let i = 0; i < TheNumPanels; i++) {
+        ThePanels[i].geometrycanvas.geometry.setSegmentStates( segments, SegmentState.LIVE, SegmentState.GHOST );
+        ThePanels[i].geometrycanvas.render();
+    }
+}
 
 function locationChanged(e) {
     // split the string and convert to ints
@@ -171,6 +179,7 @@ function main( project ) {
         // events
     TheControls.addEventListener( "locationChanged", locationChanged );
     TheControls.addEventListener( "geneChanged", geneChanged );
+    TheControls.addEventListener( "segmentChanged", segmentChanged );
     TheControls.addEventListener( "variableChanged", variableChanged );
     TheControls.addEventListener( "colormapChanged", colormapChanged );
     TheControls.addEventListener( "createTrack", createTrack );

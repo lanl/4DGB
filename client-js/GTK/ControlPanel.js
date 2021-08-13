@@ -36,6 +36,10 @@ class ControlPanel extends Publisher {
     constructor(project, parent) {
         super();
 
+        // misc 
+        this.selector = "";
+
+        // build UI
         var root = document.getElementById(parent);
         this.container = document.createElement("div");
         this.container.className = "gtkviewerpanel";
@@ -103,41 +107,89 @@ class ControlPanel extends Publisher {
         var row = this.controls.insertRow(cur_row); 
         cur_row += 1;
         var name = row.insertCell(0);
-        name.colSpan = 2;
+        name.colSpan = 3;
         name.innerHTML = "Selection";
         name.className = "gtktitlecell";
 
             // location
+                // title  
         var row = this.controls.insertRow(cur_row); 
         cur_row += 1;
         var name = row.insertCell(0);
         name.innerHTML = "Location";
-
+                // entry
         var cell = row.insertCell(1);
+        this.locationentry = document.createElement("input");
+        this.locationentry.type = "text";
+        cell.appendChild(this.locationentry);
+        this.locationentry.addEventListener('keypress', (function (e) { this.updateSelection(e, "location") }).bind(this));
+                // selection
+        var cell = row.insertCell(2);
         this.locationchoice = document.createElement("select");
         this.locationchoice.setAttribute("type", "text");
         cell.appendChild(this.locationchoice);
-        this.locationchoice.addEventListener('change', (function (e) { this.onLocationSelect(e) }).bind(this));
+        this.locationchoice.addEventListener('change', (function (e) { this.addLocation(e) }).bind(this));
         this.updateLocationNames(project);
         
-            // location
+            // gene
         var row = this.controls.insertRow(cur_row); 
         cur_row += 1;
         var name = row.insertCell(0);
-        name.innerHTML = "Gene";
-
+        name.innerHTML = "Genes";
+            // a list of all genes
+        this.genes = [];
+                // entry
         var cell = row.insertCell(1);
+        this.geneentry = document.createElement("input");
+        this.geneentry.type = "text";
+        cell.appendChild(this.geneentry);
+        this.geneentry.addEventListener('keypress', (function (e) { this.updateSelection(e, "gene") }).bind(this));
+                // selection
+        var cell = row.insertCell(2);
         this.genechoice = document.createElement("select");
         this.genechoice.setAttribute("type", "text");
         cell.appendChild(this.genechoice);
-        this.genechoice.addEventListener('change', (function (e) { this.onGeneSelect(e) }).bind(this));
+        this.genechoice.addEventListener('change', (function (e) { this.addGene(e) }).bind(this));
         this.updateGeneNames(project);
+
+            // segment
+        var row = this.controls.insertRow(cur_row); 
+        cur_row += 1;
+        var name = row.insertCell(0);
+        name.innerHTML = "Segments";
+                // entry
+        var cell = row.insertCell(1);
+        this.segmententry = document.createElement("input");
+        this.segmententry.type = "text";
+        cell.appendChild(this.segmententry);
+        this.segmententry.addEventListener('keypress', (function (e) { this.updateSelection(e, "segment") }).bind(this));
+                // selection
+        var cell = row.insertCell(2);
+        this.segmentchoice = document.createElement("select");
+        this.segmentchoice.setAttribute("type", "text");
+        cell.appendChild(this.segmentchoice);
+        // HACK don't show this for now (until it does something)
+        this.segmentchoice.style.visibility = "hidden";
+            // end HACK
+        this.segmentchoice.addEventListener('change', (function (e) { this.onSegmentSelect(e) }).bind(this));
+        // this.updateSegments(project);
+            // selection 
+        var row = this.controls.insertRow(cur_row); 
+        cur_row += 1;
+        var name = row.insertCell(0);
+        name.innerHTML = "";
+            // button
+        var cell = row.insertCell(1);
+        this.select = document.createElement("button");
+        this.select.innerHTML = "Select";
+        cell.appendChild(this.select);
+        this.select.onclick = (function (e) { this.onSelect(e) }).bind(this);
 
             // title
         var row = this.controls.insertRow(cur_row); 
         cur_row += 1;
         var name = row.insertCell(0);
-        name.colSpan = 2;
+        name.colSpan = 3;
         name.innerHTML = "Coloring";
         name.className = "gtktitlecell";
 
@@ -171,16 +223,16 @@ class ControlPanel extends Publisher {
         var row = this.controls.insertRow(cur_row); 
         cur_row += 1;
         var name = row.insertCell(0);
-        name.colSpan = 2;
+        name.colSpan = 3;
         name.innerHTML = "Data Track";
         name.className = "gtktitlecell";
 
-        // create detail button
+        // track creation button 
         var row = this.controls.insertRow(cur_row); 
         cur_row += 1;
         var name = row.insertCell(0);
-        name.innerHTML = "Create a data track";
-
+        name.innerHTML = "";
+            // button
         var cell = row.insertCell(1);
         this.createTrack = document.createElement("button");
         this.createTrack.innerHTML = "Create";
@@ -238,7 +290,9 @@ class ControlPanel extends Publisher {
             var option = document.createElement('option');
             option.value = f;
             option.innerHTML = f;
-            this.genechoice.appendChild(option)
+            this.genechoice.appendChild(option);
+                // keep a list of all the genes
+            this.genes.push(f);
         }
     }
 
@@ -272,6 +326,25 @@ class ControlPanel extends Publisher {
         super.notify("createTrack", this.getCurrentVariableName())
     }
 
+    onSelect(e) {
+        if (this.selector == "gene") {
+            if (this.validateGenes()) {
+                var values = this.getSelectedGenesList();
+                super.notify("geneChanged", values);
+            }
+        } else if (this.selector == "location") {
+            if (this.validateLocations()) {
+                var values = this.getSelectedLocationsList();
+                super.notify("locationChanged", values[0]);
+            }
+        } else if (this.selector == "segment") {
+            if (this.validateSegments()) {
+                var values = this.getSelectedSegmentsList();
+                super.notify("segmentChanged", values);
+            }
+        }
+    }
+
     openTab(e, tabname) {
         // Declare all variables
         var i, tabcontent, tablinks;
@@ -293,6 +366,153 @@ class ControlPanel extends Publisher {
         tab.style.display = "block";
         e.currentTarget.className += " active";
     }
+
+    updateSelection(e, type) {
+        if (e.keyCode == 13) {
+            this.selector = type;
+
+            if (type == "gene") {
+                if (this.validateGenes()) {
+                    this.eraseEntry(this.locationentry);
+                    this.eraseEntry(this.segmententry);
+                    this.onSelect(e);
+                }
+            } else if (type == "location") {
+                if (this.validateLocations()) {
+                    this.eraseEntry(this.geneentry);
+                    this.eraseEntry(this.segmententry);
+                    this.onSelect(e);
+                }
+            } else if (type == "segment") {
+                if (this.validateSegments()) {
+                    this.eraseEntry(this.geneentry);
+                    this.eraseEntry(this.locationentry);
+                    this.onSelect(e);
+                }
+            }
+        }
+    }
+
+    // general entry helper functions
+    // ---------------------------------------------------------------------------------
+    getSelectedValueList( entry ) {
+        var values = entry.value;
+        var valuelist = [] 
+        if (values != "") {
+            var eachValue = values.split(",");
+            for ( var i = 0; i < eachValue.length; i++ ) { 
+                valuelist.push(eachValue[i])
+            }
+        }
+
+        return valuelist;
+    }
+
+    addValueToEntry( entry, newvalue, valuelist ) {
+        if (valuelist.length > 0) {
+            if ( ! valuelist.includes(newvalue)) {
+                entry.value = entry.value + "," + newvalue;
+            }
+        } else {
+            entry.value = newvalue;
+        }
+    }
+
+    eraseEntry( entry ) {
+        entry.value = "";
+    }
+
+    setSelector( type ) {
+        this.selector = type;
+    }
+
+    // location helper functions
+    // ---------------------------------------------------------------------------------
+    getSelectedLocationsList() {
+        return this.getSelectedValueList( this.locationentry );
+    }
+
+    addLocation() {
+        // HACK for now support a single entry
+        this.locationentry.value = "";
+            // end HACK
+        this.addValueToEntry( this.locationentry, this.getCurrentLocation(), this.getSelectedLocationsList() ); 
+        this.eraseEntry(this.geneentry);
+        this.eraseEntry(this.segmententry);
+        this.setSelector("location");
+    }
+
+    validateLocations() {
+        var vlist = this.getSelectedLocationsList(); 
+        var success = true;
+        for ( var i = 0; i < vlist.length; i++ ) { 
+            if ( false ) {
+                alert("Invalid gene: " + glist[i])
+                success = false;
+                break;
+            }
+        }
+
+        return success; 
+    }
+
+    // gene helper functions
+    // ---------------------------------------------------------------------------------
+    getSelectedGenesList() {
+        return this.getSelectedValueList( this.geneentry );
+    }
+
+    addGene(e) {
+        // HACK for now support a single entry
+        this.geneentry.value = "";
+            // end HACK
+        this.addValueToEntry( this.geneentry, this.getCurrentGene(), this.getSelectedGenesList() ); 
+        this.eraseEntry(this.locationentry);
+        this.eraseEntry(this.segmententry);
+        this.setSelector("gene");
+    }
+
+    validateGenes() {
+        var glist = this.getSelectedGenesList(); 
+        var success = true;
+        for ( var i = 0; i < glist.length; i++ ) { 
+            if ( ! this.genes.includes(glist[i]) ) {
+                alert("Invalid gene: " + glist[i])
+                success = false;
+                break;
+            }
+        }
+
+        return success; 
+    }
+
+    // segment helper functions
+    // ---------------------------------------------------------------------------------
+    getSelectedSegmentsList() {
+        return this.getSelectedValueList( this.segmententry );
+    }
+
+    addSegment(e) {
+        this.addValueToEntry( this.segmententry, this.getCurrentSegment(), this.getSelectedSegmentsList() ); 
+        this.eraseEntry(this.locationentry);
+        this.eraseEntry(this.geneentry);
+        this.setSelector("segment");
+    }
+
+    validateSegments() {
+        var glist = this.getSelectedSegmentsList(); 
+        var success = true;
+        for ( var i = 0; i < glist.length; i++ ) { 
+            if ( false ) { 
+                alert("Invalid gene: " + glist[i])
+                success = false;
+                break;
+            }
+        }
+
+        return success; 
+    }
+
 }
 
 module.exports = ControlPanel;
