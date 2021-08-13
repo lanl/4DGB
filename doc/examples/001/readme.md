@@ -1,12 +1,12 @@
 # To run the Jupyter Notebook locally
 
-You will need jupyter lab, ipympl, and pypac.
+You will need jupyter lab, ipympl, and the module gentk.
 
 ### To install: 
 ```sh
 conda install -c conda-forge ipympl
-pip install pypac
 conda install -c conda-forge jupyterlab
+pip install -i https://test.pypi.org/simple/ gentk
 ```
 
 ### To run the `test.00` project in this repository:
