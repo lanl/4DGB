@@ -48,7 +48,7 @@ sourcefile = "projects/test.00/source/test.bw"
 values_0 = list(bbi.fetch(sourcefile, "1", 0, 5, 11))
 values_1 = values_0
 values_1.reverse()
-afile = "projects/test.01/source/array/0007.npz"
+afile = "projects/test.00/source/array/0007.npz"
 print("saving file to: {}".format(afile))
 numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
 
