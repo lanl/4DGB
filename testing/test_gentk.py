@@ -204,8 +204,8 @@ def test_set_array():
                                 },
                     'values'    : [0, 1, 2, 3, 4, 5],
                     'wrongvals' : [10, 11, 12, 13, 14, 15],
-                    'arrayid'   : 7,
-                    'structurearrayid'  : 6,
+                    'arrayid'   : 8,
+                    'structurearrayid'  : 7,
                     'sliceids'  : [0, 1]
                 }
             ]
@@ -223,7 +223,7 @@ def test_set_array():
             assert (result['data']['values'] != t['wrongvals'])
 
     arrays = client.get_arrays('structure')
-    assert(arrays['arrays'][t['structurearrayid']] == {'id': 7, 'max': None, 'min': None, 'type': 'structure', 'name': 'test set array'})
+    assert(arrays['arrays'][t['structurearrayid']] == {'id': 8, 'max': None, 'min': None, 'type': 'structure', 'name': 'test set array'})
 
 def test_get_arrays():
     tests = [
@@ -242,10 +242,10 @@ def test_get_arrays():
         assert(arrays['arrays'][t['id']] == t['array']) 
 
 def test_get_sampled_array():
-    array = client.get_sampled_array(4, 0, 100000, 200000, 100)
+    array = client.get_sampled_array(7, 0, 0, 200000, 100)
     assert(len(array['data']) == 100)
 
-    array = client.get_sampled_array(4, 0, 100000, 200000, 52)
+    array = client.get_sampled_array(7, 1, 0, 200000, 52)
     assert(len(array['data']) == 52)
 
 def test_get_segment_ids():

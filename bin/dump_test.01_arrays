@@ -61,3 +61,4 @@ values_1.reverse()
 afile = "projects/test.01/source/array/0007.npz"
 print("saving file to: {}".format(afile))
 numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
+

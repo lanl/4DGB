@@ -17,8 +17,8 @@ print(bbifile.read_autosql())
 
 sizes = bbifile.chromsizes
 for c in sizes:
-    print("{}: {}".format(c, sizes[c]))
+    print("sizes {}: {}".format(c, sizes[c]))
 
-values = bbi.fetch(bfile, "1", 0, 166600000, 833)
+values = bbi.fetch(bfile, "1", 0, 5, 11)
 print(values)
 # numpy.savez_compressed("0004.npz", data=values)

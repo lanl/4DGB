@@ -1,0 +1,30 @@
+{
+"name"      : "sampled H3K27me3",
+"type"      : "structure",
+"version"   : "0.1",
+"tags"      : [],
+"data"      : {
+    "type"  : "float",
+    "dim"   : 1,
+    "min"   : 0.0, 
+    "max"   : 0.3,
+    "values" : [
+        {
+            "id"  : "arr_0",
+            "url" : "source/array/0007.npz",
+            "sequence" : {
+                "chrom" : "1",
+                "url" : "source/test.bw"
+            }
+        },
+        {
+            "id"  : "arr_1",
+            "url" : "source/array/0007.npz",
+            "sequence" : {
+                "chrom" : "1",
+                "url" : "source/test.bw"
+            }
+        }
+    ]
+}
+}

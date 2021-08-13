@@ -121,9 +121,10 @@ def GetDatasetIDs():
 def GetArray(arrayID, arraySlice):
     array = get_array_metadata(arrayID)
 
-    if (array['data']['values'][int(arraySlice)]['url'] != ""):
-        values = numpy.load(PROJECT_HOME + "/" + array['data']['values'][int(arraySlice)]['url'])
-        array['data']['values'] = values[array['data']['values'][int(arraySlice)]['id']].tolist() 
+    if (array['type'] != None):
+        if (array['data']['values'][int(arraySlice)]['url'] != ""):
+            values = numpy.load(PROJECT_HOME + "/" + array['data']['values'][int(arraySlice)]['url'])
+            array['data']['values'] = values[array['data']['values'][int(arraySlice)]['id']].tolist() 
 
     return jsonify(array)
 
@@ -158,7 +159,19 @@ def SetArray():
             jfile.write("\"data\"      : {\n")
             jfile.write("    \"type\"  : \"{}\",\n".format(data["datatype"]))
             jfile.write("    \"dim\"   : {},\n".format(data["datadim"]))
-            jfile.write("    \"url\"   : \"{}\"".format(aname))
+            jfile.write("    \"values\" : [\n")
+            firstTime = True;
+            for d in get_dataset_ids():
+                if ( firstTime ) :
+                    firstTime = False
+                else :
+                    # finish the previous array 
+                    jfile.write("        },\n")
+                jfile.write("        {\n")
+                jfile.write("            \"id\"  : \"arr_{}\",\n".format(d))
+                jfile.write("            \"url\" : \"{}\"\n".format(aname))
+            jfile.write("        }\n")
+            jfile.write("    ]\n")
             jfile.write("}\n")
             jfile.write("}\n")
 
