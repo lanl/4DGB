@@ -35,25 +35,19 @@ var TheControls;
 var TheTrackPanel;
 var TheInterval;
 
-function getSegmentsForLocationRange( IDs ) {
-    var start = Math.ceil(IDs[0]/TheInterval);
-    var end   = Math.ceil(IDs[1]/TheInterval);
+function getSegmentsForLocationRange( idRange ) {
+    var start = Math.ceil(idRange[0]/TheInterval);
+    var end   = Math.ceil(idRange[1]/TheInterval);
     var size  = parseInt(end - start);
     var segments = [];
 
     if (size == 0) {
         // begin and end are the same, and we need at least one
-        segments[1] = start;
+        segments[0] = start;
     } else {
         // special case: endpoint was on a segment boundary
-        if (start*TheInterval == IDs[0]) {
-            for (var i=1; i < size+1; i++) {
-                segments[i] = start + i;
-            }
-        } else {
-            for (var i=0; i < size+1; i++) {
-                segments[i] = start + i;
-            }
+        for (var i=0; i < size+1; i++) {
+            segments[i] = start + i;
         }
     }
     return segments;
@@ -138,7 +132,7 @@ function locationChanged(e) {
 
 function geneChanged(e) {
     for (let i = 0; i < TheNumPanels; i++) {
-        GTK.Client.TheClient.get_segments_for_gene( (response) => {
+        GTK.Client.TheClient.get_segments_for_genes( (response) => {
                 ThePanels[i].geometrycanvas.geometry.setSegmentStates( response["segments"], SegmentState.LIVE, SegmentState.GHOST );
                 ThePanels[i].geometrycanvas.render();
             }, i, e); 
@@ -156,8 +150,26 @@ function colormapChanged(e) {
 }
 
 function main( project ) {
+
     var dset = project.getDatasets(); 
     TheInterval = project.getInterval();
+
+    // testing the range function
+    if (false) {
+        var segs = [];
+            // [1]
+        segs.push(getSegmentsForLocationRange( [1, TheInterval] ));
+            // [1,2]
+        segs.push(getSegmentsForLocationRange( [1, TheInterval + 100] ));
+            // [1]
+        segs.push(getSegmentsForLocationRange( [TheInterval, TheInterval] ));
+            // [1,2]
+        segs.push(getSegmentsForLocationRange( [TheInterval, 2*TheInterval] ));
+            // [1,2]
+        segs.push(getSegmentsForLocationRange( [100, 2*TheInterval] ));
+            // [1,2,3]
+        segs.push(getSegmentsForLocationRange( [100, 2*TheInterval + 100] ));
+    }
 
     // control panel
     TheControls = new GTK.ControlPanel( project, "controlpanel" );

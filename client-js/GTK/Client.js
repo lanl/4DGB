@@ -60,8 +60,8 @@ class Client {
     //
     // get segments for a gene 
     //
-    get_segments_for_gene(callback, sid, gene) {
-        fetch( this.url + ':' + this.port + '/gene/' + gene + '/data/structure/' + sid )
+    get_segments_for_genes(callback, sid, genes) {
+        fetch( this.url + ':' + this.port + '/genes/' + genes + '/data/structure/' + sid )
             .then(response => response.json())
             .then(data => callback(data))
     }

@@ -13,4 +13,4 @@ client-py/build/
 client-py/*.egg-info
 client-js/gtk-dist/
 gtk.min.js
-gtkclient_*_test.json
+./gtkclient_*_test.json

@@ -329,18 +329,30 @@ class ControlPanel extends Publisher {
     onSelect(e) {
         if (this.selector == "gene") {
             if (this.validateGenes()) {
+                // bookkeeping
+                this.eraseEntry(this.locationentry);
+                this.eraseEntry(this.segmententry);
+
                 var values = this.getSelectedGenesList();
                 super.notify("geneChanged", values);
             }
         } else if (this.selector == "location") {
             if (this.validateLocations()) {
+                // bookkeeping
+                this.eraseEntry(this.geneentry);
+                this.eraseEntry(this.segmententry);
+
                 var values = this.getSelectedLocationsList();
                 super.notify("locationChanged", values[0]);
             }
         } else if (this.selector == "segment") {
             if (this.validateSegments()) {
-                var values = this.getSelectedSegmentsList();
-                super.notify("segmentChanged", values);
+                // bookkeeping
+                this.eraseEntry(this.geneentry);
+                this.eraseEntry(this.locationentry);
+
+                var expanded_values = this.valStringToListOfValues( this.segmententry.value );
+                super.notify("segmentChanged", expanded_values);
             }
         }
     }
@@ -372,23 +384,11 @@ class ControlPanel extends Publisher {
             this.selector = type;
 
             if (type == "gene") {
-                if (this.validateGenes()) {
-                    this.eraseEntry(this.locationentry);
-                    this.eraseEntry(this.segmententry);
-                    this.onSelect(e);
-                }
+                this.onSelect(e);
             } else if (type == "location") {
-                if (this.validateLocations()) {
-                    this.eraseEntry(this.geneentry);
-                    this.eraseEntry(this.segmententry);
-                    this.onSelect(e);
-                }
+                this.onSelect(e);
             } else if (type == "segment") {
-                if (this.validateSegments()) {
-                    this.eraseEntry(this.geneentry);
-                    this.eraseEntry(this.locationentry);
-                    this.onSelect(e);
-                }
+                this.onSelect(e);
             }
         }
     }
@@ -433,9 +433,6 @@ class ControlPanel extends Publisher {
     }
 
     addLocation() {
-        // HACK for now support a single entry
-        this.locationentry.value = "";
-            // end HACK
         this.addValueToEntry( this.locationentry, this.getCurrentLocation(), this.getSelectedLocationsList() ); 
         this.eraseEntry(this.geneentry);
         this.eraseEntry(this.segmententry);
@@ -463,12 +460,11 @@ class ControlPanel extends Publisher {
     }
 
     addGene(e) {
-        // HACK for now support a single entry
-        this.geneentry.value = "";
-            // end HACK
-        this.addValueToEntry( this.geneentry, this.getCurrentGene(), this.getSelectedGenesList() ); 
+        // bookkeeping
         this.eraseEntry(this.locationentry);
         this.eraseEntry(this.segmententry);
+
+        this.addValueToEntry( this.geneentry, this.getCurrentGene(), this.getSelectedGenesList() ); 
         this.setSelector("gene");
     }
 
@@ -511,6 +507,28 @@ class ControlPanel extends Publisher {
         }
 
         return success; 
+    }
+
+    valStringToListOfValues( value ) {
+        var cleaned = value.replace(/\s/g, "");
+        var vsplit  = cleaned.split(",");
+
+        var values = [];
+        var step = 1;
+        for (var i=0; i < vsplit.length; i++) {
+
+            var hsplit = vsplit[i].split("-");
+            if (hsplit.length == 2) {
+                var start = parseInt(hsplit[0]);
+                var end   = parseInt(hsplit[1]);
+                var range = [...Array(end - start + 1)].map((_, i) => start + i);
+                values = values.concat(range);
+            } else {
+                values.push(parseInt(vsplit[i]));
+            }
+        }
+
+        return values;
     }
 
 }
