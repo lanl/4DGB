@@ -210,14 +210,14 @@ function main( project ) {
         // camera
     linkCameras(ThePanels[0].geometrycanvas, ThePanels[1].geometrycanvas);
         // events
-    TheControls.addEventListener( "locationChanged",        locationChanged );
-    TheControls.addEventListener( "geneChanged",            geneChanged );
-    TheControls.addEventListener( "segmentChanged",         segmentChanged );
-    TheControls.addEventListener( "variableChanged",        variableChanged );
-    TheControls.addEventListener( "colormapChanged",        colormapChanged );
-    TheControls.addEventListener( "createTrack",            createTrack );
-    TheControls.addEventListener( "render",                 renderAllPanels );
-    TheControls.addEventListener( "backgroundColorChanged", updateBackgroundColor );
+    TheControls.addListener( "locationChanged",        locationChanged );
+    TheControls.addListener( "geneChanged",            geneChanged );
+    TheControls.addListener( "segmentChanged",         segmentChanged );
+    TheControls.addListener( "variableChanged",        variableChanged );
+    TheControls.addListener( "colormapChanged",        colormapChanged );
+    TheControls.addListener( "createTrack",            createTrack );
+    TheControls.addListener( "render",                 renderAllPanels );
+    TheControls.addListener( "backgroundColorChanged", updateBackgroundColor );
 }
 
 //

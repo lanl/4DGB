@@ -28,14 +28,15 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const Publisher         = require('./Publisher');
+// const Publisher         = require('./Publisher');
+const EventEmitter      = require('events');
 const Client            = require('./Client');
 const GeometryCanvas    = require('./GeometryCanvas');
 const Selection         = require('./Selection');
 
 var HACK_numbins = 200;
 
-class ControlPanel extends Publisher {
+class ControlPanel extends EventEmitter {
 
     // TODO: need to update states consistently across app
     static HACK_state = false;
@@ -311,27 +312,27 @@ class ControlPanel extends Publisher {
     }
 
     onLocationSelect(e) {
-        super.notify("locationChanged", e.target.value);
+        super.emit("locationChanged", e.target.value);
     }
 
     onGeneSelect(e) {
-        super.notify("geneChanged", e.target.value);
+        super.emit("geneChanged", e.target.value);
     }
 
     onVariableSelect(e) {
         var varID = e.target.options[e.target.selectedIndex].varID;
-        super.notify("variableChanged", varID);
+        super.emit("variableChanged", varID);
     }
 
     onColormapSelect(e) {
-        super.notify("colormapChanged", e.target.value);
+        super.emit("colormapChanged", e.target.value);
     }
 
     onCreateTrack(e) {
-        super.notify("createTrack", {   varname:    this.getCurrentVariableName(), 
-                                        varid:      this.getCurrentVariableID(),
-                                        numbins:    HACK_numbins, 
-                                        locations:  this.getSelectedLocationsList()})
+        super.emit("createTrack", { varname:    this.getCurrentVariableName(), 
+                                    varid:      this.getCurrentVariableID(),
+                                    numbins:    HACK_numbins, 
+                                    locations:  this.getSelectedLocationsList()})
     }
 
     onSelect(e) {
@@ -342,7 +343,7 @@ class ControlPanel extends Publisher {
                 this.eraseEntry(this.segmententry);
 
                 var values = this.getSelectedGenesList();
-                super.notify("geneChanged", values);
+                super.emit("geneChanged", values);
             }
         } else if (this.selector == "location") {
             if (this.validateLocations()) {
@@ -351,7 +352,7 @@ class ControlPanel extends Publisher {
                 this.eraseEntry(this.segmententry);
 
                 var values = this.getSelectedLocationsList();
-                super.notify("locationChanged", values[0]);
+                super.emit("locationChanged", values[0]);
             }
         } else if (this.selector == "segment") {
             if (this.validateSegments()) {
@@ -360,7 +361,7 @@ class ControlPanel extends Publisher {
                 this.eraseEntry(this.locationentry);
 
                 var expanded_values = this.valStringToListOfValues( this.segmententry.value );
-                super.notify("segmentChanged", expanded_values);
+                super.emit("segmentChanged", expanded_values);
             }
         }
     }
@@ -598,14 +599,14 @@ class ControlPanel extends Publisher {
     }
 
     onBackgroundColorChanged(e) {
-        super.notify("backgroundColorChanged");
+        super.emit("backgroundColorChanged");
     }
 
 
     showUnmappedSegments(e) {
         if (event.currentTarget.checked != GeometryCanvas.ShowUnmappedSegments) {
             GeometryCanvas.ShowUnmappedSegments = event.currentTarget.checked;
-            super.notify("render");
+            super.emit("render");
         }
     }
 
