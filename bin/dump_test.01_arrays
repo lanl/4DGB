@@ -4,6 +4,7 @@ import bbi
 import sys
 import numpy
 import decimal
+from shutil import copyfile
 
 def float_range(start, numvalues, step):
     curval = 0
@@ -61,4 +62,8 @@ values_1.reverse()
 afile = "projects/test.01/source/array/0007.npz"
 print("saving file to: {}".format(afile))
 numpy.savez_compressed(afile, arr_0=values_0, arr_1=values_1) 
+
+# create a structure array that isn't linked to the sequence array
+copyfile("projects/test.01/source/array/0007.npz", "projects/test.01/source/array/0008.npz") 
+print("copying file projects/test.01/source/array/0007.npz to projects/test.01/source/array/0008.npz") 
 
