@@ -96,11 +96,12 @@ function createTrack ( data ) {
         var title =  "Var: " + data.varname + " Range: (" + lrange[0] + ", " + lrange[1] + ")"
         TheTrackPanel.pushContainer( title, addTrackCallback );
 
+        var title = [TheTrackPanel.topTitle, TheTrackPanel.bottomTitle]
         for (let i = 0; i < TheNumPanels; i++) {
             GTK.Client.TheClient.get_sampled_array( (response) => {
                     var numlabels = response["data"].length;
                     var labels = generateTrackLabels( lrange[0], lrange[1], numlabels); 
-                    TheTrackPanel.addTrack( labels, response["data"]);
+                    TheTrackPanel.addTrack( labels, response["data"], title[i]);
                     var data = response["data"];
                 }, data.varid, i, lrange[0], lrange[1], data.numbins); 
         }
@@ -204,6 +205,7 @@ function main( project ) {
 
     // attribute charts
     TheTrackPanel = new GTK.TrackPanel( "trackpanel" );
+    TheTrackPanel.setTrackTitles( dset[0]["name"], dset[1]["name"] );
 
 
     // connections

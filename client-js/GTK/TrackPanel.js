@@ -45,6 +45,8 @@ class TrackPanel {
         this.title.className = "gtktrackpaneltitle";
         this.container.appendChild(this.title);
         this.setTitle("Tracks")
+        this.topTitle = "";
+        this.bottomTitle = "";
 
         // charts
         this.charts = document.createElement("div");
@@ -53,6 +55,11 @@ class TrackPanel {
 
         var parent = document.getElementById(parentID);
         parent.appendChild(this.container);
+    }
+
+    setTrackTitles( top, bottom ) {
+        this.topTitle = top;
+        this.bottomTitle = bottom;
     }
 
     clear() {
@@ -95,8 +102,8 @@ class TrackPanel {
     //
     // add track data to the top of the current container
     //
-    addTrack(labels, values) { 
-        var track = new TrackChart(this.charts.firstChild.id);
+    addTrack(labels, values, title) { 
+        var track = new TrackChart(this.charts.firstChild.id, title);
         // charts[i].setYValLimits( min, max );
         track.make( labels, values );
     }

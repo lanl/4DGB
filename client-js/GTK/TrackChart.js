@@ -3,12 +3,13 @@ class TrackChart {
     static Width = 400;
     static Height = 50;
 
-    constructor(parentID) {
+    constructor(parentID, title) {
         this.data;
         this.limitsY= [];
 
         // layout
         this.container = document.createElement("div");
+        this.container.innerHTML = title; 
         this.container.className = "gtkattributechart";
         this.chartdiv  = document.createElement("div");
         this.container.appendChild(this.chartdiv);
