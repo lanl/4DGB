@@ -149,6 +149,11 @@ class GeometryCanvas {
         this.geometry.load( this.dataset.id, this.scene, this );
     }
 
+    // color must be of the form #000000
+    setBackgroundColor( color ) {
+        this.scene.background.set(color)
+    }
+
     setSegmentStates( segments, setState, unsetState ) {
         this.geometry.setSegmentStates(segments, setState, unsetState);
     }

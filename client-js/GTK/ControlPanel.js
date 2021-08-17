@@ -31,6 +31,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const Publisher         = require('./Publisher');
 const Client            = require('./Client');
 const GeometryCanvas    = require('./GeometryCanvas');
+const Selection         = require('./Selection');
 
 var HACK_numbins = 200;
 
@@ -38,12 +39,14 @@ class ControlPanel extends Publisher {
 
     // TODO: need to update states consistently across app
     static HACK_state = false;
+    static HACK_color = "#D3D3D3"; 
 
     constructor(project, parent) {
         super();
 
         // misc 
         this.selector = "";
+        this.selection = new Selection();
 
         // build UI
         var root = document.getElementById(parent);
@@ -235,6 +238,14 @@ class ControlPanel extends Publisher {
 
         // select the default tab
         this.globaltab.click();
+    }
+
+    //
+    // returns a color of the form #000000
+    //
+    getBackgroundColor() {
+        var elem = document.getElementById("controlpanel-settings-background");
+        return elem.value; 
     }
 
     getCurrentLocation() {
@@ -561,12 +572,35 @@ class ControlPanel extends Publisher {
         cur_row += 1;
         cell = row.insertCell(0);
         cell.innerHTML = "Show Unmapped Segments";
+
+        cell = row.insertCell(1);
         var checkbox = document.createElement("input");
         checkbox.setAttribute("type", "checkbox");
-        checkbox.checked = this.HACK_state; 
+        checkbox.checked = ControlPanel.HACK_state; 
         checkbox.addEventListener('change', (function (e) { this.showUnmappedSegments(e) }).bind(this));
         cell.appendChild(checkbox);
+
+        // background
+        var row = this.settings.insertRow(cur_row); 
+        cur_row += 1;
+        cell = row.insertCell(0);
+        cell.innerHTML = "Background";
+
+        cell = row.insertCell(1);
+        var color = document.createElement("input");
+        color.id = "controlpanel-settings-background";
+        color.setAttribute("type", "color");
+        color.setAttribute("value", ControlPanel.HACK_color);
+            // TODO: clean up event notification (no need for second functions -
+            // instead do it like this
+        color.addEventListener('change', (function (e) { this.onBackgroundColorChanged(e) }).bind(this));
+        cell.appendChild(color);
     }
+
+    onBackgroundColorChanged(e) {
+        super.notify("backgroundColorChanged");
+    }
+
 
     showUnmappedSegments(e) {
         if (event.currentTarget.checked != GeometryCanvas.ShowUnmappedSegments) {

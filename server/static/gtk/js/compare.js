@@ -43,6 +43,13 @@ function renderAllPanels () {
     }
 }
 
+function updateBackgroundColor () {
+    for (let i = 0; i < TheNumPanels; i++) {
+        ThePanels[i].geometrycanvas.setBackgroundColor(TheControls.getBackgroundColor());
+        ThePanels[i].geometrycanvas.render();
+    }
+}
+
 function getSegmentsForLocationRange( idRange ) {
     var start = Math.ceil(idRange[0]/TheInterval);
     var end   = Math.ceil(idRange[1]/TheInterval);
@@ -203,13 +210,14 @@ function main( project ) {
         // camera
     linkCameras(ThePanels[0].geometrycanvas, ThePanels[1].geometrycanvas);
         // events
-    TheControls.addEventListener( "locationChanged",    locationChanged );
-    TheControls.addEventListener( "geneChanged",        geneChanged );
-    TheControls.addEventListener( "segmentChanged",     segmentChanged );
-    TheControls.addEventListener( "variableChanged",    variableChanged );
-    TheControls.addEventListener( "colormapChanged",    colormapChanged );
-    TheControls.addEventListener( "createTrack",        createTrack );
-    TheControls.addEventListener( "render",             renderAllPanels );
+    TheControls.addEventListener( "locationChanged",        locationChanged );
+    TheControls.addEventListener( "geneChanged",            geneChanged );
+    TheControls.addEventListener( "segmentChanged",         segmentChanged );
+    TheControls.addEventListener( "variableChanged",        variableChanged );
+    TheControls.addEventListener( "colormapChanged",        colormapChanged );
+    TheControls.addEventListener( "createTrack",            createTrack );
+    TheControls.addEventListener( "render",                 renderAllPanels );
+    TheControls.addEventListener( "backgroundColorChanged", updateBackgroundColor );
 }
 
 //
