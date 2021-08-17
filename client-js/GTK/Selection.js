@@ -29,23 +29,78 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-class ResultSet {
+const EventEmitter = require('events');
+const Client = require('./Client');
+
+class Selection extends EventEmitter {
+
+    static Selector = {
+        GENES:      'genes',
+        LOCATIONS:  'locations',
+        SEGMENTS:   'segments'
+    };
 
     constructor() {
-        this.segments = new Set(); 
+        super();
+
+        this.reset();
+            // TODO: remove dependency on global client
+        this.client = Client.TheClient; 
     }
 
-    addSegment( id ) {
-        this.segments.add(id);
+    setSelector( name ) {
+        if (name in Selection.Selector) {
+            this.curSelector = name;
+        } else {
+            throw "Invalid Selection Type: " + name;
+        }
     }
 
-    removeSegment( id ) {
-        this.segments.remove(id);
+    reset () {
+        this.locations  = [];
+        this.genes      = [];
+        this.segments   = [];
+        this.curSelector = "";
     }
 
-    clear() {
-        this.segments.clear();
+    setGenes( values ) {
+        this.curSelector = Selection.Selector.GENES;
+        this.genes = values;
+        this.updateLocations();
+        this.updateSegments();
+
+        super.notify("selectionChanged", this);
     }
+
+    setLocations( values ) {
+        this.curSelector = Selection.Selector.LOCATIONS;
+        this.locations = values;
+        this.updateGenes();
+        this.updateSegments();
+
+        super.notify("selectionChanged", this);
+    }
+
+    setSegments( values ) {
+        this.curSelector = Selection.Selector.SEGMENTS;
+        this.segments = values;
+        this.updateGenes();
+        this.updateLocations();
+
+        super.notify("selectionChanged", this);
+    }
+
+
+    updateGenes() {
+
+    }
+
+    updateLocations() {
+    }
+
+    updateSegments() {
+    }
+
 }
 
-module.exports = ResultSet;
+module.exports = Selection;
