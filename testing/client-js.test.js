@@ -57,8 +57,8 @@ test('client test', () => {
                             writeStream.end();
                         });
 
-    client.get_genes_for_segment( (response) => {
-                            var streamname = "gtkclient_genes-for-segment_test.json";
+    client.get_genes_for_segments( (response) => {
+                            var streamname = "gtkclient_genes-for-segments_test.json";
                             var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
                             writeStream.write(JSON.stringify(response));
                             writeStream.write("\n");

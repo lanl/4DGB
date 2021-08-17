@@ -130,7 +130,7 @@ def test_get_array():
         assert (result['tags'] == t['tags'])
         assert (result['data']['values'] == t['values'])
 
-def test_get_genes_for_segment():
+def test_get_genes_for_segments():
     tests = [
                 {
                     'note'      : 'Edge test: first segment is 1. Should return empty list',
@@ -153,7 +153,7 @@ def test_get_genes_for_segment():
             ]
 
     for t in tests:
-        result = client.get_genes_for_segment(t["structure"], t["segment"])
+        result = client.get_genes_for_segments(t["structure"], t["segment"])
         assert (result['genes'] == t["gold"])
     
 

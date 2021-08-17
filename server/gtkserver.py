@@ -278,31 +278,37 @@ def Genes():
     return jsonify({'genes': genes})
 
 #
-# genes for a segment 
+# genes for a list of segments 
 #
-@app.route('/data/structure/<structureid>/segment/<segmentid>/genes')
-def GenesForSegment(structureid, segmentid):
-    # find all genes that intersect with this segment
-    conn = db_connect.connect()
-    query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, segmentid)
-    results = query.cursor.fetchall()
-
-    # if the result returns nothing, we return an empty genes list
+@app.route('/data/structure/<structureid>/segment/<segmentids>/genes')
+def GenesForSegments(structureid, segmentids):
+    # if the query returns nothing, we return an empty list
     genes = []
 
-    # query and create a list of genes 
-    if (len(results) != 0):
-        seg_start = results[0][0]
-        seg_end   = results[0][1]
+    # find all genes that intersect with the segments
+    conn = db_connect.connect()
+    sids = segmentids.split(',')
 
-        query = conn.execute("SELECT gene_name from genes WHERE \
-                                ( start BETWEEN ? AND ? ) OR ( end BETWEEN ? AND ? ) OR \
-                                ( start < ? AND end > ? ) ORDER BY gene_name", 
-                                seg_start, seg_end, seg_start, seg_end, seg_start, seg_end)
+    for s in sids:
+        # find all genes that intersect with these segments 
+        query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, s)
+        results = query.cursor.fetchall()
 
-        for g in query.cursor.fetchall():
-            genes.append(g[0])
+        # query and create a list of genes 
+        if (len(results) != 0):
+            seg_start = results[0][0]
+            seg_end   = results[0][1]
 
+            query = conn.execute("SELECT gene_name from genes WHERE \
+                                    ( start BETWEEN ? AND ? ) OR ( end BETWEEN ? AND ? ) OR \
+                                    ( start < ? AND end > ? ) ORDER BY gene_name", 
+                                    seg_start, seg_end, seg_start, seg_end, seg_start, seg_end)
+
+            for g in query.cursor.fetchall():
+                if (not g[0] in genes):
+                    genes.append(g[0])
+
+    genes.sort()
     return jsonify({'genes': genes})
     
 #
