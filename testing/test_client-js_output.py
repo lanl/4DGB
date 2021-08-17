@@ -11,7 +11,8 @@ def test_outputs():
                 "gtkclient_get-arrays_test.json",
                 "gtkclient_get-sequence-arrays_test.json",
                 "gtkclient_get-structure-arrays_test.json",
-                "gtkclient_segments-for-genes_test.json",
+                "gtkclient_segments-for-genes-list_test.json",
+                "gtkclient_segments-for-genes-single_test.json",
                 "gtkclient_structure_test.json"
             ]
 

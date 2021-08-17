@@ -58,12 +58,20 @@ test('client test', () => {
                         });
 
     client.get_genes_for_segments( (response) => {
-                            var streamname = "gtkclient_genes-for-segments_test.json";
+                            var streamname = "gtkclient_genes-for-segments-single_test.json";
                             var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
                             writeStream.write(JSON.stringify(response));
                             writeStream.write("\n");
                             writeStream.end();
                         }, 0, 8);
+
+    client.get_genes_for_segments( (response) => {
+                            var streamname = "gtkclient_genes-for-segments-list_test.json";
+                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
+                            writeStream.write(JSON.stringify(response));
+                            writeStream.write("\n");
+                            writeStream.end();
+                        }, 0, "7,8,9");
 
     client.get_segments_for_genes( (response) => {
                             var streamname = "gtkclient_segments-for-genes_test.json";

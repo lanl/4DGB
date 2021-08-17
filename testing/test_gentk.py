@@ -145,6 +145,12 @@ def test_get_genes_for_segments():
                     'gold'      : ['Btbd35f23', 'Btbd35f24']
                 },
                 {
+                    'note'      : 'correct list query',
+                    'segment'   : "7,8,9",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f11', 'Btbd35f23', 'Btbd35f24']
+                },
+                {
                     'note'      : 'Edge test: last segment is < 10000. Should return empty list',
                     'segment'   : 10000,
                     'structure' : 0,
