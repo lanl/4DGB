@@ -29,9 +29,9 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-var Publisher = require( './Publisher.js' );
+var EventEmitter = require('events');
 
-class AppState extends Publisher {
+class AppState extends EventEmitter {
     /**
      * Class AppState
      *
