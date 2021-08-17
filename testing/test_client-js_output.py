@@ -6,13 +6,13 @@ def test_outputs():
     outputs = [
                 "gtkclient_array_test.json",
                 "gtkclient_contactmap_test.json",
-                "gtkclient_genes-for-segments_test.json",
+                "gtkclient_genes-for-segments-list_test.json",
+                "gtkclient_genes-for-segments-single.json",
                 "gtkclient_genes_test.json",
                 "gtkclient_get-arrays_test.json",
                 "gtkclient_get-sequence-arrays_test.json",
                 "gtkclient_get-structure-arrays_test.json",
-                "gtkclient_segments-for-genes-list_test.json",
-                "gtkclient_segments-for-genes-single_test.json",
+                "gtkclient_segments-for-genes_test.json",
                 "gtkclient_structure_test.json"
             ]
 
