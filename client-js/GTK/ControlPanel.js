@@ -28,10 +28,16 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const Publisher = require('./Publisher');
-const Client = require('./Client');
+const Publisher         = require('./Publisher');
+const Client            = require('./Client');
+const GeometryCanvas    = require('./GeometryCanvas');
+
+var HACK_numbins = 200;
 
 class ControlPanel extends Publisher {
+
+    // TODO: need to update states consistently across app
+    static HACK_state = false;
 
     constructor(project, parent) {
         super();
@@ -87,19 +93,7 @@ class ControlPanel extends Publisher {
         this.infotabcontent.appendChild(this.info);
 
         // settings
-        this.settingstab = document.createElement("button");
-        this.settingstab.className = "tablinks";
-        this.settingstab.innerHTML = "Settings";
-        this.settingstab.onclick = (function (e) { this.openTab(e, "settingstab") }).bind(this);
-        this.tabdiv.appendChild(this.settingstab);
-        this.settingstabcontent = document.createElement("div");
-        this.settingstabcontent.className = "tabcontent";
-        this.settingstabcontent.id = "settingstab";
-        root.appendChild(this.settingstabcontent);
-            // table
-        this.settings = document.createElement("table");
-        this.settings.className = "gtkcontroltable";
-        this.settingstabcontent.appendChild(this.settings);
+        this.initializeSettingsTab(root, project);
 
             // global controls
         var cur_row = 0;
@@ -190,7 +184,7 @@ class ControlPanel extends Publisher {
         cur_row += 1;
         var name = row.insertCell(0);
         name.colSpan = 3;
-        name.innerHTML = "Coloring";
+        name.innerHTML = "Data";
         name.className = "gtktitlecell";
 
             // variable
@@ -235,7 +229,7 @@ class ControlPanel extends Publisher {
             // button
         var cell = row.insertCell(1);
         this.createTrack = document.createElement("button");
-        this.createTrack.innerHTML = "Create";
+        this.createTrack.innerHTML = "Create Data Tracks";
         cell.appendChild(this.createTrack);
         this.createTrack.onclick = (function (e) { this.onCreateTrack(e) }).bind(this);
 
@@ -323,7 +317,10 @@ class ControlPanel extends Publisher {
     }
 
     onCreateTrack(e) {
-        super.notify("createTrack", this.getCurrentVariableName())
+        super.notify("createTrack", {   varname:    this.getCurrentVariableName(), 
+                                        varid:      this.getCurrentVariableID(),
+                                        numbins:    HACK_numbins, 
+                                        locations:  this.getSelectedLocationsList()})
     }
 
     onSelect(e) {
@@ -529,6 +526,53 @@ class ControlPanel extends Publisher {
         }
 
         return values;
+    }
+
+    initializeSettingsTab(parent, project) {
+        // create the tab
+        this.settingstab = document.createElement("button");
+        this.settingstab.className = "tablinks";
+        this.settingstab.innerHTML = "Settings";
+        this.settingstab.onclick = (function (e) { this.openTab(e, "settingstab") }).bind(this);
+        this.tabdiv.appendChild(this.settingstab);
+        this.settingstabcontent = document.createElement("div");
+        this.settingstabcontent.className = "tabcontent";
+        this.settingstabcontent.id = "settingstab";
+        parent.appendChild(this.settingstabcontent);
+
+        // create the content 
+        this.settings = document.createElement("table");
+        this.settings.className = "gtkcontroltable";
+        this.settingstabcontent.appendChild(this.settings);
+
+        // controls
+        
+        // title
+        var cur_row = 0;
+        var row = this.settings.insertRow(cur_row); 
+        cur_row += 1;
+        var cell = row.insertCell(0);
+        cell.colSpan = 3;
+        cell.innerHTML = "GeometryCanvas";
+        cell.className = "gtktitlecell";
+
+        // unmapped  
+        var row = this.settings.insertRow(cur_row); 
+        cur_row += 1;
+        cell = row.insertCell(0);
+        cell.innerHTML = "Show Unmapped Segments";
+        var checkbox = document.createElement("input");
+        checkbox.setAttribute("type", "checkbox");
+        checkbox.checked = this.HACK_state; 
+        checkbox.addEventListener('change', (function (e) { this.showUnmappedSegments(e) }).bind(this));
+        cell.appendChild(checkbox);
+    }
+
+    showUnmappedSegments(e) {
+        if (event.currentTarget.checked != GeometryCanvas.ShowUnmappedSegments) {
+            GeometryCanvas.ShowUnmappedSegments = event.currentTarget.checked;
+            super.notify("render");
+        }
     }
 
 }

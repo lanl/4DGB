@@ -35,6 +35,9 @@ const Geometry = require('./Geometry');
 
 class GeometryCanvas {
 
+    // class global settings
+    static ShowUnmappedSegments = false;
+
     constructor(project, dataset, rootElemID) {
         this.renderRequested = false;
         this.camera;
@@ -48,6 +51,9 @@ class GeometryCanvas {
 
         this.render = (function() {
             this.renderRequested = undefined;
+
+            // TODO: improve granularity of control for this
+            this.showUnmappedSegments( GeometryCanvas.ShowUnmappedSegments );
 
             if (this.resizeRendererToDisplaySize(this.renderer)) {
                 const canvas = this.renderer.domElement;
@@ -157,7 +163,8 @@ class GeometryCanvas {
         // instance.paintByVariable();
          
         // turn off the unmapped ones
-        instance.geometry.setSegmentVisible(instance.unmapped, false);
+        instance.showUnmappedSegments( instance.ShowUnmappedSegments );
+        // instance.geometry.setSegmentVisible(instance.unmapped, false);
 
         this.loaded = true;
     }
@@ -178,13 +185,16 @@ class GeometryCanvas {
 
     initializeUnmappedSegments() {
         var dset = Project.TheProject.getData("hic", this.dataset.hic);
-        var umList = dset["unmapped-segments"];
-        for ( var l=0; l<umList.length;l++ ) {
-            var start = umList[l][0];
-            var end   = umList[l][1];
-            var numelems = end - start;
-            for (var i=0;i<numelems+1;i++) {
-                this.unmapped.push(start + i);
+        
+        if ("unmapped-segments" in dset) {
+            var umList = dset["unmapped-segments"];
+            for ( var l=0; l<umList.length;l++ ) {
+                var start = umList[l][0];
+                var end   = umList[l][1];
+                var numelems = end - start;
+                for (var i=0;i<numelems+1;i++) {
+                    this.unmapped.push(start + i);
+                }
             }
         }
     }
@@ -193,12 +203,16 @@ class GeometryCanvas {
         // no-op for now
     }
 
+    showUnmappedSegments( state ) {
+        this.geometry.setSegmentVisible(this.unmapped, state);
+    }
+
     setDataset(d) {
         this.reset();
         this.dataset = d;
         this.initializeUnmappedSegments();
         if (this.loaded) {
-            instance.geometry.setSegmentVisible(instance.unmapped, false);
+            this.showUnmappedSegments(this.ShowUnmappedSegments);
         }
     }
 

@@ -35,6 +35,14 @@ var TheControls;
 var TheTrackPanel;
 var TheInterval;
 
+// general function for updating
+// TODO: refine granularity of updates, etc.
+function renderAllPanels () {
+    for (let i = 0; i < TheNumPanels; i++) {
+        ThePanels[i].geometrycanvas.render();
+    }
+}
+
 function getSegmentsForLocationRange( idRange ) {
     var start = Math.ceil(idRange[0]/TheInterval);
     var end   = Math.ceil(idRange[1]/TheInterval);
@@ -57,6 +65,9 @@ function addTrackCallback() {
     alert("track clicked")
 }
 
+//
+// generate the labels for track data
+//
 function generateTrackLabels (start, end, numbins) {
     var labels = [];
     var incr   = Math.trunc((end-start)/numbins);
@@ -66,23 +77,26 @@ function generateTrackLabels (start, end, numbins) {
     return labels;
 }
 
+//
+// create a track using the data provided
+//
 function createTrack ( data ) {
-    var start   = 0;
-    var end     = 73000000;
-    var numbins = 200;
-    var vid     = TheControls.getCurrentVariableID();
-    var vname   = TheControls.getCurrentVariableName();
 
-    // create a title for the track
-    var title =  "Var: " + vname + " Range: (" + start + ", " + end + ")"
-    TheTrackPanel.pushContainer( title, addTrackCallback );
+    for (var i = 0; i < data.locations.length; i++) {
+        var lrange = data.locations[i].split("-").map(Number);
 
-    for (let i = 0; i < TheNumPanels; i++) {
-        GTK.Client.TheClient.get_sampled_array( (response) => {
-                var labels = generateTrackLabels( 0, 1000000, 200); 
-                TheTrackPanel.addTrack( labels, response["data"]);
-                var data = response["data"];
-            }, vid, i, start, end, numbins); 
+        // create a title for the track
+        var title =  "Var: " + data.varname + " Range: (" + lrange[0] + ", " + lrange[1] + ")"
+        TheTrackPanel.pushContainer( title, addTrackCallback );
+
+        for (let i = 0; i < TheNumPanels; i++) {
+            GTK.Client.TheClient.get_sampled_array( (response) => {
+                    var numlabels = response["data"].length;
+                    var labels = generateTrackLabels( lrange[0], lrange[1], numlabels); 
+                    TheTrackPanel.addTrack( labels, response["data"]);
+                    var data = response["data"];
+                }, data.varid, i, lrange[0], lrange[1], data.numbins); 
+        }
     }
 }
 
@@ -189,12 +203,13 @@ function main( project ) {
         // camera
     linkCameras(ThePanels[0].geometrycanvas, ThePanels[1].geometrycanvas);
         // events
-    TheControls.addEventListener( "locationChanged", locationChanged );
-    TheControls.addEventListener( "geneChanged", geneChanged );
-    TheControls.addEventListener( "segmentChanged", segmentChanged );
-    TheControls.addEventListener( "variableChanged", variableChanged );
-    TheControls.addEventListener( "colormapChanged", colormapChanged );
-    TheControls.addEventListener( "createTrack", createTrack );
+    TheControls.addEventListener( "locationChanged",    locationChanged );
+    TheControls.addEventListener( "geneChanged",        geneChanged );
+    TheControls.addEventListener( "segmentChanged",     segmentChanged );
+    TheControls.addEventListener( "variableChanged",    variableChanged );
+    TheControls.addEventListener( "colormapChanged",    colormapChanged );
+    TheControls.addEventListener( "createTrack",        createTrack );
+    TheControls.addEventListener( "render",             renderAllPanels );
 }
 
 //

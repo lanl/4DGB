@@ -37,6 +37,19 @@ api = Api(app)
 
 db_connect = None
 
+#
+# get the interval of the datasets for this project
+# TODO: generalize the storage and retrieval of this data
+#
+def get_dataset_interval():
+    interval = 0
+    with open(PROJECT_FILE, 'r') as pfile:
+        data = json.load(pfile)
+
+        interval = data["project"]["interval"]
+
+    return interval
+
 def get_dataset_ids():
     datasets = []
     with open(PROJECT_FILE, 'r') as pfile:
@@ -75,6 +88,23 @@ def get_array_metadata(arrayID):
 
         with open(fname, "r") as jfile:
             array = json.load(jfile)
+
+    return array
+
+#
+# get the array data for an ID
+#
+def load_array_data(arrayID, arraySlice):
+    array = get_array_metadata(arrayID)
+
+    if (array['type'] != None):
+        # determine if there is data there
+        if (array['data']['values'][int(arraySlice)]['url'] != ""):
+            # load the data from disk
+            values = numpy.load(PROJECT_HOME + "/" + array['data']['values'][int(arraySlice)]['url'])
+            array['data']['values'] = values[array['data']['values'][int(arraySlice)]['id']].tolist() 
+        # else:
+            # TODO: determine the correct behavior
 
     return array
 
@@ -119,12 +149,7 @@ def GetDatasetIDs():
 #
 @app.route('/data/array/<arrayID>/<arraySlice>')
 def GetArray(arrayID, arraySlice):
-    array = get_array_metadata(arrayID)
-
-    if (array['type'] != None):
-        if (array['data']['values'][int(arraySlice)]['url'] != ""):
-            values = numpy.load(PROJECT_HOME + "/" + array['data']['values'][int(arraySlice)]['url'])
-            array['data']['values'] = values[array['data']['values'][int(arraySlice)]['id']].tolist() 
+    array = load_array_data(arrayID, arraySlice)
 
     return jsonify(array)
 
@@ -326,7 +351,13 @@ def SampleArray(arrayID, arraySlice, begin, end, numsamples):
         url = "{}/{}".format(PROJECT_HOME, adata['sequence']['url'])
         data = bbi.fetch(url, adata['sequence']['chrom'], int(begin), int(end), int(numsamples))
     else:
-        data = [0, 1, 2, 3, 4, 5, 6]
+        # there is a sequence array
+        array = load_array_data(arrayID, arraySlice)
+        interval = get_dataset_interval()
+        sid = int(int(begin)/interval)
+            # add one, to include the final element we want
+        eid = int(int(end)/interval) + 1
+        data = array['data']['values'][sid:eid]
 
     return jsonify({'data': list(data)})
 
