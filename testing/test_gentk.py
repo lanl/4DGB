@@ -151,6 +151,54 @@ def test_get_genes_for_segments():
                     'gold'      : ['Btbd35f11', 'Btbd35f23', 'Btbd35f24']
                 },
                 {
+                    'note'      : 'correct list query',
+                    'segment'   : "7-9",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f11', 'Btbd35f23', 'Btbd35f24']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "8,9,10",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "8-10",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "7,8,9,10",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "7-10",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "7,8-10",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "7,8,9-10",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "7 ,8, 9 -10 ",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+                {
                     'note'      : 'Edge test: last segment is < 10000. Should return empty list',
                     'segment'   : 10000,
                     'structure' : 0,

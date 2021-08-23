@@ -299,17 +299,17 @@ def GenesForSegments(structureid, segmentids):
         if (match != None):
             # this is a range
                 # get the start
-            query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, match.start())
+            query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, match.group('start'))
             results = query.cursor.fetchall()
             if (len(results) != 0):
                 seg_start = results[0][0]
 
                 # get the end
-            query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, match.end())
+            query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, match.group('end'))
             results = query.cursor.fetchall()
 
             if (len(results) != 0):
-                seg_start = results[0][1]
+                seg_end = results[0][1]
         else:
             # find all genes that intersect with these segments 
             query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, s)
