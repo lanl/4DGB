@@ -320,15 +320,46 @@ def GenesForSegments(structureid, segmentids):
                 seg_start = results[0][0]
                 seg_end   = results[0][1]
 
-        # find the genes for the entire range, or the single segment
-        query = conn.execute("SELECT gene_name from genes WHERE \
-                                ( start BETWEEN ? AND ? ) OR ( end BETWEEN ? AND ? ) OR \
-                                ( start < ? AND end > ? ) ORDER BY gene_name", 
-                                seg_start, seg_end, seg_start, seg_end, seg_start, seg_end)
+        # find the genes for a range 
+        results = getGenesForLocationRange( seg_start, seg_end )
+        for g in results: 
+            if (not g in genes):
+                genes.append(g)
 
-        for g in query.cursor.fetchall():
-            if (not g[0] in genes):
-                genes.append(g[0])
+    genes.sort()
+    return jsonify({'genes': genes})
+
+
+#
+# genes for a list of locations or location ranges
+#
+@app.route('/data/structure/<structureid>/locations/<locations>/genes')
+def GenesForLocations(structureid, locations):
+    # if the query returns nothing, we return an empty list
+    genes = []
+
+    # find all genes that intersect with the segments
+    conn = db_connect.connect()
+    cleaned = re.sub(r'\s', '', locations)
+    locations = cleaned.split(',')
+
+    for s in locations:
+        match = re.match( r'^(?P<start>[0-9]+)\-(?P<end>[0-9]+)$', s )
+
+        start = 0
+        end   = 0
+        if (match != None):
+            start = match.group('start')
+            end   = match.group('end')
+        else:
+            start = s
+            end   = s
+
+        # find the genes for a range 
+        results = getGenesForLocationRange( start, end )
+        for g in results: 
+            if (not g in genes):
+                genes.append(g)
 
     genes.sort()
     return jsonify({'genes': genes})
@@ -388,6 +419,27 @@ def SampleArray(arrayID, arraySlice, begin, end, numsamples):
         data = array['data']['values'][sid:eid]
 
     return jsonify({'data': list(data)})
+
+#
+# helper function to query genes for a location range
+#
+def getGenesForLocationRange( start, end ):
+    conn = db_connect.connect()
+
+    # find the genes for the entire range, or the single segment
+    query = conn.execute("SELECT gene_name from genes WHERE \
+                            ( start BETWEEN ? AND ? ) OR ( end BETWEEN ? AND ? ) OR \
+                            ( start < ? AND end > ? ) ORDER BY gene_name", 
+                            start, end, start, end, start, end)
+
+    genes = []
+    for g in query.cursor.fetchall():
+        if (not g[0] in genes):
+            genes.append(g[0])
+
+    genes.sort()
+
+    return genes
 
 
 #

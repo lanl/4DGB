@@ -45,6 +45,13 @@ class client:
 
         return jdata
 
+    def get_genes_for_locations(self, structureID, locations):
+        # get the data from the server
+        response = requests.get('{}:{}/data/structure/{}/locations/{}/genes'.format(self.url, self.port, structureID, locations))
+        jdata = json.loads(response.text)
+
+        return jdata
+
     def get_genes_for_segments(self, structureID, segIDs):
         # get the data from the server
         response = requests.get('{}:{}/data/structure/{}/segment/{}/genes'.format(self.url, self.port, structureID, segIDs))
