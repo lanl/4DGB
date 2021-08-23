@@ -3,6 +3,7 @@ import yaml
 import sys
 from os import path, chdir
 import numpy
+import re
 
 from math import nan
 
@@ -278,7 +279,7 @@ def Genes():
     return jsonify({'genes': genes})
 
 #
-# genes for a list of segments 
+# genes for a list of segments or segment ranges
 #
 @app.route('/data/structure/<structureid>/segment/<segmentids>/genes')
 def GenesForSegments(structureid, segmentids):
@@ -287,26 +288,47 @@ def GenesForSegments(structureid, segmentids):
 
     # find all genes that intersect with the segments
     conn = db_connect.connect()
-    sids = segmentids.split(',')
+    cleaned = re.sub(r'\s', '', segmentids)
+    sids = cleaned.split(',')
 
     for s in sids:
-        # find all genes that intersect with these segments 
-        query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, s)
-        results = query.cursor.fetchall()
+        match = re.match( r'^(?P<start>[0-9]+)\-(?P<end>[0-9]+)$', sRange )
 
-        # query and create a list of genes 
-        if (len(results) != 0):
-            seg_start = results[0][0]
-            seg_end   = results[0][1]
+        seg_start = 0
+        seg_end   = 0
+        if (match != None):
+            # this is a range
+                # get the start
+            query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, match.start())
+            results = query.cursor.fetchall()
+            if (len(results) != 0):
+                seg_start = results[0][0]
 
-            query = conn.execute("SELECT gene_name from genes WHERE \
-                                    ( start BETWEEN ? AND ? ) OR ( end BETWEEN ? AND ? ) OR \
-                                    ( start < ? AND end > ? ) ORDER BY gene_name", 
-                                    seg_start, seg_end, seg_start, seg_end, seg_start, seg_end)
+                # get the end
+            query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, match.end())
+            results = query.cursor.fetchall()
 
-            for g in query.cursor.fetchall():
-                if (not g[0] in genes):
-                    genes.append(g[0])
+            if (len(results) != 0):
+                seg_start = results[0][1]
+        else:
+            # find all genes that intersect with these segments 
+            query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, s)
+            results = query.cursor.fetchall()
+
+            # query and create a list of genes 
+            if (len(results) != 0):
+                seg_start = results[0][0]
+                seg_end   = results[0][1]
+
+        # find the genes for the entire range, or the single segment
+        query = conn.execute("SELECT gene_name from genes WHERE \
+                                ( start BETWEEN ? AND ? ) OR ( end BETWEEN ? AND ? ) OR \
+                                ( start < ? AND end > ? ) ORDER BY gene_name", 
+                                seg_start, seg_end, seg_start, seg_end, seg_start, seg_end)
+
+        for g in query.cursor.fetchall():
+            if (not g[0] in genes):
+                genes.append(g[0])
 
     genes.sort()
     return jsonify({'genes': genes})

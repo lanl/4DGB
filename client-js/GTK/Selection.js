@@ -43,9 +43,12 @@ class Selection extends EventEmitter {
     constructor() {
         super();
 
-        this.reset();
-            // TODO: remove dependency on global client
-        this.client = Client.TheClient; 
+        this.resetSelection();
+        this.client = "";
+    }
+
+    setClient( client ) {
+        this.client = client;
     }
 
     setSelector( name ) {
@@ -56,7 +59,7 @@ class Selection extends EventEmitter {
         }
     }
 
-    reset () {
+    resetSelection () {
         this.locations  = [];
         this.genes      = [];
         this.segments   = [];
@@ -69,7 +72,7 @@ class Selection extends EventEmitter {
         this.updateLocations();
         this.updateSegments();
 
-        super.notify("selectionChanged", this);
+        super.emit("selectionChanged", this);
     }
 
     setLocations( values ) {
@@ -78,7 +81,7 @@ class Selection extends EventEmitter {
         this.updateGenes();
         this.updateSegments();
 
-        super.notify("selectionChanged", this);
+        super.emit("selectionChanged", this);
     }
 
     setSegments( values ) {
@@ -87,18 +90,110 @@ class Selection extends EventEmitter {
         this.updateGenes();
         this.updateLocations();
 
-        super.notify("selectionChanged", this);
+        super.emit("selectionChanged", this);
     }
 
 
     updateGenes() {
+        if (this.curSelector == Selection.Selector.LOCATIONS) {
+            this.genes = "locations";
+            var vlist = this.getListOfLocations();
 
+            for (const v of vlist) {
+            }
+
+        } else if (this.curSelector == Selection.Selector.SEGMENTS) {
+            this.genes = "segments";
+        } else {
+            // do nothing, because this type is the selector
+            // TODO: determine if this is an error
+        }
     }
 
     updateLocations() {
+        if (this.curSelector == Selection.Selector.GENES) {
+            this.locations = "genes";
+        } else if (this.curSelector == Selection.Selector.SEGMENTS) {
+            this.locations = "segments";
+        } else {
+            // do nothing, because this type is the selector
+            // TODO: determine if this is an error
+        }
     }
 
     updateSegments() {
+        if (this.curSelector == Selection.Selector.LOCATIONS) {
+            this.segments = "locations";
+        } else if (this.curSelector == Selection.Selector.GENES) {
+            this.segments = "genes";
+        } else {
+            // do nothing, because this type is the selector
+            // TODO: determine if this is an error
+        }
+    }
+
+    // parse the gene string to get a list of values 
+    getListOfGenes() {
+        var cleaned = this.genes.replace(/\s/g, "");
+        var vsplit  = cleaned.split(",");
+
+        // TODO: error check
+
+        return vsplit; 
+    }
+
+    // from the list of ranges, construct an expanded list of elements 
+    getListOfLocations() {
+        return this.valStringToListOfRanges( this.locations );
+    }
+
+    // from the list of ranges, construct an expanded list of elements 
+    getListOfSegments() {
+        return this.valStringToListOfValues( this.segments );
+    }
+
+    valStringToListOfValues( value ) {
+        var cleaned = value.replace(/\s/g, "");
+        var vsplit  = cleaned.split(",");
+
+        var values = [];
+        var step = 1;
+        for (var i=0; i < vsplit.length; i++) {
+
+            var hsplit = vsplit[i].split("-");
+            if (hsplit.length == 2) {
+                var start = parseInt(hsplit[0]);
+                var end   = parseInt(hsplit[1]);
+                var range = [...Array(end - start + 1)].map((_, i) => start + i);
+                values = values.concat(range);
+            } else {
+                values.push(parseInt(vsplit[i]));
+            }
+        }
+
+        return values;
+    }
+
+    valStringToListOfRanges( value ) {
+        var cleaned = value.replace(/\s/g, "");
+        var vsplit  = cleaned.split(",");
+
+        var values = [];
+        var step = 1;
+        for (var i=0; i < vsplit.length; i++) {
+
+            var hsplit = vsplit[i].split("-");
+            if (hsplit.length == 2) {
+                var start = parseInt(hsplit[0]);
+                var end   = parseInt(hsplit[1]);
+                values = values.concat(start + ", " + end)
+            } else {
+                var cur = parseInt(vsplit[i]);
+                values.push(cur + ", " + cur)
+            }
+        }
+
+        return values;
     }
 
 }
