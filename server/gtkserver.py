@@ -292,7 +292,7 @@ def GenesForSegments(structureid, segmentids):
     sids = cleaned.split(',')
 
     for s in sids:
-        match = re.match( r'^(?P<start>[0-9]+)\-(?P<end>[0-9]+)$', sRange )
+        match = re.match( r'^(?P<start>[0-9]+)\-(?P<end>[0-9]+)$', s )
 
         seg_start = 0
         seg_end   = 0
