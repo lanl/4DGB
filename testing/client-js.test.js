@@ -58,20 +58,42 @@ test('client test', () => {
                         });
 
     client.get_genes_for_segments( (response) => {
-                            var streamname = "gtkclient_genes-for-segments-single_test.json";
-                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
-                            writeStream.write(JSON.stringify(response));
-                            writeStream.write("\n");
-                            writeStream.end();
+                            expect(response).toStrictEqual({"genes":["Btbd35f23","Btbd35f24"]});
                         }, 0, 8);
 
+    // list of single values (7,8,9)
     client.get_genes_for_segments( (response) => {
-                            var streamname = "gtkclient_genes-for-segments-list_test.json";
-                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
-                            writeStream.write(JSON.stringify(response));
-                            writeStream.write("\n");
-                            writeStream.end();
+                            expect(response).toStrictEqual({"genes":["Btbd35f11","Btbd35f23","Btbd35f24"]});
                         }, 0, "7,8,9");
+
+    // single range value (7-9)
+    client.get_genes_for_segments( (response) => {
+                            expect(response).toStrictEqual({"genes":["Btbd35f11","Btbd35f23","Btbd35f24"]});
+                        }, 0, "7-9");
+
+    // combined list (7,8-10)
+    client.get_genes_for_segments( (response) => {
+                            expect(response).toStrictEqual({"genes": ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']});
+                        }, 0, "7,8-10");
+
+    // list of single values (7,8,9)
+    client.get_genes_for_locations( (response) => {
+                            expect(response).toStrictEqual({"genes":["Btbd35f11","Btbd35f23","Btbd35f24"]});
+                        }, 0, "2400000-2800000,2800000-3200000,3200000-3600000");
+
+    // single range value (7-9)
+    client.get_genes_for_locations( (response) => {
+                            expect(response).toStrictEqual({"genes":["Btbd35f11","Btbd35f23","Btbd35f24"]});
+                        }, 0, "2400000-3600000");
+
+    // combined list (7,8-10)
+    client.get_genes_for_locations( (response) => {
+                            expect(response).toStrictEqual({"genes": ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']});
+                        }, 0, "2400000-2800000,2800000-4000000");
+
+    client.get_genes_for_locations( (response) => {
+                            expect(response).toStrictEqual({"genes":["Btbd35f11","Btbd35f23","Btbd35f24"]});
+                        }, 0, "2400000-3600000");
 
     client.get_segments_for_genes( (response) => {
                             var streamname = "gtkclient_segments-for-genes_test.json";
@@ -89,6 +111,6 @@ test('client test', () => {
                             writeStream.end();
                         }, 0);
 
-    expect(false).toBe("need to add location test");
+    expect(false).toBe(false);
 
 });
