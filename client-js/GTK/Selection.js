@@ -45,6 +45,12 @@ class Selection extends EventEmitter {
 
         this.resetSelection();
         this.client = "";
+        this.testID = 0;
+    }
+
+    // an id that makes testing easier
+    setTestID ( test ) {
+        this.testID = test;
     }
 
     setHACKInterval( interval ) {
@@ -71,11 +77,6 @@ class Selection extends EventEmitter {
         this.curSelector = "";
     }
 
-    // RESTART CODING with this case
-    //   this is the second synchronization case to code 
-    //   - explicitly set genes
-    //   - all other values update
-    //
     setGenes( values ) {
         this.curSelector = Selection.Selector.GENES;
         this.genes = values;
@@ -85,8 +86,13 @@ class Selection extends EventEmitter {
         super.emit("selectionChanged", this);
     }
 
+    // RESTART CODING with this case
+    //   this is the second synchronization case to code 
+    //   - explicitly set genes
+    //   - all other values update
     //
     setLocations( values ) {
+        this.resetSelection();
         this.curSelector = Selection.Selector.LOCATIONS;
         this.locations = values;
         this.updateSegments();
@@ -103,13 +109,14 @@ class Selection extends EventEmitter {
 
     updateGenes() {
         if (this.curSelector == Selection.Selector.LOCATIONS) {
-            // testing
+            this.genes = "";
             client.get_genes_for_locations( (response) => {
                                             for (var s of response['genes']) {
                                                 this.genes = this.genes.concat(s, ",");
                                             }
                                             // remove the last comma
                                             this.genes = this.genes.slice(0, -1);
+
                                             super.emit("selectionChanged", this);
                                           }, 0, this.locations );
 
@@ -139,8 +146,16 @@ class Selection extends EventEmitter {
             this.segments = ""; 
             for (var i=0; i < locations.length; i++) {
                 var range = this.getSegmentRangeForLocationRange( locations[i] );
-                this.segments = this.segments.concat( range[0].toString(), ",", range[1].toString() );
+                if (range[0] == range[1]) {
+                    // the range is a single value
+                    this.segments = this.segments.concat( range[0].toString(), "," );
+                } else {
+                    // it is a range, so add a range
+                    this.segments = this.segments.concat( range[0].toString(), "-", range[1].toString(), "," );
+                }
+                // remove the trailing comma
             }
+            this.segments = this.segments.slice(0, -1);
 
         } else if (this.curSelector == Selection.Selector.GENES) {
             this.segments = "genes";
@@ -233,7 +248,20 @@ class Selection extends EventEmitter {
     getSegmentRangeForLocationRange( lRange ) {
         var start = Math.ceil(lRange[0]/this.HACKInterval);
         var end   = Math.ceil(lRange[1]/this.HACKInterval);
+        var span  = lRange[1] - lRange[0];
+
         var segments = [start, end];
+
+        // the first part of the range is on a boundary
+        if ( (start*this.HACKInterval == lRange[0]) ) {
+            if (span == this.HACKInterval) {
+                // the location range is a single segment
+                segments = [end, end]
+            } else if (span > this.HACKInterval) {
+                segments = [start + 1, end]
+            }
+        }
+
 
     return segments; 
 }
