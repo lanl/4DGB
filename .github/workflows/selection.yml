@@ -37,4 +37,4 @@ jobs:
         python3 release/test.00/server/gtkserver.py &
         sleep 5
         echo 'running javascript test'
-        npm run test testing/selection.yml
+        npm run test testing/selection.test.js
