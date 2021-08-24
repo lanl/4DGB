@@ -18,11 +18,7 @@ test('client test', () => {
                         });
 
     client.get_sequence_arrays( (response) => {
-                            var streamname = "gtkclient_get-sequence-arrays_test.json";
-                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
-                            writeStream.write(JSON.stringify(response));
-                            writeStream.write("\n");
-                            writeStream.end();
+                            expect(response).toStrictEqual({"arrays":[{"id":4,"max":1,"min":0,"name":"H3K27me3","type":"sequence"}]});
                         });
 
     client.get_arrays( (response) => {
@@ -96,11 +92,7 @@ test('client test', () => {
                         }, 0, "2400000-3600000");
 
     client.get_segments_for_genes( (response) => {
-                            var streamname = "gtkclient_segments-for-genes_test.json";
-                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
-                            writeStream.write(JSON.stringify(response));
-                            writeStream.write("\n");
-                            writeStream.end();
+                            expect(response).toStrictEqual({"segments":[8]});
                         }, 0, "Btbd35f23");
 
     client.get_structure( (response) => {
