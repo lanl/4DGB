@@ -47,6 +47,11 @@ class Selection extends EventEmitter {
         this.client = "";
     }
 
+    setHACKInterval( interval ) {
+        // TODO: design a better way for everything to get the interval
+        this.HACKInterval = interval;
+    }
+
     setClient( client ) {
         this.client = client;
     }
@@ -60,12 +65,17 @@ class Selection extends EventEmitter {
     }
 
     resetSelection () {
-        this.locations  = [];
-        this.genes      = [];
-        this.segments   = [];
+        this.locations  = "";
+        this.genes      = ""; 
+        this.segments   = ""; 
         this.curSelector = "";
     }
 
+    // RESTART CODING with this case
+    //   this is the second synchronization case to code 
+    //   - explicitly set genes
+    //   - all other values update
+    //
     setGenes( values ) {
         this.curSelector = Selection.Selector.GENES;
         this.genes = values;
@@ -75,13 +85,12 @@ class Selection extends EventEmitter {
         super.emit("selectionChanged", this);
     }
 
+    //
     setLocations( values ) {
         this.curSelector = Selection.Selector.LOCATIONS;
         this.locations = values;
-        this.updateGenes();
         this.updateSegments();
-
-        super.emit("selectionChanged", this);
+        this.updateGenes();
     }
 
     setSegments( values ) {
@@ -89,18 +98,20 @@ class Selection extends EventEmitter {
         this.segments = values;
         this.updateGenes();
         this.updateLocations();
-
-        super.emit("selectionChanged", this);
     }
 
 
     updateGenes() {
         if (this.curSelector == Selection.Selector.LOCATIONS) {
-            this.genes = "locations";
-            var vlist = this.getListOfLocations();
-
-            for (const v of vlist) {
-            }
+            // testing
+            client.get_genes_for_locations( (response) => {
+                                            for (var s of response['genes']) {
+                                                this.genes = this.genes.concat(s, ",");
+                                            }
+                                            // remove the last comma
+                                            this.genes = this.genes.slice(0, -1);
+                                            super.emit("selectionChanged", this);
+                                          }, 0, this.locations );
 
         } else if (this.curSelector == Selection.Selector.SEGMENTS) {
             this.genes = "segments";
@@ -123,7 +134,14 @@ class Selection extends EventEmitter {
 
     updateSegments() {
         if (this.curSelector == Selection.Selector.LOCATIONS) {
-            this.segments = "locations";
+            var locations = this.getListOfLocations();
+
+            this.segments = ""; 
+            for (var i=0; i < locations.length; i++) {
+                var range = this.getSegmentRangeForLocationRange( locations[i] );
+                this.segments = this.segments.concat( range[0].toString(), ",", range[1].toString() );
+            }
+
         } else if (this.curSelector == Selection.Selector.GENES) {
             this.segments = "genes";
         } else {
@@ -149,9 +167,14 @@ class Selection extends EventEmitter {
 
     // from the list of ranges, construct an expanded list of elements 
     getListOfSegments() {
-        return this.valStringToListOfValues( this.segments );
+        return this.valStringToListOfRanges( this.segments );
     }
 
+    //
+    // expand any ranges into individual values and make one big list
+    //
+    // for example, "1,2-5,10" would become [1,2,3,4,5,10]
+    //
     valStringToListOfValues( value ) {
         var cleaned = value.replace(/\s/g, "");
         var vsplit  = cleaned.split(",");
@@ -174,6 +197,13 @@ class Selection extends EventEmitter {
         return values;
     }
 
+    //
+    // expand a string to a list of ranges
+    //
+    // if a value is a single number, make that a range
+    //
+    // for example: "1,2-5,10" becomes [[1,1], [2,5], [10,10]]
+    //
     valStringToListOfRanges( value ) {
         var cleaned = value.replace(/\s/g, "");
         var vsplit  = cleaned.split(",");
@@ -181,20 +211,32 @@ class Selection extends EventEmitter {
         var values = [];
         var step = 1;
         for (var i=0; i < vsplit.length; i++) {
-
-            var hsplit = vsplit[i].split("-");
-            if (hsplit.length == 2) {
-                var start = parseInt(hsplit[0]);
-                var end   = parseInt(hsplit[1]);
-                values = values.concat(start + ", " + end)
-            } else {
-                var cur = parseInt(vsplit[i]);
-                values.push(cur + ", " + cur)
-            }
+            values.push( this.valStringToRange(vsplit[i]) );
         }
 
         return values;
     }
+
+    valStringToRange( value ) {
+        var values = []
+
+        var hsplit = value.split("-");
+        if (hsplit.length == 2) {
+            values = [parseInt(hsplit[0]), parseInt(hsplit[1])];
+        } else {
+            values = [parseInt(value), parseInt(value)]
+        }
+
+        return values; 
+    }
+
+    getSegmentRangeForLocationRange( lRange ) {
+        var start = Math.ceil(lRange[0]/this.HACKInterval);
+        var end   = Math.ceil(lRange[1]/this.HACKInterval);
+        var segments = [start, end];
+
+    return segments; 
+}
 
 }
 
