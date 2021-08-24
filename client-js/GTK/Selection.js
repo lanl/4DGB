@@ -80,17 +80,11 @@ class Selection extends EventEmitter {
     setGenes( values ) {
         this.curSelector = Selection.Selector.GENES;
         this.genes = values;
-        this.updateLocations();
         this.updateSegments();
-
-        super.emit("selectionChanged", this);
+        // this.updateLocations();
     }
 
-    // RESTART CODING with this case
-    //   this is the second synchronization case to code 
-    //   - explicitly set genes
-    //   - all other values update
-    //
+    // complete
     setLocations( values ) {
         this.resetSelection();
         this.curSelector = Selection.Selector.LOCATIONS;
@@ -99,11 +93,12 @@ class Selection extends EventEmitter {
         this.updateGenes();
     }
 
+    // next
     setSegments( values ) {
         this.curSelector = Selection.Selector.SEGMENTS;
         this.segments = values;
-        this.updateGenes();
         this.updateLocations();
+        this.updateGenes();
     }
 
 
@@ -121,7 +116,16 @@ class Selection extends EventEmitter {
                                           }, 0, this.locations );
 
         } else if (this.curSelector == Selection.Selector.SEGMENTS) {
-            this.genes = "segments";
+            this.genes = "";
+            client.get_genes_for_segments( (response) => {
+                                            for (var s of response['genes']) {
+                                                this.genes = this.genes.concat(s, ",");
+                                            }
+                                            // remove the last comma
+                                            this.genes = this.genes.slice(0, -1);
+
+                                            super.emit("selectionChanged", this);
+                                          }, 0, this.segments );
         } else {
             // do nothing, because this type is the selector
             // TODO: determine if this is an error
@@ -129,10 +133,16 @@ class Selection extends EventEmitter {
     }
 
     updateLocations() {
-        if (this.curSelector == Selection.Selector.GENES) {
-            this.locations = "genes";
-        } else if (this.curSelector == Selection.Selector.SEGMENTS) {
-            this.locations = "segments";
+        if ((this.curSelector == Selection.Selector.GENES) || (this.curSelector == Selection.Selector.SEGMENTS)) {
+            var segments = this.getListOfSegments();
+            this.locations = "";
+            for (var i=0; i < segments.length; i++) {
+                var range = this.getLocationRangeForSegmentRange( segments[i] );
+                this.locations = this.locations.concat( range[0].toString(), "-", range[1].toString(), "," );
+            }
+            // remove the last comma
+            this.locations = this.locations.slice(0, -1);
+            
         } else {
             // do nothing, because this type is the selector
             // TODO: determine if this is an error
@@ -153,12 +163,25 @@ class Selection extends EventEmitter {
                     // it is a range, so add a range
                     this.segments = this.segments.concat( range[0].toString(), "-", range[1].toString(), "," );
                 }
-                // remove the trailing comma
             }
+            // remove the last comma
             this.segments = this.segments.slice(0, -1);
 
         } else if (this.curSelector == Selection.Selector.GENES) {
-            this.segments = "genes";
+            this.segments = ""; 
+            client.get_segments_for_genes( (response) => {
+                                            // var unique = Array.from(new Set(response['segments']));
+                                            // for (var s of unique) { 
+                                            for (var s of response['segments']) { 
+                                                this.segments = this.segments.concat(s, ",");
+                                            }
+                                            // remove the last comma
+                                            this.segments = this.segments.slice(0, -1);
+                                            this.updateLocations();
+
+                                            super.emit("selectionChanged", this);
+                                          }, 0, this.genes );
+
         } else {
             // do nothing, because this type is the selector
             // TODO: determine if this is an error
@@ -245,6 +268,21 @@ class Selection extends EventEmitter {
         return values; 
     }
 
+    //
+    // given a segment range, return the location range that
+    // encompasses it
+    //
+    getLocationRangeForSegmentRange( sRange ) {
+        var start = (sRange[0]-1)*this.HACKInterval; 
+        var end   = sRange[1]*this.HACKInterval; 
+
+        return [start, end]
+    }
+
+    //
+    // given a location range, return the segment range that
+    // encompasses it
+    //
     getSegmentRangeForLocationRange( lRange ) {
         var start = Math.ceil(lRange[0]/this.HACKInterval);
         var end   = Math.ceil(lRange[1]/this.HACKInterval);
@@ -262,9 +300,8 @@ class Selection extends EventEmitter {
             }
         }
 
-
-    return segments; 
-}
+        return segments; 
+    }
 
 }
 

@@ -390,10 +390,12 @@ def SegmentsForGene(names, structureid):
                                         ( startid > ? AND endid < ? ) OR ( startid < ? AND endid > ? ) ) ORDER BY segid", 
                                       structureid, g_start, g_end, g_start, g_end, g_start, g_end, g_start, g_end)
             for b in query.cursor.fetchall():
-                segments.append(b[0])
+                if (b[0] not in segments) :
+                    segments.append(b[0])
         else:
             print("SegmentsForGene did not find gene: ({})".format(name))
 
+    segments.sort()
     return jsonify({'segments': segments})
 
 #
