@@ -80,7 +80,9 @@ class Selection extends EventEmitter {
     setGenes( values ) {
         this.curSelector = Selection.Selector.GENES;
         this.genes = values;
+            // emits signal
         this.updateSegments();
+        // locations are updated in the segments call
         // this.updateLocations();
     }
 
@@ -90,6 +92,7 @@ class Selection extends EventEmitter {
         this.curSelector = Selection.Selector.LOCATIONS;
         this.locations = values;
         this.updateSegments();
+            // emits signal
         this.updateGenes();
     }
 
@@ -98,10 +101,13 @@ class Selection extends EventEmitter {
         this.curSelector = Selection.Selector.SEGMENTS;
         this.segments = values;
         this.updateLocations();
+            // emits signal
         this.updateGenes();
     }
 
-
+    //
+    // update, based on which attribute is the selector
+    //
     updateGenes() {
         if (this.curSelector == Selection.Selector.LOCATIONS) {
             this.genes = "";
@@ -132,6 +138,9 @@ class Selection extends EventEmitter {
         }
     }
 
+    //
+    // update, based on which attribute is the selector
+    //
     updateLocations() {
         if ((this.curSelector == Selection.Selector.GENES) || (this.curSelector == Selection.Selector.SEGMENTS)) {
             var segments = this.getListOfSegments();
@@ -149,6 +158,9 @@ class Selection extends EventEmitter {
         }
     }
 
+    //
+    // update, based on which attribute is the selector
+    //
     updateSegments() {
         if (this.curSelector == Selection.Selector.LOCATIONS) {
             var locations = this.getListOfLocations();
@@ -255,6 +267,32 @@ class Selection extends EventEmitter {
         return values;
     }
 
+    //
+    // expand a string to a list of string ranges
+    //
+    // if a value is a single number, make that a range
+    //
+    // for example: "1,2-5,10" becomes [["1-1"], ["2-5"], ["10-10"]]
+    //
+    valStringToListOfRanges( value ) {
+        var cleaned = value.replace(/\s/g, "");
+        var vsplit  = cleaned.split(",");
+
+        var values = [];
+        var step = 1;
+        for (var i=0; i < vsplit.length; i++) {
+            values.push( this.valStringToRange(vsplit[i]) );
+        }
+
+        return values;
+    }
+
+    //
+    // convert a string to a range
+    //
+    // - "8"    becomes [8,8]
+    // - "8-10" becomes [8,10]
+    //
     valStringToRange( value ) {
         var values = []
 
@@ -263,6 +301,25 @@ class Selection extends EventEmitter {
             values = [parseInt(hsplit[0]), parseInt(hsplit[1])];
         } else {
             values = [parseInt(value), parseInt(value)]
+        }
+
+        return values; 
+    }
+
+    //
+    // convert a string to a range string
+    //
+    // - "8"    becomes "8-8"
+    // - "8-10" remains "8-10"
+    //
+    valStringToRangeString( value ) {
+        var values = []
+
+        var hsplit = value.split("-");
+        if (hsplit.length == 2) {
+            values = value 
+        } else {
+            values = [value + "-" + value]
         }
 
         return values; 
@@ -301,6 +358,40 @@ class Selection extends EventEmitter {
         }
 
         return segments; 
+    }
+
+    //
+    // compress a list of the form [["8-8"], ["12-25"], ["20-29"]]
+    // to [ 8, '12-29' ]
+    //
+    // from: https://stackoverflow.com/questions/42093036
+    //
+    compressListOfRanges( ranges ) {
+        var data = getListOfRangesFromString( ranges );
+        result = data.reduce(function (r, a) {
+            a.map(function (b) {
+                var c = b.toString().split('-')
+                c[1] = c[1] || c[0];
+                r.push(c.map(Number));
+            });
+            return r;
+        }, [])
+        .sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; })
+        .reduce(function (r, a) {
+            var last = r[r.length - 1] || [];
+            if (a[0] <= last[1] + 1) {
+                if (last[1] < a[1]) {
+                    last[1] = a[1];
+                }
+                return r;
+            }
+            return r.concat([a]);
+        }, [])
+        .map(function (a) {
+            return a[0] === a[1] ? a[0] : a.join('-');
+        });
+
+        return result;
     }
 
 }
