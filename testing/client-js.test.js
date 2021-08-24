@@ -89,6 +89,6 @@ test('client test', () => {
                             writeStream.end();
                         }, 0);
 
-    expect(true).toBe(true);
+    expect(false).toBe("need to add location test");
 
 });
