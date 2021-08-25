@@ -111,7 +111,7 @@ class Selection extends EventEmitter {
     updateGenes() {
         if (this.curSelector == Selection.Selector.LOCATIONS) {
             this.genes = "";
-            client.get_genes_for_locations( (response) => {
+            this.client.get_genes_for_locations( (response) => {
                                             for (var s of response['genes']) {
                                                 this.genes = this.genes.concat(s, ",");
                                             }
@@ -123,7 +123,7 @@ class Selection extends EventEmitter {
 
         } else if (this.curSelector == Selection.Selector.SEGMENTS) {
             this.genes = "";
-            client.get_genes_for_segments( (response) => {
+            this.client.get_genes_for_segments( (response) => {
                                             for (var s of response['genes']) {
                                                 this.genes = this.genes.concat(s, ",");
                                             }
@@ -181,7 +181,7 @@ class Selection extends EventEmitter {
 
         } else if (this.curSelector == Selection.Selector.GENES) {
             this.segments = ""; 
-            client.get_segments_for_genes( (response) => {
+            this.client.get_segments_for_genes( (response) => {
                                             // var unique = Array.from(new Set(response['segments']));
                                             // for (var s of unique) { 
                                             for (var s of response['segments']) { 

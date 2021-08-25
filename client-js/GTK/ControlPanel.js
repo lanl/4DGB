@@ -47,6 +47,9 @@ class ControlPanel extends EventEmitter {
         // misc 
         this.selector = "";
         this.selection = new Selection();
+        this.selection.setClient( Client.TheClient );
+        this.selection.setHACKInterval( TheInterval );
+        this.selection.addListener('selectionChanged', (function (e) { this.#syncronizeSelection(e) }).bind(this));
 
         // build UI
         var root = document.getElementById(parent);
@@ -241,6 +244,16 @@ class ControlPanel extends EventEmitter {
     }
 
     //
+    // locally synchronize the selection elements based on
+    // the selection object
+    //
+    #syncronizeSelection() {
+        this.geneentry.value        = this.selection.genes;
+        this.locationentry.value    = this.selection.locations;
+        this.segmententry.value     = this.selection.segments;
+    }
+
+    //
     // returns a color of the form #000000
     //
     getBackgroundColor() {
@@ -334,6 +347,10 @@ class ControlPanel extends EventEmitter {
                                     locations:  this.getSelectedLocationsList()})
     }
 
+    //
+    // based on the UI element that is controlling the selection,
+    // update the rest of the UI
+    //
     onSelect(e) {
         if (this.selector == "gene") {
             if (this.validateGenes()) {
@@ -342,6 +359,7 @@ class ControlPanel extends EventEmitter {
                 this.eraseEntry(this.segmententry);
 
                 var values = this.getSelectedGenesList();
+                this.selection.setGenes(this.geneentry.value);
                 super.emit("geneChanged", values);
             }
         } else if (this.selector == "location") {
@@ -351,6 +369,7 @@ class ControlPanel extends EventEmitter {
                 this.eraseEntry(this.segmententry);
 
                 var values = this.getSelectedLocationsList();
+                this.selection.setLocations(this.locationentry.value);
                 super.emit("locationChanged", values[0]);
             }
         } else if (this.selector == "segment") {
@@ -359,6 +378,7 @@ class ControlPanel extends EventEmitter {
                 this.eraseEntry(this.geneentry);
                 this.eraseEntry(this.locationentry);
 
+                this.selection.setLocations(this.segmententry.value);
                 var expanded_values = this.valStringToListOfValues( this.segmententry.value );
                 super.emit("segmentChanged", expanded_values);
             }
@@ -387,10 +407,15 @@ class ControlPanel extends EventEmitter {
         e.currentTarget.className += " active";
     }
 
+    //
+    // when the user types <enter> (keyCode 13), evaluate
+    // where the action took place, and update the selection
+    //
     updateSelection(e, type) {
         if (e.keyCode == 13) {
             this.selector = type;
 
+            // TODO: update to a single case statement to improve clarity
             if (type == "gene") {
                 this.onSelect(e);
             } else if (type == "location") {
