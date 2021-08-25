@@ -47,8 +47,8 @@ class ControlPanel extends EventEmitter {
         // misc 
         this.selector = "";
         this.selection = new Selection();
-        this.selection.setClient( Client.TheClient );
-        this.selection.setHACKInterval( TheInterval );
+        this.selection.client = Client.TheClient;
+        this.selection.HACKInterval = TheInterval;
         this.selection.addListener('selectionChanged', (function (e) { this.#syncronizeSelection(e) }).bind(this));
 
         // build UI
@@ -359,7 +359,7 @@ class ControlPanel extends EventEmitter {
                 this.eraseEntry(this.segmententry);
 
                 var values = this.getSelectedGenesList();
-                this.selection.setGenes(this.geneentry.value);
+                this.selection.genes = this.geneentry.value;
                 super.emit("geneChanged", values);
             }
         } else if (this.selector == "location") {
@@ -369,7 +369,7 @@ class ControlPanel extends EventEmitter {
                 this.eraseEntry(this.segmententry);
 
                 var values = this.getSelectedLocationsList();
-                this.selection.setLocations(this.locationentry.value);
+                this.selection.locations = this.locationentry.value;
                 super.emit("locationChanged", values[0]);
             }
         } else if (this.selector == "segment") {
@@ -378,7 +378,7 @@ class ControlPanel extends EventEmitter {
                 this.eraseEntry(this.geneentry);
                 this.eraseEntry(this.locationentry);
 
-                this.selection.setLocations(this.segmententry.value);
+                this.selection.locations = this.segmententry.value;
                 var expanded_values = this.valStringToListOfValues( this.segmententry.value );
                 super.emit("segmentChanged", expanded_values);
             }

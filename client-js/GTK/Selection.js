@@ -35,50 +35,103 @@ const Client = require('./Client');
 class Selection extends EventEmitter {
 
     static Selector = {
+        NONE:       'none',
         GENES:      'genes',
         LOCATIONS:  'locations',
         SEGMENTS:   'segments'
     };
+    static SelectorValues = ['none', 'genes', 'locations', 'segments'];
 
     constructor() {
         super();
 
-        this.resetSelection();
-        this.client = "";
-        this.testID = 0;
+        this._locations     = "";
+        this._genes         = ""; 
+        this._segments      = ""; 
+        this._selector      = Selection.Selector.NONE; 
+        this._client        = "";
+        this._marker        = 0;
+        this._HACKInterval  = 0;
     }
 
-    // an id that makes testing easier
-    setTestID ( test ) {
-        this.testID = test;
+    // ----------------------------------------
+    // set and get methods
+    // ----------------------------------------
+    set genes(value) {
+        this._genes = value;
     }
 
-    setHACKInterval( interval ) {
-        // TODO: design a better way for everything to get the interval
-        this.HACKInterval = interval;
+    get genes() {
+        return this._genes;
     }
 
-    setClient( client ) {
-        this.client = client;
+    set locations(value) {
+        this._locations = value;
     }
 
-    setSelector( name ) {
-        if (name in Selection.Selector) {
-            this.curSelector = name;
+    get locations() {
+        return this._locations;
+    }
+
+    set segments(value) {
+        this._segments = value;
+    }
+
+    get segments() {
+        return this._segments;
+    }
+
+    set marker( value ) {
+        this._marker = value;
+    }
+
+    get marker() {
+        return this._marker;
+    }
+
+    // TODO: design a better way for everything to get the interval
+    set HACKInterval(value) {
+        this._HACKInterval = value;
+    }
+
+    // TODO: design a better way for everything to get the interval
+    get HACKInterval() {
+        return this._HACKInterval;
+    }
+
+    set client(value) {
+        this._client = value;
+    }
+
+    get client() {
+        return this._client;
+    }
+
+    set selector(value) {
+        if (Selection.SelectorValues.includes(value)) {
+            this._selector = value;
         } else {
-            throw "Invalid Selection Type: " + name;
+            throw "Invalid Selection Type: " + value;
         }
     }
+
+    get selector() {
+        return this._selector;
+    }
+    // ----------------------------------------
+    // set and get methods
+    // ----------------------------------------
+
 
     resetSelection () {
         this.locations  = "";
         this.genes      = ""; 
         this.segments   = ""; 
-        this.curSelector = "";
+        // this.selector   = Selection.Selector.NONE; 
     }
 
     setGenes( values ) {
-        this.curSelector = Selection.Selector.GENES;
+        this.selector = Selection.Selector.GENES;
         this.genes = values;
             // emits signal
         this.updateSegments();
@@ -89,7 +142,7 @@ class Selection extends EventEmitter {
     // complete
     setLocations( values ) {
         this.resetSelection();
-        this.curSelector = Selection.Selector.LOCATIONS;
+        this.selector = Selection.Selector.LOCATIONS;
         this.locations = values;
         this.updateSegments();
             // emits signal
@@ -98,7 +151,7 @@ class Selection extends EventEmitter {
 
     // next
     setSegments( values ) {
-        this.curSelector = Selection.Selector.SEGMENTS;
+        this.selector = Selection.Selector.SEGMENTS;
         this.segments = values;
         this.updateLocations();
             // emits signal
@@ -109,7 +162,7 @@ class Selection extends EventEmitter {
     // update, based on which attribute is the selector
     //
     updateGenes() {
-        if (this.curSelector == Selection.Selector.LOCATIONS) {
+        if (this.selector == Selection.Selector.LOCATIONS) {
             this.genes = "";
             this.client.get_genes_for_locations( (response) => {
                                             for (var s of response['genes']) {
@@ -121,7 +174,7 @@ class Selection extends EventEmitter {
                                             super.emit("selectionChanged", this);
                                           }, 0, this.locations );
 
-        } else if (this.curSelector == Selection.Selector.SEGMENTS) {
+        } else if (this.selector == Selection.Selector.SEGMENTS) {
             this.genes = "";
             this.client.get_genes_for_segments( (response) => {
                                             for (var s of response['genes']) {
@@ -142,7 +195,7 @@ class Selection extends EventEmitter {
     // update, based on which attribute is the selector
     //
     updateLocations() {
-        if ((this.curSelector == Selection.Selector.GENES) || (this.curSelector == Selection.Selector.SEGMENTS)) {
+        if ((this.selector == Selection.Selector.GENES) || (this.selector == Selection.Selector.SEGMENTS)) {
             var segments = this.getListOfSegments();
             this.locations = "";
             for (var i=0; i < segments.length; i++) {
@@ -162,7 +215,7 @@ class Selection extends EventEmitter {
     // update, based on which attribute is the selector
     //
     updateSegments() {
-        if (this.curSelector == Selection.Selector.LOCATIONS) {
+        if (this.selector == Selection.Selector.LOCATIONS) {
             var locations = this.getListOfLocations();
 
             this.segments = ""; 
@@ -179,7 +232,7 @@ class Selection extends EventEmitter {
             // remove the last comma
             this.segments = this.segments.slice(0, -1);
 
-        } else if (this.curSelector == Selection.Selector.GENES) {
+        } else if (this.selector == Selection.Selector.GENES) {
             this.segments = ""; 
             this.client.get_segments_for_genes( (response) => {
                                             // var unique = Array.from(new Set(response['segments']));

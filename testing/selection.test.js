@@ -155,13 +155,13 @@ test('selection test', () => {
     // location-setting tests
     for (const t of LocationTests) {
         var selection = new Selection();
-        selection.setClient( client );
-        selection.setHACKInterval( 400000 ); 
-        selection.setTestID( t['test'] );
+        selection.client = client;
+        selection.HACKInterval = 400000; 
+        selection.marker = t['test'];
 
         // for each instance, create a unique callback that tests the results
         selection.addListener( "selectionChanged",  ((selection) => {
-                var ID = selection.testID; 
+                var ID = selection.marker; 
                 expect(selection.locations).toBe(LocationTests[ID]['locations']);
                 expect(selection.segments).toBe(LocationTests[ID]['segments']);
                 expect(selection.genes).toBe(LocationTests[ID]['genes']);
@@ -173,13 +173,13 @@ test('selection test', () => {
     // segment-setting tests
     for (const t of SegmentTests) {
         var selection = new Selection();
-        selection.setClient( client );
-        selection.setHACKInterval( 400000 ); 
-        selection.setTestID( t['test'] );
+        selection.client = client;
+        selection.HACKInterval = 400000; 
+        selection.marker = t['test'];
 
         // for each instance, create a unique callback that tests the results
         selection.addListener( "selectionChanged",  ((selection) => {
-                var ID = selection.testID; 
+                var ID = selection.marker; 
                 expect(selection.locations).toBe(SegmentTests[ID]['locations']);
                 expect(selection.segments).toBe(SegmentTests[ID]['segments']);
                 expect(selection.genes).toBe(SegmentTests[ID]['genes']);
@@ -191,13 +191,13 @@ test('selection test', () => {
     // gene-setting tests
     for (const t of GeneTests) {
         var selection = new Selection();
-        selection.setClient( client );
-        selection.setHACKInterval( 400000 ); 
-        selection.setTestID( t['test'] );
+        selection.client = client;
+        selection.HACKInterval = 400000; 
+        selection.marker = t['test'];
 
         // for each instance, create a unique callback that tests the results
         selection.addListener( "selectionChanged",  ((selection) => {
-                var ID = selection.testID; 
+                var ID = selection.marker; 
                 expect(selection.locations).toBe(GeneTests[ID]['locations']);
                 expect(selection.segments).toBe(GeneTests[ID]['segments']);
                 expect(selection.genes).toBe(GeneTests[ID]['genes']);
