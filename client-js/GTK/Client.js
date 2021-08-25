@@ -51,6 +51,15 @@ class Client {
     //
     // get the genes for a list of segments 
     //
+    get_genes_for_locations(callback, sid, locations) {
+        fetch( this.url + ':' + this.port + '/data/structure/' + sid + '/locations/' + locations + '/genes' )
+            .then(response => response.json())
+            .then(data => callback(data))
+    }
+
+    //
+    // get the genes for a list of segments 
+    //
     get_genes_for_segments(callback, sid, segids) {
         fetch( this.url + ':' + this.port + '/data/structure/' + sid + '/segment/' + segids + '/genes' )
             .then(response => response.json())

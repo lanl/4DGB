@@ -45,8 +45,12 @@ class ControlPanel extends EventEmitter {
         super();
 
         // misc 
-        this.selector = "";
+        this.selector = Selection.Selector.NONE; 
+        this.prevSelector = Selection.Selector.NONE; 
         this.selection = new Selection();
+        this.selection.client = Client.TheClient;
+        this.selection.HACKInterval = TheInterval;
+        this.selection.addListener('selectionChanged', (function (e) { this.#syncronizeSelection(e) }).bind(this));
 
         // build UI
         var root = document.getElementById(parent);
@@ -119,7 +123,7 @@ class ControlPanel extends EventEmitter {
         this.locationentry = document.createElement("input");
         this.locationentry.type = "text";
         cell.appendChild(this.locationentry);
-        this.locationentry.addEventListener('keypress', (function (e) { this.updateSelection(e, "location") }).bind(this));
+        this.locationentry.addEventListener('keypress', (function (e) { this.updateSelection(e, Selection.Selector.LOCATIONS) }).bind(this));
                 // selection
         var cell = row.insertCell(2);
         this.locationchoice = document.createElement("select");
@@ -140,7 +144,7 @@ class ControlPanel extends EventEmitter {
         this.geneentry = document.createElement("input");
         this.geneentry.type = "text";
         cell.appendChild(this.geneentry);
-        this.geneentry.addEventListener('keypress', (function (e) { this.updateSelection(e, "gene") }).bind(this));
+        this.geneentry.addEventListener('keypress', (function (e) { this.updateSelection(e, Selection.Selector.GENES) }).bind(this));
                 // selection
         var cell = row.insertCell(2);
         this.genechoice = document.createElement("select");
@@ -159,16 +163,16 @@ class ControlPanel extends EventEmitter {
         this.segmententry = document.createElement("input");
         this.segmententry.type = "text";
         cell.appendChild(this.segmententry);
-        this.segmententry.addEventListener('keypress', (function (e) { this.updateSelection(e, "segment") }).bind(this));
+        this.segmententry.addEventListener('keypress', (function (e) { this.updateSelection(e, Selection.Selector.SEGMENTS) }).bind(this));
                 // selection
         var cell = row.insertCell(2);
-        this.segmentchoice = document.createElement("select");
-        this.segmentchoice.setAttribute("type", "text");
-        cell.appendChild(this.segmentchoice);
-        // HACK don't show this for now (until it does something)
-        this.segmentchoice.style.visibility = "hidden";
-            // end HACK
-        this.segmentchoice.addEventListener('change', (function (e) { this.onSegmentSelect(e) }).bind(this));
+//      this.segmentchoice = document.createElement("select");
+//      this.segmentchoice.setAttribute("type", "text");
+//      cell.appendChild(this.segmentchoice);
+//      // HACK don't show this for now (until it does something)
+//      this.segmentchoice.style.visibility = "hidden";
+//          // end HACK
+//      this.segmentchoice.addEventListener('change', (function (e) { this.onSegmentSelect(e) }).bind(this));
         // this.updateSegments(project);
             // selection 
         var row = this.controls.insertRow(cur_row); 
@@ -241,6 +245,16 @@ class ControlPanel extends EventEmitter {
     }
 
     //
+    // locally synchronize the selection elements based on
+    // the selection object
+    //
+    #syncronizeSelection() {
+        this.geneentry.value        = this.selection.genes;
+        this.locationentry.value    = this.selection.locations;
+        this.segmententry.value     = this.selection.segments;
+    }
+
+    //
     // returns a color of the form #000000
     //
     getBackgroundColor() {
@@ -310,13 +324,13 @@ class ControlPanel extends EventEmitter {
         }
     }
 
-    onLocationSelect(e) {
-        super.emit("locationChanged", e.target.value);
-    }
+//  onLocationSelect(e) {
+//      super.emit("locationChanged", e.target.value);
+//  }
 
-    onGeneSelect(e) {
-        super.emit("geneChanged", e.target.value);
-    }
+//  onGeneSelect(e) {
+//      super.emit("geneChanged", e.target.value);
+//  }
 
     onVariableSelect(e) {
         var varID = e.target.options[e.target.selectedIndex].varID;
@@ -334,31 +348,26 @@ class ControlPanel extends EventEmitter {
                                     locations:  this.getSelectedLocationsList()})
     }
 
+    //
+    // based on the UI element that is controlling the selection,
+    // update the rest of the UI
+    //
     onSelect(e) {
-        if (this.selector == "gene") {
+        if (this.selector == Selection.Selector.GENES) {
             if (this.validateGenes()) {
-                // bookkeeping
-                this.eraseEntry(this.locationentry);
-                this.eraseEntry(this.segmententry);
-
                 var values = this.getSelectedGenesList();
+                this.selection.selectGenes(this.geneentry.value);
                 super.emit("geneChanged", values);
             }
-        } else if (this.selector == "location") {
+        } else if (this.selector == Selection.Selector.LOCATIONS) {
             if (this.validateLocations()) {
-                // bookkeeping
-                this.eraseEntry(this.geneentry);
-                this.eraseEntry(this.segmententry);
-
                 var values = this.getSelectedLocationsList();
+                this.selection.selectLocations(this.locationentry.value);
                 super.emit("locationChanged", values[0]);
             }
-        } else if (this.selector == "segment") {
+        } else if (this.selector == Selection.Selector.SEGMENTS) {
             if (this.validateSegments()) {
-                // bookkeeping
-                this.eraseEntry(this.geneentry);
-                this.eraseEntry(this.locationentry);
-
+                this.selection.selectSegments(this.segmententry.value);
                 var expanded_values = this.valStringToListOfValues( this.segmententry.value );
                 super.emit("segmentChanged", expanded_values);
             }
@@ -387,15 +396,14 @@ class ControlPanel extends EventEmitter {
         e.currentTarget.className += " active";
     }
 
+    //
+    // when the user types <enter> (keyCode 13), evaluate
+    // where the action took place, and update the selection
+    //
     updateSelection(e, type) {
         if (e.keyCode == 13) {
-            this.selector = type;
-
-            if (type == "gene") {
-                this.onSelect(e);
-            } else if (type == "location") {
-                this.onSelect(e);
-            } else if (type == "segment") {
+            if (Selection.SelectorValues.includes(type)) {
+                this.selector = type;
                 this.onSelect(e);
             }
         }
@@ -430,10 +438,6 @@ class ControlPanel extends EventEmitter {
         entry.value = "";
     }
 
-    setSelector( type ) {
-        this.selector = type;
-    }
-
     // location helper functions
     // ---------------------------------------------------------------------------------
     getSelectedLocationsList() {
@@ -441,10 +445,17 @@ class ControlPanel extends EventEmitter {
     }
 
     addLocation() {
-        this.addValueToEntry( this.locationentry, this.getCurrentLocation(), this.getSelectedLocationsList() ); 
+        this.selector = Selection.Selector.LOCATIONS;
+
+        // bookkeeping
         this.eraseEntry(this.geneentry);
         this.eraseEntry(this.segmententry);
-        this.setSelector("location");
+        if (this.prevSelector != this.selector) {
+            this.eraseEntry(this.locationentry);
+            this.prevSelector = this.selector;
+        }
+
+        this.addValueToEntry( this.locationentry, this.getCurrentLocation(), this.getSelectedLocationsList() ); 
     }
 
     validateLocations() {
@@ -468,12 +479,17 @@ class ControlPanel extends EventEmitter {
     }
 
     addGene(e) {
+        this.selector = Selection.Selector.GENES;
+
         // bookkeeping
         this.eraseEntry(this.locationentry);
         this.eraseEntry(this.segmententry);
+        if (this.prevSelector != this.selector) {
+            this.eraseEntry(this.geneentry);
+            this.prevSelector = this.selector;
+        }
 
         this.addValueToEntry( this.geneentry, this.getCurrentGene(), this.getSelectedGenesList() ); 
-        this.setSelector("gene");
     }
 
     validateGenes() {
@@ -497,10 +513,17 @@ class ControlPanel extends EventEmitter {
     }
 
     addSegment(e) {
-        this.addValueToEntry( this.segmententry, this.getCurrentSegment(), this.getSelectedSegmentsList() ); 
+        this.selector = Selection.Selector.SEGMENTS;
+
+        // bookkeeping
         this.eraseEntry(this.locationentry);
         this.eraseEntry(this.geneentry);
-        this.setSelector("segment");
+        if (this.prevSelector != this.selector) {
+            this.eraseEntry(this.segmententry);
+            this.prevSelector = this.selector;
+        }
+
+        this.addValueToEntry( this.segmententry, this.getCurrentSegment(), this.getSelectedSegmentsList() ); 
     }
 
     validateSegments() {

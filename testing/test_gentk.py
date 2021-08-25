@@ -151,6 +151,54 @@ def test_get_genes_for_segments():
                     'gold'      : ['Btbd35f11', 'Btbd35f23', 'Btbd35f24']
                 },
                 {
+                    'note'      : 'correct list query',
+                    'segment'   : "7-9",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f11', 'Btbd35f23', 'Btbd35f24']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "8,9,10",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "8-10",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "7,8,9,10",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "7-10",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "7,8-10",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "7,8,9-10",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "7 ,8, 9 -10 ",
+                    'structure' : 0,
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+                {
                     'note'      : 'Edge test: last segment is < 10000. Should return empty list',
                     'segment'   : 10000,
                     'structure' : 0,
@@ -162,6 +210,55 @@ def test_get_genes_for_segments():
         result = client.get_genes_for_segments(t["structure"], t["segment"])
         assert (result['genes'] == t["gold"])
     
+def test_get_genes_for_locations():
+    tests = [
+                {
+                    'note'      : 'correct query',
+                    'segment'   : 8,
+                    'structure' : 0,
+                    'locations' : "2800000-3200000",
+                    'gold'      : ['Btbd35f23', 'Btbd35f24']
+                },
+                {
+                    'note'      : 'correct query',
+                    'segment'   : "7,8,9",
+                    'structure' : 0,
+                    'locations' : "2400000-2800000,2800000-3200000,3200000-3600000",
+                    'gold'      : ['Btbd35f11', 'Btbd35f23', 'Btbd35f24']
+                },
+                {
+                    'note'      : 'correct query',
+                    'segment'   : "7-9",
+                    'structure' : 0,
+                    'locations' : "2400000-3600000",
+                    'gold'      : ['Btbd35f11', 'Btbd35f23', 'Btbd35f24']
+                },
+                {
+                    'note'      : 'correct query',
+                    'segment'   : "8,9",
+                    'structure' : 0,
+                    'locations' : "2800000-3200000,3200000-3600000",
+                    'gold'      : ['Btbd35f11', 'Btbd35f23', 'Btbd35f24']
+                },
+                {
+                    'note'      : 'correct query',
+                    'segment'   : "8-9",
+                    'structure' : 0,
+                    'locations' : "2800000-3600000",
+                    'gold'      : ['Btbd35f11', 'Btbd35f23', 'Btbd35f24']
+                },
+                {
+                    'note'      : 'correct list query',
+                    'segment'   : "7,8-10",
+                    'structure' : 0,
+                    'locations' : "2400000-2800000,2800000-4000000",
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                },
+            ]
+
+    for t in tests:
+        result = client.get_genes_for_locations(t["structure"], t["locations"])
+        assert (result['genes'] == t["gold"])
 
 
 def test_get_segments_for_genes():
