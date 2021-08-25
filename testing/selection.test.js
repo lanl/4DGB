@@ -167,7 +167,7 @@ test('selection test', () => {
                 expect(selection.genes).toBe(LocationTests[ID]['genes']);
             }).bind(selection));
 
-        selection.setLocations( t['locations'] );
+        selection.selectLocations( t['locations'] );
     }
 
     // segment-setting tests
@@ -185,7 +185,7 @@ test('selection test', () => {
                 expect(selection.genes).toBe(SegmentTests[ID]['genes']);
             }).bind(selection));
 
-        selection.setSegments( t['segments'] );
+        selection.selectSegments( t['segments'] );
     }
 
     // gene-setting tests
@@ -203,6 +203,6 @@ test('selection test', () => {
                 expect(selection.genes).toBe(GeneTests[ID]['genes']);
             }).bind(selection));
 
-        selection.setGenes( t['genes'] );
+        selection.selectGenes( t['genes'] );
     }
 });

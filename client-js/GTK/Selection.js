@@ -127,10 +127,13 @@ class Selection extends EventEmitter {
         this.locations  = "";
         this.genes      = ""; 
         this.segments   = ""; 
-        // this.selector   = Selection.Selector.NONE; 
+        this.selector   = Selection.Selector.NONE; 
     }
 
-    setGenes( values ) {
+    selectGenes( values ) {
+        // initialize
+        this.resetSelection();
+
         this.selector = Selection.Selector.GENES;
         this.genes = values;
             // emits signal
@@ -139,9 +142,10 @@ class Selection extends EventEmitter {
         // this.updateLocations();
     }
 
-    // complete
-    setLocations( values ) {
+    selectLocations( values ) {
+        // initialize
         this.resetSelection();
+
         this.selector = Selection.Selector.LOCATIONS;
         this.locations = values;
         this.updateSegments();
@@ -149,8 +153,10 @@ class Selection extends EventEmitter {
         this.updateGenes();
     }
 
-    // next
-    setSegments( values ) {
+    selectSegments( values ) {
+        // initialize
+        this.resetSelection();
+
         this.selector = Selection.Selector.SEGMENTS;
         this.segments = values;
         this.updateLocations();
