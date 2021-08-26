@@ -1,7 +1,7 @@
 # 🧬 4D Genome Browser project 🧬
 ![client](https://github.com/lanl/4DGB/actions/workflows/client.yml/badge.svg)
 ![client-js](https://github.com/lanl/4DGB/actions/workflows/client-js.yml/badge.svg)
-![publisher](https://github.com/lanl/4DGB/actions/workflows/publisher.yml/badge.svg)
+![selection](https://github.com/lanl/4DGB/actions/workflows/selection.yml/badge.svg)
 
 The 4D Genome Browser is a toolkit for querying and visualizing genomics data through the web. It consists of a few different components:
 
