@@ -264,6 +264,13 @@ def ContactMap(identifier):
     return jsonify({ 'contacts': data })
 
 #
+# get the project-wide interval
+#
+@app.route('/project/interval')
+def ProjectInterval():
+    return jsonify(get_dataset_interval())
+
+#
 # get all genes in a project
 #
 @app.route('/genes')
@@ -277,6 +284,30 @@ def Genes():
         genes.append(g[0])
 
     return jsonify({'genes': genes})
+
+#
+# get metadata for a gene 
+#
+@app.route('/gene/<name>')
+def GetGeneMetadata(name):
+    # return all genes
+    conn = db_connect.connect()
+
+    query = conn.execute("SELECT start,end,length,gID,gene_id,gene_type,gene_name from genes WHERE gene_name = ?", name)
+    results = query.cursor.fetchone()
+
+    data = {
+            "start"     : results[0],
+            "end"       : results[1],
+            "length"    : results[2],
+            "gID"       : results[3],
+            "gene_id"   : results[4],
+            "gene_type" : results[5],
+            "gene_name" : results[6]
+            }
+
+
+    return jsonify(data)
 
 #
 # genes for a list of segments or segment ranges
@@ -319,6 +350,9 @@ def GenesForSegments(structureid, segmentids):
             if (len(results) != 0):
                 seg_start = results[0][0]
                 seg_end   = results[0][1]
+
+            else:
+                print("ERROR! no segment found for: {}, {}".format(structureid, s))
 
         # find the genes for a range 
         results = getGenesForLocationRange( seg_start, seg_end )
@@ -428,11 +462,11 @@ def SampleArray(arrayID, arraySlice, begin, end, numsamples):
 def getGenesForLocationRange( start, end ):
     conn = db_connect.connect()
 
-    # find the genes for the entire range, or the single segment
+    # find the genes for the entire range
     query = conn.execute("SELECT gene_name from genes WHERE \
                             ( start BETWEEN ? AND ? ) OR ( end BETWEEN ? AND ? ) OR \
-                            ( start < ? AND end > ? ) ORDER BY gene_name", 
-                            start, end, start, end, start, end)
+                            ( start < ? AND end > ? ) OR ( start == ? ) or ( end == ? ) ORDER BY gene_name", 
+                            start, end, start, end, start, end, start, end)
 
     genes = []
     for g in query.cursor.fetchall():

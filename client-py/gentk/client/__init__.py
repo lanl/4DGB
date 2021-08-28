@@ -33,6 +33,13 @@ class client:
     def port(self, value):
         self._port = value
 
+    def get_project_interval(self):
+        response = requests.get('{}:{}/project/interval'.format(self.url, self.port)) 
+        jdata = json.loads(response.text)
+
+        return jdata
+
+
     def get_structure(self, sid):
         response = requests.get('{}:{}/data/structure/{}/segments'.format(self.url, self.port, sid)) 
         jdata = json.loads(response.text)
@@ -41,6 +48,13 @@ class client:
 
     def get_genes(self):
         response = requests.get('{}:{}/genes'.format(self.url, self.port)) 
+        jdata = json.loads(response.text)
+
+        return jdata
+
+    def get_gene_metadata(self, gene):
+        # get the data from the server
+        response = requests.get('{}:{}/gene/{}'.format(self.url, self.port, gene))
         jdata = json.loads(response.text)
 
         return jdata

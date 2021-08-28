@@ -8,6 +8,8 @@ pwd
 
 cp -rf ../../../client-py/* .
 cp ../../test_gentk.py .
+cp ../../test_gene-query.py .
 
-pytest -vv test_gentk.py
+# pytest -vv test_gentk.py
+pytest -vv test_gene-query.py
 

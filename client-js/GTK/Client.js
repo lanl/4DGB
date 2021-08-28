@@ -40,10 +40,28 @@ class Client {
     }
 
     //
+    // get the project interval 
+    //
+    get_project_interval(callback) {
+        fetch( this.url + ':' + this.port + '/project/interval' )
+            .then(response => response.json())
+            .then(data => callback(data))
+    }
+
+    //
     // get the genes for the current project 
     //
     get_genes(callback) {
         fetch( this.url + ':' + this.port + '/genes' )
+            .then(response => response.json())
+            .then(data => callback(data))
+    }
+
+    //
+    // get metadata for a gene
+    //
+    get_gene_metadata(callback, gene) {
+        fetch( this.url + ':' + this.port + '/gene/' + gene )
             .then(response => response.json())
             .then(data => callback(data))
     }
