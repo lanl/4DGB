@@ -443,7 +443,7 @@ def SegmentsForGene(names, structureid):
                 if (b[0] not in segments) :
                     segments.append(b[0])
         else:
-            print("SegmentsForGene did not find gene: ({})".format(name))
+            print("SegmentsForGene did not find gene: ({})".format(s))
 
     segments.sort()
     return jsonify({'segments': segments})

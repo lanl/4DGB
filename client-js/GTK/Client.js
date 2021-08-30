@@ -131,7 +131,7 @@ class Client {
     //
     //
     get_sampled_array(callback, arrayID, arraySlice, begin, end, numsamples) {
-        this._fetch(`/data/samplearray/${arryID}/${arraySlice}/${begin}/${end}/${numsamples}`);
+        this._fetch(`/data/samplearray/${arrayID}/${arraySlice}/${begin}/${end}/${numsamples}`);
     }
 
 }
