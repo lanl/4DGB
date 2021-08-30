@@ -53,6 +53,6 @@ function main( project ) {
 // create the project object and load data 
 //
 GTK.Project.TheProject = new GTK.Project( GTKProjectName );
-GTK.Client.TheClient  = new GTK.Client( "http://" + window.location.hostname, window.location.port);
+GTK.Client.TheClient  = new GTK.Client();
 
 main( GTK.Project.TheProject );
