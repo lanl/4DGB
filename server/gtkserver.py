@@ -49,7 +49,7 @@ if __file__ != '__main__':
 #
 def get_dataset_interval():
     interval = 0
-    with open(PROJECT_FILE, 'r') as pfile:
+    with open(PROJECT_FILE, 'r', encoding="utf-8" ) as pfile:
         data = json.load(pfile)
 
         interval = data["project"]["interval"]
@@ -58,7 +58,7 @@ def get_dataset_interval():
 
 def get_dataset_ids():
     datasets = []
-    with open(PROJECT_FILE, 'r') as pfile:
+    with open(PROJECT_FILE, 'r', encoding="utf-8" ) as pfile:
         data = json.load(pfile)
 
         for d in data["datasets"]:
@@ -92,7 +92,7 @@ def get_array_metadata(arrayID):
     if (len(results) != 0):
         fname = PROJECT_HOME + "/" + results[0][0]
 
-        with open(fname, "r") as jfile:
+        with open(fname, "r", encoding="utf-8" ) as jfile:
             array = json.load(jfile)
 
     return array
