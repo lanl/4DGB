@@ -10,9 +10,8 @@ class Client {
 
     static TheClient = null;
 
-    constructor( url, port ) {
-        this.url = url;
-        this.port = port;
+    constructor( host ) {
+        this.host = host;
     }
 
     set data(d) {
@@ -23,20 +22,11 @@ class Client {
         return this._data;
     }
 
-    set port(p) {
-        this._port = p;
-    }
-
-    get port() {
-        return this._port;
-    }
-
-    set url(u) {
-        this._url = u;
-    }
-
-    get url() {
-        return this._url;
+    _fetch(path, callback) {
+        const url = this.host !== undefined ? new URL(path, this.host) : path; 
+        fetch(url)
+            .then(response => response.json())
+            .then(data => callback(data));
     }
 
     //
@@ -52,9 +42,7 @@ class Client {
     // get the genes for the current project 
     //
     get_genes(callback) {
-        fetch( this.url + ':' + this.port + '/genes' )
-            .then(response => response.json())
-            .then(data => callback(data))
+        this._fetch('/genes', callback);
     }
 
     //
@@ -79,27 +67,21 @@ class Client {
     // get the genes for a list of segments 
     //
     get_genes_for_segments(callback, sid, segids) {
-        fetch( this.url + ':' + this.port + '/data/structure/' + sid + '/segment/' + segids + '/genes' )
-            .then(response => response.json())
-            .then(data => callback(data))
+        this._fetch(`/data/structure/${sid}/segment/${segids}/genes`, callback);
     }
 
     //
     // get segments for a list of genes 
     //
     get_segments_for_genes(callback, sid, genes) {
-        fetch( this.url + ':' + this.port + '/genes/' + genes + '/data/structure/' + sid )
-            .then(response => response.json())
-            .then(data => callback(data))
+        this._fetch(`/genes/${genes}/data/structure/${sid}`, callback);
     }
 
     //
     // get the contactmap for an id 
     //
     get_contactmap(callback, cmID) {
-        fetch( this.url + ':' + this.port + '/data/contact-map/' + cmID )
-            .then(response => response.json())
-            .then(data => callback(data))
+        this._fetch(`/data/contact-map/${cmID}`, callback);
     }
 
 
@@ -107,18 +89,14 @@ class Client {
     // get the structure for an ID
     //
     get_structure(callback, sid) {
-        fetch( this.url + ':' + this.port + '/data/structure/' + sid + "/segments" )
-            .then(response => response.json())
-            .then(data => callback(data))
+        this._fetch(`/data/structure/${sid}/segments`, callback);
     }
 
     //
     // get an array 
     //
     get_array(callback, arrayID, arraySlice) {
-        fetch( this.url + ':' + this.port + '/data/array/' + arrayID + '/' + arraySlice)
-            .then(response => response.json())
-            .then(data => callback(data))
+        this._fetch(`/data/array/${arrayID}/${arraySlice}`, callback);
     }
 
     //
@@ -139,27 +117,21 @@ class Client {
     // get all arrays
     //
     get_arrays(callback, type) {
-        fetch( this.url + ':' + this.port + '/data/arrays/' + type )
-            .then(response => response.json())
-            .then(data => callback(data))
+        this._fetch(`/data/arrays/${type}`, callback);
     }
 
     //
     // get dataset ids 
     //
     get_dataset_ids(callback) {
-        fetch( this.url + ':' + this.port + '/datasets' )
-            .then(response => response.json())
-            .then(data => callback(data))
+        this._fetch(`/datasets`, callback);
     }
 
     //
     //
     //
     get_sampled_array(callback, arrayID, arraySlice, begin, end, numsamples) {
-        fetch( this.url + ':' + this.port + '/data/samplearray/' + arrayID + '/' + arraySlice + '/' + begin + '/' + end + '/' + numsamples )
-            .then(response => response.json())
-            .then(data => callback(data))
+        this._fetch(`/data/samplearray/${arrayID}/${arraySlice}/${begin}/${end}/${numsamples}`, callback);
     }
 
 }

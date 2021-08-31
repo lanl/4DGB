@@ -36,7 +36,12 @@ DB_PATH = path.abspath(
 app = Flask(__name__)
 api = Api(app)
 
-db_connect = None
+# If not running as the test server, we can run connect
+# to the database now (for the test server, the connection
+# is made at the bottom of the file after DB_PATH has had
+# a chance to be overwritten by command-line arguments)
+if __file__ != '__main__':
+    db_connect = create_engine('sqlite:///'+DB_PATH)
 
 #
 # get the interval of the datasets for this project
@@ -44,7 +49,7 @@ db_connect = None
 #
 def get_dataset_interval():
     interval = 0
-    with open(PROJECT_FILE, 'r') as pfile:
+    with open(PROJECT_FILE, 'r', encoding="utf-8" ) as pfile:
         data = json.load(pfile)
 
         interval = data["project"]["interval"]
@@ -53,7 +58,7 @@ def get_dataset_interval():
 
 def get_dataset_ids():
     datasets = []
-    with open(PROJECT_FILE, 'r') as pfile:
+    with open(PROJECT_FILE, 'r', encoding="utf-8" ) as pfile:
         data = json.load(pfile)
 
         for d in data["datasets"]:
@@ -87,7 +92,7 @@ def get_array_metadata(arrayID):
     if (len(results) != 0):
         fname = PROJECT_HOME + "/" + results[0][0]
 
-        with open(fname, "r") as jfile:
+        with open(fname, "r", encoding="utf-8" ) as jfile:
             array = json.load(jfile)
 
     return array
@@ -108,6 +113,17 @@ def load_array_data(arrayID, arraySlice):
             # TODO: determine the correct behavior
 
     return array
+
+#
+# routes for serving static files
+#
+@app.route('/')
+def home():
+    return app.send_static_file('index.html')
+
+@app.route('/<path:path>')
+def root(path):
+    return app.send_static_file(path)
 
 #
 # return a list of the variables available
@@ -426,7 +442,7 @@ def SegmentsForGene(names, structureid):
                 if (b[0] not in segments) :
                     segments.append(b[0])
         else:
-            print("SegmentsForGene did not find gene: ({})".format(name))
+            print("SegmentsForGene did not find gene: ({})".format(s))
 
     segments.sort()
     return jsonify({'segments': segments})
@@ -483,15 +499,6 @@ def getGenesForLocationRange( start, end ):
 if __name__ == '__main__':
     import argparse
 
-    # Add routes for serving static files
-    @app.route('/')
-    def home():
-        return app.send_static_file('index.html')
-
-    @app.route('/<path:path>')
-    def root(path):
-        return app.send_static_file(path)
-
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
         description="gtkserver.py: GTK Testing Server"
@@ -515,10 +522,10 @@ if __name__ == '__main__':
     DB_PATH      = path.abspath(args.database)
     PROJECT_HOME = path.abspath(args.project)
 
+    db_connect = create_engine('sqlite:///'+DB_PATH)
+
     # cd to server directory
     chdir( path.dirname(__file__) )
-
-    db_connect = create_engine('sqlite:///'+DB_PATH)
 
     app.run(host=args.host, port=args.port)
 

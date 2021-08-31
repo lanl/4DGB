@@ -52,3 +52,7 @@ You can see the comparison app with the following URL `http://127.0.0.1:8000/com
 <div align="center">
 <img src="server/static/img/compare_test.00_thumb.png"></img>
 </div>
+
+## To run a public instance
+
+See the [Deployment Guide](doc/deployment.md)
