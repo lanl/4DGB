@@ -293,7 +293,7 @@ def GetGeneMetadata(name):
     # return all genes
     conn = db_connect.connect()
 
-    query = conn.execute("SELECT start,end,length,gID,gene_id,gene_type,gene_name from genes WHERE gene_name = ?", name)
+    query = conn.execute("SELECT start,end,length,gID,gene_type,gene_name from genes WHERE gene_name = ?", name)
     results = query.cursor.fetchone()
 
     data = {
@@ -301,9 +301,8 @@ def GetGeneMetadata(name):
             "end"       : results[1],
             "length"    : results[2],
             "gID"       : results[3],
-            "gene_id"   : results[4],
-            "gene_type" : results[5],
-            "gene_name" : results[6]
+            "gene_type" : results[4],
+            "gene_name" : results[5]
             }
 
 

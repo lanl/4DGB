@@ -199,14 +199,16 @@ if jsondata["data"]["annotations"]["url"] != "None":
         # start from scratch
     c.execute('''DROP TABLE IF EXISTS genes''')
         # create the table
-    c.execute('''CREATE TABLE genes (id INTEGER PRIMARY KEY AUTOINCREMENT, start INTEGER, end INTEGER, length INTEGER, gID TEXT, gene_id TEXT, gene_type TEXT, gene_name TEXT)''')
+    c.execute('''CREATE TABLE genes (id INTEGER PRIMARY KEY AUTOINCREMENT, start INTEGER, end INTEGER, length INTEGER, gID TEXT, gene_type TEXT, gene_name TEXT)''')
 
     # populate the table from a file
     infile = os.path.join( project, jsondata["data"]["annotations"]["url"])
-    insert = '''INSERT INTO genes (start,end,length,gID,gene_id,gene_type,gene_name) VALUES(?,?,?,?,?,?,?)'''
+    insert = '''INSERT INTO genes (start,end,length,gID,gene_type,gene_name) VALUES(?,?,?,?,?,?)'''
     print("Creating genes table ...")
     print("    reading: {}".format(infile))
     with open(infile, 'r') as indata:
+        alltypes = []
+        noname_types = []
         for l in indata:
             data = l.strip()
             v = re.split(r'\t+', data) 
@@ -215,15 +217,30 @@ if jsondata["data"]["annotations"]["url"] != "None":
             #       this works on version 3 of the format
 
             # check the type
+            excluded_types = [
+                                'biological_region',
+                                'CDS',
+                                'chromosome',
+                                'exon',
+                                'five_prime_UTR',
+                                'pseudogene',
+                                'pseudogenic_transcript',
+                                'three_prime_UTR',
+                                'unconfirmed_transcript'
+                             ]
             if (len(v) > 1):
-                if (v[2] == "gene"):
-                    # print(l)
+
+                # if you need to keep track of the types, you can print this out
+                if v[2] not in alltypes:
+                    alltypes.append(v[2])
+
+                if (v[2] not in excluded_types): 
                     pairs = v[8].split(";")
                     values = {}
                     for p in pairs:
                         (key, value) = p.split("=")
                         values[key] = value
-                        
+
                     # check for possible errors
                     # this is obsolete, but is left in as a reminder that checks on data
                     # should be integrated into this process
@@ -235,8 +252,28 @@ if jsondata["data"]["annotations"]["url"] != "None":
 
                     # insert the data into the table
                     length = int(v[4]) - int(v[3])
-                    c.execute(insert, [v[3], v[4], length, values["ID"], values["gene_id"], values["biotype"], values["Name"]] ) 
 
+                    # get the name
+                    name = "unknown"
+                    if "Name" in values:
+                        name = values["Name"]
+                    elif "logic_name" in values:
+                        name = values["logic_name"] 
+                    else:
+                        # collect the list of unnamed types
+                        if v[2] not in noname_types:
+                            noname_types.append(v[2])
+
+                        # optionally print out anything without a name
+                        # print("No name found: {}".format(l))
+
+                    c.execute(insert, [v[3], v[4], length, values["ID"], values["biotype"], name]) 
+        # if you want the list output
+        # noname_types.sort()
+        # print(noname_types)
+        # if you want the list output
+        # alltypes.sort()
+        # print(alltypes)
 else:
     print("No annotation data")
 
