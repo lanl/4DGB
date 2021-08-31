@@ -137,7 +137,7 @@ function setVariable( id ) {
 function segmentChanged(e) {
     var segments = e.map(i=>Number(i)); 
     for (let i = 0; i < TheNumPanels; i++) {
-        ThePanels[i].geometrycanvas.geometry.setSegmentStates( segments, SegmentState.LIVE, SegmentState.GHOST );
+        ThePanels[i].geometrycanvas.geometry.setSegmentStates( segments, GTK.Segment.State.LIVE, GTK.Segment.State.GHOST );
         ThePanels[i].geometrycanvas.render();
     }
 }
@@ -147,7 +147,7 @@ function locationChanged(e) {
     var lrange = e.split("-").map(Number);
     var segments = getSegmentsForLocationRange( lrange );
     for (let i = 0; i < TheNumPanels; i++) {
-        ThePanels[i].geometrycanvas.geometry.setSegmentStates( segments, SegmentState.LIVE, SegmentState.GHOST );
+        ThePanels[i].geometrycanvas.geometry.setSegmentStates( segments, GTK.Segment.State.LIVE, GTK.Segment.State.GHOST );
         ThePanels[i].geometrycanvas.render();
     }
 }
@@ -155,7 +155,7 @@ function locationChanged(e) {
 function geneChanged(e) {
     for (let i = 0; i < TheNumPanels; i++) {
         GTK.Client.TheClient.get_segments_for_genes( (response) => {
-                ThePanels[i].geometrycanvas.geometry.setSegmentStates( response["segments"], SegmentState.LIVE, SegmentState.GHOST );
+                ThePanels[i].geometrycanvas.geometry.setSegmentStates( response["segments"], GTK.Segment.State.LIVE, GTK.Segment.State.GHOST );
                 ThePanels[i].geometrycanvas.render();
             }, i, e); 
     }

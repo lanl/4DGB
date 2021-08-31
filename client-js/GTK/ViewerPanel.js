@@ -30,6 +30,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const Client = require('./Client');
 const ContactMapCanvas = require('./ContactMapCanvas');
 const GeometryCanvas = require('./GeometryCanvas');
+const Segment = require('./Segment');
 
 class ViewerPanel {
 
@@ -72,7 +73,7 @@ class ViewerPanel {
                     segments[i] = true;
             }
             const ids = Object.keys(segments).map( d => parseInt(d) );
-            this.geometrycanvas.setSegmentStates( ids, SegmentState.LIVE, SegmentState.GHOST );
+            this.geometrycanvas.setSegmentStates( ids, Segment.State.LIVE, Segment.State.GHOST );
             this.geometrycanvas.render();
         }).bind(this);
     }
