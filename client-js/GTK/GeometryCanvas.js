@@ -141,6 +141,9 @@ class GeometryCanvas {
             } else if (curLight["type"] == "ambient") {
                 var light = new THREE.AmbientLight(curLight["color"], curLight["intensity"]);
                 this.scene.add(light);
+            } else {
+                // report ignored light type, but this is not an error 
+                console.log("Unknown light type in project: " + curLight["type"])
             }
         }
 

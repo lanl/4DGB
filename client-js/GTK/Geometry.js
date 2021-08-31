@@ -32,6 +32,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 require('three/examples/js/math/Lut');
 
 const ArrowSegment = require('./ArrowSegment');
+const CurveSegment = require('./CurveSegment');
 const Client = require('./Client');
 
 class Geometry {
@@ -62,6 +63,7 @@ class Geometry {
             // this.segments is a dictionary because:
             // 1. the indices are not zero-based (they start at 1) 
             // 2. the indices may not be consecutive over the entire set of segments
+        this.segmentType = 'curve'; 
         this.segments = {};
         this.LUT = new THREE.Lut( s["colormap"]["name"], s["colormap"]["divs"] );
         this.opacityClamp = s["colormap"]["opacity-clamp"]
@@ -92,7 +94,7 @@ class Geometry {
     setSegmentVisible( segments, state ) {
         for (const s of segments) {
             if (s in this.segments) {
-                this.segments[s].setVisible(state);
+                this.segments[s].visible = state;
             }
         }
     }
@@ -122,18 +124,68 @@ class Geometry {
         var center = new THREE.Vector3(0.0, 0.0, 0.0);
 
         Client.TheClient.get_structure( (response) => {
-            for (var s of response["segments"]) {
-                let startPoint = new THREE.Vector3(s['start'][0], s['start'][1], s['start'][2]);
-                let endPoint   = new THREE.Vector3(s['end'][0], s['end'][1], s['end'][2]);
-                center.add(endPoint);
+            if (this.segmentType == "arrow") {
+                for (var s of response["segments"]) {
 
-                const newSeg = new ArrowSegment(s['segid'], startPoint, endPoint, ArrowSegment.RadiusBegin, ArrowSegment.RadiusEnd); 
-                newSeg.addToParent(this.root);
-                this.segments[s['segid']] = newSeg;
+                    let points = {
+                        'start': new THREE.Vector3(s['start'][0], s['start'][1], s['start'][2]),
+                        'end'  : new THREE.Vector3(s['end'][0], s['end'][1], s['end'][2])
+                    }
+                    center.add(points['end']);
+                    var radius = {
+                        'start': ArrowSegment.RadiusBegin, 
+                        'end'  : ArrowSegment.RadiusEnd 
+                    }
+                    const newSeg = new ArrowSegment(s['segid'], points, radius); 
+                    newSeg.addToParent(this.root);
+                    this.segments[s['segid']] = newSeg;
+                }
+            } else if (this.segmentType == "curve") {
+                var segArray = {};
+                // HACK: for now, make a new data structure that can be accessed with IDs
+                for (var s of response["segments"]) {
+                    segArray[s["segid"]] = s;
+                }
+
+                let defPoint = {
+                    'start' : [0.0, 0.0, 0.0], 
+                    'end'   : [0.0, 0.0, 0.0] 
+                }
+                let numSegs = Object.keys(segArray).length;
+                for (var i=1;i<=numSegs;i++) {
+                    let pSeg = defPoint; 
+                    let cSeg = segArray[i];
+                    let nSeg = defPoint; 
+                    if ( i == 1 ) {
+                        nSeg = segArray[i+1];
+                    } else if (i == numSegs) { 
+                        pSeg = segArray[i-1];
+                        nSeg = defPoint; 
+                    } else {
+                        pSeg = segArray[i-1];
+                        nSeg = segArray[i+1];
+                    }
+
+                    // gather the four points required by the C/R object
+                    let points = {
+                        '0' : new THREE.Vector3(pSeg['start'][0], pSeg['start'][1], pSeg['start'][2]),
+                        '1' : new THREE.Vector3(cSeg['start'][0], cSeg['start'][1], cSeg['start'][2]),
+                        '2' : new THREE.Vector3(cSeg['end'][0],   cSeg['end'][1],   cSeg['end'][2]),
+                        '3' : new THREE.Vector3(nSeg['end'][0],   nSeg['end'][1],   nSeg['end'][2]),
+                    }
+
+                    center.add(points['1'])
+                    const newSeg = new CurveSegment(i, points, 0.01); 
+                    newSeg.addToParent(this.root);
+                    this.segments[i] = newSeg;
+                }
+            } else {
+                // TODO: report error
             }
 
             // compute centroid
-            this.centroid = center.divideScalar(this.getNumSegments()); 
+            var numSegs = this.getNumSegments(); 
+            this.centroid = center.divideScalar(numSegs);
             
             if (caller != "None") {
                 caller.postLoad(caller);

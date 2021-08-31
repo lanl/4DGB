@@ -29,6 +29,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+const Segment = require('./Segment');
 const ArrowSegment = require('./ArrowSegment');
 
 //
@@ -57,14 +58,15 @@ class Project {
         // set up class constants, etc.
         var app = this.getApplicationData("gtk")
         var g   = app["geometrycanvas"]["geometry"]["segment"]["glyph"]
-        ArrowSegment.EndpointRadius = g["endpoint"]["radius"]; 
-        ArrowSegment.GeomEndpoint   = new THREE.SphereBufferGeometry( g["endpoint"]["radius"], 
-                                                                        g["endpoint"]["segments"], 
-                                                                        g["endpoint"]["segments"] );
-        ArrowSegment.GhostOpacity   = g["ghost"]["opacity"];
         ArrowSegment.RadiusBegin    = g["span"]["radius-beg"];
         ArrowSegment.RadiusEnd      = g["span"]["radius-end"];
-        ArrowSegment.Color          = new THREE.Color(parseInt(g["color"]));
+        // HACK set super class
+        Segment.Color          = new THREE.Color(parseInt(g["color"]));
+        Segment.EndpointRadius = g["endpoint"]["radius"]; 
+        Segment.GeomEndpoint   = new THREE.SphereBufferGeometry( g["endpoint"]["radius"], 
+                                                                 g["endpoint"]["segments"], 
+                                                                 g["endpoint"]["segments"] );
+        Segment.GhostOpacity   = g["ghost"]["opacity"];
     }
 
     getInterval() {
