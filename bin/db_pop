@@ -231,24 +231,23 @@ if jsondata["data"]["annotations"]["url"] != "None":
                              ]
             # old behavior (only 'gene' is not excluded)
             excluded_types = [ 
-                                'chromosome', 
-                                'gene', 
-                                'mRNA', 
-                                'five_prime_UTR', 
-                                'exon', 
-                                'CDS', 
-                                'three_prime_UTR', 
-                                'pseudogene', 
-                                'pseudogenic_transcript', 
                                 'biological_region', 
-                                'ncRNA_gene', 
+                                'CDS', 
+                                'chromosome', 
+                                'exon', 
+                                'five_prime_UTR', 
                                 'lnc_RNA', 
                                 'miRNA', 
+                                'mRNA', 
+                                'ncRNA', 
+                                'ncRNA_gene', 
+                                'pseudogene', 
+                                'pseudogenic_transcript', 
                                 'rRNA', 
+                                'scRNA', 
                                 'snoRNA', 
                                 'snRNA', 
-                                'scRNA', 
-                                'ncRNA', 
+                                'three_prime_UTR', 
                                 'unconfirmed_transcript'
                             ]
 
