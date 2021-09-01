@@ -149,6 +149,7 @@ class ControlPanel extends EventEmitter {
         var cell = row.insertCell(2);
         this.genechoice = document.createElement("select");
         this.genechoice.setAttribute("type", "text");
+        // this.genechoice.className = "gtkcontrolpanelselect";
         cell.appendChild(this.genechoice);
         this.genechoice.addEventListener('change', (function (e) { this.addGene(e) }).bind(this));
         this.updateGeneNames(project);
@@ -201,8 +202,10 @@ class ControlPanel extends EventEmitter {
         name.innerHTML = "Variable";
 
         var cell = row.insertCell(1);
+        cell.colSpan = 2;
         this.variablechoice = document.createElement("select");
         this.variablechoice.setAttribute("type", "text");
+        // this.variablechoice.className = "gtkcontrolpanelselect";
         cell.appendChild(this.variablechoice);
         this.variablechoice.addEventListener('change', (function (e) { this.onVariableSelect(e) }).bind(this));
         this.updateArrayNames();

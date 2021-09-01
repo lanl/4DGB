@@ -83,6 +83,10 @@ div.gtk { padding: 5px;
     position: relative;
     margin: 5px;
     line-height: 0;
+    border-style: solid;
+    border-color: #000000;
+    border-width: 1px;
+    border-radius: 5px;
 }
 
 .gtkoverlay {
@@ -118,8 +122,6 @@ div.gtk { padding: 5px;
 }
 
 .gtkgeometrycanvas, .gtkviewcanvas {
-    border: 1px solid black;
-    border-radius: 5px;
 }
 
 .gtktrackscontainer {
@@ -187,4 +189,8 @@ div.gtk { padding: 5px;
 
 .gtkcontroltable {
     width: 300px;
+}
+
+.gtkcontrolpanelselect {
+    width: 150px;
 }
