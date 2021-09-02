@@ -6,6 +6,7 @@ import os
 import json
 import sys
 from math import nan
+import pandas as pd
 
 #
 # handle command line arguments
@@ -218,7 +219,7 @@ if jsondata["data"]["annotations"]["url"] != "None":
 
             # check the type
             # new behavior (currently breaks all tests, to be updated ...)
-            excluded_types = [
+            new_excluded_types = [
                                 'biological_region',
                                 'CDS',
                                 'chromosome',
@@ -230,6 +231,7 @@ if jsondata["data"]["annotations"]["url"] != "None":
                                 'unconfirmed_transcript'
                              ]
             # old behavior (only 'gene' is not excluded)
+            # removing ncRNA_gene
             excluded_types = [ 
                                 'biological_region', 
                                 'CDS', 
@@ -240,7 +242,6 @@ if jsondata["data"]["annotations"]["url"] != "None":
                                 'miRNA', 
                                 'mRNA', 
                                 'ncRNA', 
-                                'ncRNA_gene', 
                                 'pseudogene', 
                                 'pseudogenic_transcript', 
                                 'rRNA', 
@@ -291,12 +292,20 @@ if jsondata["data"]["annotations"]["url"] != "None":
                         # print("No name found: {}".format(l))
 
                     c.execute(insert, [v[3], v[4], length, values["ID"], values["biotype"], name]) 
-        # if you want the list output
-        # noname_types.sort()
-        # print(noname_types)
-        # if you want the list output
-        # alltypes.sort()
-        # print(alltypes)
+
+    # ---------------------------------------------------------
+    # if there is an annotations file, insert that data as well
+    # ---------------------------------------------------------
+    annotations_file = os.path.join( project, "source/annotations.csv" ) 
+    if os.path.isfile(annotations_file):
+        print("    processing annotations file: {}".format(annotations_file))
+        df = pd.read_csv(annotations_file)
+        for e in df.to_dict(orient='records'):
+            c.execute(insert, [ int(e['start']), int(e['end']), 
+                                int(e['end']) - int(e['start']),
+                                e['id'], e['type'], e['name'] ] 
+                     )
+
 else:
     print("No annotation data")
 
