@@ -37,4 +37,4 @@ jobs:
         python3 release/test.00/server/gtkserver.py &
         sleep 5
         ls -la
-        pytest testing/test_gentk.py 
+        pytest testing/test_gentk_debug.py 

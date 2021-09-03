@@ -7,7 +7,7 @@ var fs = require('fs');
 //
 test('client test', () => {
     // test.00
-    client = new Client("http://127.0.0.1", 8000);
+    client = new Client("http://127.0.0.1:8000");
 
     client.get_structure_arrays( (response) => {
                             var streamname = "gtkclient_get-structure-arrays_test.json";
