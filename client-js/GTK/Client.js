@@ -8,6 +8,7 @@ const fetch = require('node-fetch');
  */
 class Client {
 
+    /** @type Client */
     static TheClient = null;
 
     constructor( host, options ) {
