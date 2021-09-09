@@ -10,8 +10,12 @@ class Client {
 
     static TheClient = null;
 
-    constructor( host ) {
+    constructor( host, options ) {
         this.host = host;
+
+        if (options && options.auth) {
+            this.auth = `Basic ${Buffer.from(options.auth).toString("base64")}`
+        }
     }
 
     set data(d) {
@@ -23,8 +27,14 @@ class Client {
     }
 
     _fetch(path, callback) {
-        const url = this.host !== undefined ? new URL(path, this.host) : path; 
-        fetch(url)
+        const url = this.host !== undefined ? new URL(path, this.host) : path;
+        const options = this.auth ? {
+            headers: {
+                'Authorization': this.auth
+            }
+        } : undefined;
+
+        fetch(url, options)
             .then(response => response.json())
             .then(data => callback(data));
     }
@@ -33,9 +43,7 @@ class Client {
     // get the project interval 
     //
     get_project_interval(callback) {
-        fetch( this.url + ':' + this.port + '/project/interval' )
-            .then(response => response.json())
-            .then(data => callback(data))
+        this._fetch('/project/interval', callback)
     }
 
     //
@@ -49,18 +57,14 @@ class Client {
     // get metadata for a gene
     //
     get_gene_metadata(callback, gene) {
-        fetch( this.url + ':' + this.port + '/gene/' + gene )
-            .then(response => response.json())
-            .then(data => callback(data))
+        this._fetch(`/gene/${gene}`, callback)
     }
 
     //
     // get the genes for a list of segments 
     //
     get_genes_for_locations(callback, sid, locations) {
-        fetch( this.url + ':' + this.port + '/data/structure/' + sid + '/locations/' + locations + '/genes' )
-            .then(response => response.json())
-            .then(data => callback(data))
+        this._fetch(`/data/structure/${sid}/locations/${locations}/genes`, callback)
     }
 
     //
