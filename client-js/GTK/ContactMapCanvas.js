@@ -280,6 +280,51 @@ class ContactMapCanvas {
     }
 
     /**
+     * Set the selection within the canvas.
+     * 
+     * This takes its 'segments' parameter in the same format that GeometryCanvas does,
+     * i.e. As an array of segment IDs to be included in the selection. This takes the first
+     * contiguous set of segment IDs that it finds in the list and uses that to set the
+     * brush selection.
+     * 
+     * TODO: In the future, we'll have a better method/format for components to communicate
+     * selections with one-another, at which point we should revisit this function.
+     * 
+     * @param {Number[]} segments
+     */
+    setSelection(segments) {
+
+        // Determine selection range
+        let selection = null;
+        for (let i in segments) {
+            if (i == 0) {
+                // First segment marks the start of the selection
+                // (if that's the only segment, it will also mark the end)
+                selection = [ segments[0], segments[0] ]
+            }
+            else if (segments[i] == segments[i-1]+1) {
+                // Extend the end of the selection while the segments are continous
+                selection[1] = segments[i]
+            }
+            else {
+                break;
+            }
+        }
+
+        if (selection !== null) {
+            // Rephrase the selection as coordinates of the selection box's corners
+            // then rescale to pixels
+            selection = [
+                [ selection[0], selection[0] ],
+                [ selection[1], selection[1] ]
+            ];
+            selection = this._scaleBrushSelection( selection, this.xScale, this.yScale);
+        }
+
+        this.brush.move( this.brushSVG, selection, new Event("setSelection") );
+    }
+
+    /**
      * Called automatically after contact map data has been loaded
      * @param {ContactMap} contactMap 
      */
@@ -346,8 +391,12 @@ class ContactMapCanvas {
         // If there isn't a handler set, then just forget it
         if (this.onSelectionChange === undefined) return;
 
-        // Ignore if the brush moved as a result of panning or zooming
-        if (event.sourceEvent && event.sourceEvent.type === 'zoom') return;
+        // Ignore if the brush moved as a result of panning/zooming
+        // or from calling the 'setSelection' method
+        if (event.sourceEvent && (
+            event.sourceEvent.type === 'zoom' ||
+            event.sourceEvent.type === 'setSelection'
+        )) return;
 
         // event.selection defines the coorindates (in pixels) of the corners of the
         // selection. We convert that to the extents of the selection along each axis
