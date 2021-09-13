@@ -98,7 +98,6 @@ def test_get_genes():
     result = client.get_genes()
     ogResult = '1600025M17Rik'
     assert (result['genes'][0] == ogResult) 
-    assert (len(result['genes']) == 100) 
 
 def test_get_array():
     tests = [
