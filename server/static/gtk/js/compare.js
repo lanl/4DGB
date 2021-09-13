@@ -122,6 +122,23 @@ function linkCameras(a, b) {
     });
 }
 
+/**
+ * Given two ViewerPanels, link their selections so that changing the contact map selection in
+ * one will change the other.
+ * @param {ViewerPanel} a 
+ * @param {ViewerPanel} b 
+ */
+function linkContactMaps(a, b) {
+    a.contactmapcanvas.addListener('selectionChanged', (selection) => {
+        b.setSelection(selection);
+        b.contactmapcanvas._syncBrush(a.contactmapcanvas);
+    });
+    b.contactmapcanvas.addListener('selectionChanged', (selection) => {
+        a.setSelection(selection);
+        a.contactmapcanvas._syncBrush(b.contactmapcanvas);
+    });
+}
+
 function setVariable( id ) {
     GTK.Client.TheClient.get_array( (response) => {
             ThePanels[0].geometrycanvas.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
@@ -137,9 +154,7 @@ function setVariable( id ) {
 function segmentChanged(e) {
     var segments = e.map(i=>Number(i)); 
     for (let i = 0; i < TheNumPanels; i++) {
-        ThePanels[i].geometrycanvas.geometry.setSegmentStates( segments, GTK.Segment.State.LIVE, GTK.Segment.State.GHOST );
-        ThePanels[i].geometrycanvas.render();
-        ThePanels[i].contactmapcanvas.setSelection(segments);
+        ThePanels[i].setSelection(segments);
     }
 }
 
@@ -148,19 +163,15 @@ function locationChanged(e) {
     var lrange = e.split("-").map(Number);
     var segments = getSegmentsForLocationRange( lrange );
     for (let i = 0; i < TheNumPanels; i++) {
-        ThePanels[i].geometrycanvas.geometry.setSegmentStates( segments, GTK.Segment.State.LIVE, GTK.Segment.State.GHOST );
-        ThePanels[i].geometrycanvas.render();
-        ThePanels[i].contactmapcanvas.setSelection(segments);
+        ThePanels[i].setSelection(segments);
     }
 }
 
 function geneChanged(e) {
     for (let i = 0; i < TheNumPanels; i++) {
         GTK.Client.TheClient.get_segments_for_genes( (response) => {
-                ThePanels[i].geometrycanvas.geometry.setSegmentStates( response["segments"], GTK.Segment.State.LIVE, GTK.Segment.State.GHOST );
-                ThePanels[i].geometrycanvas.render();
-                ThePanels[i].contactmapcanvas.setSelection( response["segments"]);
-            }, i, e); 
+                ThePanels[i].setSelection( response["segments"] );
+        }, i, e);
     }
 }
 
@@ -214,6 +225,7 @@ function main( project ) {
     // connections
         // camera
     linkCameras(ThePanels[0].geometrycanvas, ThePanels[1].geometrycanvas);
+    linkContactMaps(ThePanels[0], ThePanels[1])
         // events
     TheControls.addListener( "locationChanged",        locationChanged );
     TheControls.addListener( "geneChanged",            geneChanged );

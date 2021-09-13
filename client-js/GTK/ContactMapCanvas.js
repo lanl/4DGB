@@ -32,6 +32,8 @@ const Project = require('./Project');
 const Dataset = require('./Dataset');
 const ContactMap = require('./ContactMap');
 
+const EventEmitter = require('events');
+
 /**
  * @class ContactMapCanvas
  * 
@@ -41,20 +43,26 @@ const ContactMap = require('./ContactMap');
  * down the spacebar, then they can use the scroll wheel to zoom in or out of the image and
  * click-and-drag to pan across it.
  * 
- * You can listen to changes in the selection made on the map by assigning a function to
- * the onSelectionChange property.
+ * This class is also an EventEmitter, you can add a listener to the 'selectionChanged' event
+ * to listen for changes made in the selection. This will be called with an array as an argument
+ * where each element is a Segment ID to be included in the selection.
+ * 
+ * TODO: The format for representing selections is meant to match the format used by the
+ * GeometryCanvas class, and isn't really ideal for the ContactMap. In the future, we should have
+ * an actual type that can represent Selections for either in a more efficient way.
  */
-class ContactMapCanvas {
+class ContactMapCanvas extends EventEmitter {
 
     /**
      * The DOM layout of the widget looks like this:
      *      div (this.contdiv)
-     *          - svg (this.baseSVG)
-     *              - g (xaxis)
-     *              - g (yaxis)
-     *          - canvas
-     *          - svg (this.brushSVG)
-     *          - svg (this.zoomSVG)
+     *          - div (this.boundingDiv)
+        *          - svg (this.baseSVG)
+        *              - g (xaxis)
+        *              - g (yaxis)
+        *          - canvas
+        *          - svg (this.brushSVG)
+        *          - svg (this.zoomSVG)
      * 
      * Click-and-drag selection, and zooming/panning are implemented using D3's brush and zoom
      * tools respectively. However, brush and zoom aren't normally designed to work together, so
@@ -92,6 +100,7 @@ class ContactMapCanvas {
      * @param {String} rootElemID The DOM ID of the element this will be appended to.
      */
     constructor(project, dataset, rootElemID) {
+        super();
         const self = this;
 
         /** Div containing all the contents of the contact map widget */
@@ -252,25 +261,6 @@ class ContactMapCanvas {
             // #CCCCCC in order to use it with the canvas context 
         this.background = "#" + this.displayOpts["background"].substring(2); 
 
-        /**
-         * Another class can set this property to enable a listener for when the selection changes.
-         * This will be called as the selection changes with an array of arrays as an argument
-         * formatted like so:
-         * 
-         *      [ [ x1, x2 ], [ y1, y2] ]
-         * 
-         * Where:
-         * 
-         *      x1 is the start of the selected range along the x-axis
-         *      x2 is the end of the selected range along the x-axis
-         *      y1 is the start of the selected range along the y-axis
-         *      y2 is the end of the selected range along the y-axis
-         * 
-         * These values are in terms of bin-number, although they may not be whole numbers
-         * for cases where the user has drawn a selection over just a part of a bin.
-         */
-        this.onSelectionChange = null;
-
         // Load data
         ContactMap.loadNew( dataset.md_contact_mp )
             .then( (contactMap) => this._afterLoad(contactMap) );
@@ -284,44 +274,68 @@ class ContactMapCanvas {
      * 
      * This takes its 'segments' parameter in the same format that GeometryCanvas does,
      * i.e. As an array of segment IDs to be included in the selection. This takes the first
-     * contiguous set of segment IDs that it finds in the list and uses that to set the
+     * two contiguous sets of segment IDs that it finds in the list and uses that to set the
      * brush selection.
      * 
-     * TODO: In the future, we'll have a better method/format for components to communicate
-     * selections with one-another, at which point we should revisit this function.
+     * Calling this function will *NOT* trigger the 'selectionChanged' event.
      * 
      * @param {Number[]} segments
      */
-    setSelection(segments) {
+    setSelection(segments, event) {
 
-        // Determine selection range
+        // Split an array of integers, into an array of arrays specifying the ranges of
+        // continous stretches of numbers.
+        function splitIntoRanges(array) {
+            if (array === undefined || array.length === 0) return [];
+            
+            const ranges = [ [array[0],array[0]] ];
+            if (array.length === 1) return ranges;
+
+            let currentRange = 0;
+            for (let i = 1; i < array.length; i++) {
+                if ( segments[i] === segments[i-1]+1) { // continue this range
+                    ranges[currentRange][1] = segments[i];
+                }
+                else { // start the next range
+                    ranges[++currentRange] = [segments[i],segments[i]];
+                }
+            }
+            return ranges;
+        }
+
+        const ranges = splitIntoRanges(segments);
+        if (ranges.length === 1) {
+            // If there was only one range, we set the second part of the selection equal to it
+            ranges[1] = ranges[0];
+        }
+
         let selection = null;
-        for (let i in segments) {
-            if (i == 0) {
-                // First segment marks the start of the selection
-                // (if that's the only segment, it will also mark the end)
-                selection = [ segments[0], segments[0] ]
-            }
-            else if (segments[i] == segments[i-1]+1) {
-                // Extend the end of the selection while the segments are continous
-                selection[1] = segments[i]
-            }
-            else {
-                break;
-            }
+        if (ranges.length >= 2) {
+            selection = this._scaleBrushSelection([
+                [ ranges[0][0], ranges[1][0] ],
+                [ ranges[0][1], ranges[1][1] ]
+            ], this.xScale, this.yScale)
         }
 
-        if (selection !== null) {
-            // Rephrase the selection as coordinates of the selection box's corners
-            // then rescale to pixels
-            selection = [
-                [ selection[0], selection[0] ],
-                [ selection[1], selection[1] ]
-            ];
-            selection = this._scaleBrushSelection( selection, this.xScale, this.yScale);
-        }
-
+        // Move brush
         this.brush.move( this.brushSVG, selection, new Event("setSelection") );
+    }
+
+    /**
+     * Set the brush selection in this contact map to be the same as the brush selection
+     * in another contact map widget. This will *NOT* trigger a 'selectionChanged' event.
+     * 
+     * Since there are multiple ways a selection of the same regions can be represented on the map,
+     * having a contact map set the selection of another through 'selectionChanged' event and
+     * setSelection method is not sufficient, since the second contact map's brush will usually
+     * be a different shape than the first's (even though it marks out an equivalent region). So
+     * this method exists as a hack to force the brushes of two contact maps to match.
+     * 
+     * @param {ContactMapCanvas} other 
+     */
+    _syncBrush(other) {
+        const otherSelection = d3.brushSelection(other.brushSVG.node());
+        this.brush.move( this.brushSVG, otherSelection, new Event("syncBrush") );
     }
 
     /**
@@ -384,49 +398,51 @@ class ContactMapCanvas {
 
     /**
      * Handler for the d3-brush "brush" event, called whenever the
-     * selection changes.
+     * brush selection changes.
      * ( call so that 'this' still refers to this ContactMapCanvas instance ) 
      */
     _onBrush(event) {
-        // If there isn't a handler set, then just forget it
-        if (this.onSelectionChange === undefined) return;
-
         // Ignore if the brush moved as a result of panning/zooming
-        // or from calling the 'setSelection' method
+        // or from calling an internal method.
         if (event.sourceEvent && (
             event.sourceEvent.type === 'zoom' ||
-            event.sourceEvent.type === 'setSelection'
+            event.sourceEvent.type === 'setSelection' ||
+            event.sourceEvent.type === 'syncBrush'
         )) return;
 
         // event.selection defines the coorindates (in pixels) of the corners of the
-        // selection. We convert that to the extents of the selection along each axis
-        // (in bin numbers)
+        // selection. We convert that an array of segmentIDs that are included in the selection.
+        // (it's inefficient, but this is the same format that the GeometryCanvas class accepts)
 
-        const selection = event.selection;
-        let selected;
-
-        if (selection === null) {
+        const bounds = this.contactMap.bounds;
+        let extents;
+        if (event.selection === null) {
             // No selection with the brush is equivalent to just selecting the whole area
-            selected = [ this.xScaleOriginal.domain(), this.yScaleOriginal.domain() ]
+            extents = [
+                [ bounds.x, bounds.x+bounds.width-1  ],
+                [ bounds.y, bounds.y+bounds.height-1 ]
+            ]
         }
         else {
-            const coords = this._scaleBrushSelection(selection, this.xScale.invert, this.yScale.invert);
-            selected = [
-                [ coords[0][0], coords[1][0] ],
-                [ coords[0][1], coords[1][1] ]
-            ];
+            // Otherwise, get extents from brush selection
+            let [ [x1,y1],[x2,y2] ] = this._scaleBrushSelection(event.selection, this.xScale.invert, this.yScale.invert);
+            // Clamp selection to boundaries
+            x1 = Math.max( bounds.x,                     Math.floor(x1) );
+            x2 = Math.min( bounds.x + bounds.width - 1,  Math.ceil(x2)  );
+            y1 = Math.max( bounds.y,                     Math.floor(y1) );
+            y2 = Math.min( bounds.y + bounds.height - 1, Math.ceil(y2)  );
+            extents = [ [x1,x2], [y1,y2] ];
         }
 
-        // Clamp selection to boundaries
-        const rect = this.contactMap.bounds;
-        selected[0][0] = Math.max( rect.x,                   selected[0][0] );
-        selected[0][1] = Math.min( rect.x + rect.width - 1,  selected[0][1] )
-        selected[1][0] = Math.max( rect.y,                   selected[1][0] );
-        selected[1][1] = Math.min( rect.y + rect.height - 1, selected[1][1] )
+        let segments = {}; //segments is an object/hash initially to avoid duplicates
+        for (let extent of extents) {
+            for (let i = extent[0]; i <= extent[1]; i++) segments[i] = true;
+        }
 
-        //console.log(`Selection: (X: ${selected[0][0]} - ${selected[0][1]} ) (Y: ${selected[1][0]} - ${selected[1][1]} )`)
+        // change segments to array of IDs
+        segments = Object.keys(segments).map( d => parseInt(d) );
 
-        this.onSelectionChange(selected);
+        this.emit('selectionChanged', segments);
     }
 
     /**

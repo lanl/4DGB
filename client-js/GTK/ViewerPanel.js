@@ -60,22 +60,24 @@ class ViewerPanel {
         this.contactmapcanvas = new ContactMapCanvas( project, dataset, cm_elem.id )
 
         // Update view when selection in contact map changes
-        this.contactmapcanvas.onSelectionChange = (function(selection) {
-            const segments = {};
-            const [ [x1,x2], [y1,y2] ] = selection; // start/end coordinates for the selection on each axis
-
-            for (let i = Math.floor(x1); i <= Math.ceil(x2); i++ ) {
-                if (!segments[i])
-                    segments[i] = true;
-            }
-            for (let i = Math.floor(y1); i <= Math.ceil(y2); i++ ) {
-                if (!segments[i])
-                    segments[i] = true;
-            }
-            const ids = Object.keys(segments).map( d => parseInt(d) );
-            this.geometrycanvas.setSegmentStates( ids, Segment.State.LIVE, Segment.State.GHOST );
+        this.contactmapcanvas.addListener('selectionChanged', (function(selection) {
+            this.geometrycanvas.setSegmentStates( selection, Segment.State.LIVE, Segment.State.GHOST );
             this.geometrycanvas.render();
-        }).bind(this);
+        }).bind(this) );
+    }
+
+    /**
+     * Sets the selection within this panel's GeometryCanvas and ContactMapCanvas. It will *NOT*
+     * trigger the event listeners for either.
+     * 
+     * 'segments' is an array of segment IDs, specifying the segments that are included in the
+     * selection.
+     * @param {Number[]} segments 
+     */
+    setSelection(segments) {
+        this.geometrycanvas.setSegmentStates( segments, Segment.State.LIVE, Segment.State.GHOST );
+        this.geometrycanvas.render();
+        this.contactmapcanvas.setSelection(segments);
     }
 
 }
