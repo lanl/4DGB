@@ -36,7 +36,7 @@ jobs:
     - name: Run the server and test with client 
       run: |
         python3 release/test.00/server/gtkserver.py &
-        sleep 5
+        sleep 10
         echo 'running javascript test'
         npm run test --detectOpenHandles testing/client-js.test.js
         ls -la
