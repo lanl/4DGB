@@ -122,6 +122,7 @@ RUN  echo "from gtkserver import app as application" > /srv/app.wsgi
 # symlink here.
 RUN ln -sf /dev/stderr /var/log/apache2/error.log
 
+RUN chown -R www-data:www-data /srv
 WORKDIR /srv
 
 EXPOSE 443

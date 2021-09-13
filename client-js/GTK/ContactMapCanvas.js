@@ -94,7 +94,6 @@ class ContactMapCanvas {
     constructor(project, dataset, rootElemID) {
         const self = this;
 
-        // Build content div
         /** Div containing all the contents of the contact map widget */
         this.contdiv = document.createElement("div");
         this.contdiv.className = "gtkviewcontainer";
@@ -117,16 +116,35 @@ class ContactMapCanvas {
         this.margin.innerHeight = this.displayOpts["height"] - ( this.margin.top  + this.margin.bottom );
 
         /**
-         * A d3 selection of the large SVG container.
-         * This contains the x and y axis, but most importantly, it is what enforces the
-         * size of the whole widget. It has an explicit width and height and doesn't have
-         * it's position set to 'absolute' like most other pieces, so the contdiv
+         * The div acting as the widget's "bounding box".
+         * This is what enforces the size of the whole widget. It has an explicit width and height
+         * and doesn't have it's position set to 'absolute' like most other pieces, so the contdiv
          * will expand to match this SVG's width and height.
+         */
+        this.boundingDiv = d3.create('div')
+            .attr('style', `
+                position: relative;
+                width:    ${this.displayOpts.width}px;
+                height:   ${this.displayOpts.height}px;
+            `).node();
+        this.contdiv.appendChild(this.boundingDiv);
+
+        /**
+         * A d3 selection of the large SVG container.
+         * This contains the x and y axis.
          */
         this.baseSVG = d3.create('svg')
             .attr('width',  this.displayOpts["width"] )
-            .attr('height', this.displayOpts["height"]);
-        this.contdiv.appendChild(this.baseSVG.node());
+            .attr('height', this.displayOpts["height"])
+            .attr('style', `
+                position: absolute;
+                top:    0px;
+                left:   0px;
+                bottom: 0px;
+                right:  0px;
+            `);
+        this.boundingDiv.appendChild(this.baseSVG.node());
+        //this.contdiv.appendChild(this.baseSVG.node());
 
         // Sets CSS attributes on a selection to make it work
         // as an overlay that fits within the margins
@@ -143,7 +161,8 @@ class ContactMapCanvas {
 
         /** A d3 selection of the canvas*/
         this.canvas = d3.create('canvas').call(overlay);
-        this.contdiv.appendChild(this.canvas.node());
+        this.boundingDiv.appendChild(this.canvas.node());
+        //this.contdiv.appendChild(this.canvas.node());
 
         /** A d3 selection of a text label displaying help to the user */
         /**
@@ -160,13 +179,15 @@ class ContactMapCanvas {
         /** A d3 selection of the SVG handling brush selection */
         this.brushSVG = d3.create('svg').call(overlay)
             .classed('brushsvg', true);
-            this.contdiv.appendChild(this.brushSVG.node());
+        this.boundingDiv.appendChild(this.brushSVG.node());
+        //this.contdiv.appendChild(this.brushSVG.node());
             
             /** A d3 selection of the SVG handling zooming/panning */
             this.zoomSVG = d3.create('svg').call(overlay)
             .classed('zoomsvg', true)
             .attr('pointer-events', 'none');
-        this.contdiv.appendChild(this.zoomSVG.node());
+        this.boundingDiv.appendChild(this.zoomSVG.node());
+       //this.contdiv.appendChild(this.zoomSVG.node());
 
         // Placeholders for fields that aren't initialized until after
         // the data loads

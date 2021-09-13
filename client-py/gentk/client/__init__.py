@@ -4,10 +4,15 @@ import requests
 
 class client:
 
-    def __init__(self, url, port):
+    def __init__(self, url, port, **kwargs):
         self.port = port
         self.url  = url
         self.project = ""
+
+        self.session = requests.Session()
+
+        if 'auth' in kwargs:
+            self.session.auth = tuple(kwargs['auth'].split(':'))
 
     @property
     def project(self):
@@ -33,52 +38,40 @@ class client:
     def port(self, value):
         self._port = value
 
+    def _request(self, path):
+        if path[0] == '/':
+            path = path[1:]
+        response = self.session.get(f'{self.url}:{self.port}/{path}')
+
+        return response.json()
+
+    def _postrequest(self, path, payload):
+        if path[0] == ('/'):
+            path = path[1:]
+        response = self.session.post(f'{self.url}:{self.port}/{path}', json=payload)
+
+        return response.json()
+
     def get_project_interval(self):
-        response = requests.get('{}:{}/project/interval'.format(self.url, self.port)) 
-        jdata = json.loads(response.text)
-
-        return jdata
-
+        return self._request('project/interval')
 
     def get_structure(self, sid):
-        response = requests.get('{}:{}/data/structure/{}/segments'.format(self.url, self.port, sid)) 
-        jdata = json.loads(response.text)
-
-        return jdata
+        return self._request(f'data/structure/{sid}/segments')
 
     def get_genes(self):
-        response = requests.get('{}:{}/genes'.format(self.url, self.port)) 
-        jdata = json.loads(response.text)
-
-        return jdata
+        return self._request('genes')
 
     def get_gene_metadata(self, gene):
-        # get the data from the server
-        response = requests.get('{}:{}/gene/{}'.format(self.url, self.port, gene))
-        jdata = json.loads(response.text)
-
-        return jdata
+        return self._request(f'gene/{gene}')
 
     def get_genes_for_locations(self, structureID, locations):
-        # get the data from the server
-        response = requests.get('{}:{}/data/structure/{}/locations/{}/genes'.format(self.url, self.port, structureID, locations))
-        jdata = json.loads(response.text)
-
-        return jdata
+        return self._request(f'data/structure/{structureID}/locations/{locations}/genes')
 
     def get_genes_for_segments(self, structureID, segIDs):
-        # get the data from the server
-        response = requests.get('{}:{}/data/structure/{}/segment/{}/genes'.format(self.url, self.port, structureID, segIDs))
-        jdata = json.loads(response.text)
-
-        return jdata
+        return self._request(f'data/structure/{structureID}/segment/{segIDs}/genes')
 
     def get_segments_for_genes(self, structureID, gene):
-        # get the data from the server
-        response = requests.get('{}:{}/genes/{}/data/structure/{}'.format(self.url, self.port, gene, structureID))
-        jdata = json.loads(response.text)
-
-        return jdata
+        return self._request(f'genes/{gene}/data/structure/{structureID}')
 
     def get_structure_arrays(self):
         return self.get_arrays('structure')
@@ -87,49 +80,27 @@ class client:
         return self.get_arrays('sequence')
 
     def get_arrays(self, atype):
-        response = requests.get('{}:{}/data/arrays/{}'.format(self.url, self.port, atype))
-        jdata = json.loads(response.text)
-
-        return jdata
+        return self._request(f'data/arrays/{atype}')
 
     def get_array(self, arrayID, arraySlice):
-        # get the data from the server
-        response = requests.get('{}:{}/data/array/{}/{}'.format(self.url, self.port, arrayID, arraySlice))
-        jdata = json.loads(response.text)
-
-        return jdata
+        return self._request(f'data/array/{arrayID}/{arraySlice}')
 
     def get_contactmap(self, cmID):
-        # get the data from the server
-        response = requests.get('{}:{}/data/contact-map/{}'.format(self.url, self.port, cmID))
-        jdata = json.loads(response.text)
-
-        return jdata
+        return self._request(f'data/contact-map/{cmID}')
 
     def set_array(self, array, params):
         # send the data to the server
         data = params
         data["array"] = array
-        response = requests.post('{}:{}/data/setarray'.format(self.url, self.port), json=data)
-        jdata = json.loads(response.text)
-
-        return jdata["id"]
+        
+        response = self._postrequest('data/setarray', data)
+        return response["id"]
 
     def get_sampled_array(self, arrayID, arraySlice, begin, end, numsamples ):
-        # get the data from the server
-        response = requests.get('{}:{}/data/samplearray/{}/{}/{}/{}/{}'.format(self.url, self.port, arrayID, arraySlice, begin, end, numsamples))
-        jdata = json.loads(response.text)
-
-        return jdata
+        return self._request(f'data/samplearray/{arrayID}/{arraySlice}/{begin}/{end}/{numsamples}')
 
     def get_segment_ids(self, sid ):
-        response = requests.get('{}:{}/data/structure/{}/segmentids'.format(self.url, self.port, sid)) 
-        jdata = json.loads(response.text)
-
-        return jdata
+        return self._request(f'data/structure/{sid}/segmentids')
 
     def get_dataset_ids(self):
-        response = requests.get('{}:{}/datasets'.format(self.url, self.port)) 
-        jdata = json.loads(response.text)
-
-        return jdata
+        return self._request('datasets')

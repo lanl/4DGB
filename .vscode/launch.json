@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "gtkserver test.00",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/release/test.00/server/gtkserver.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Test Server",
             "type": "firefox",
             "request": "launch",

@@ -1,7 +1,14 @@
-import gentk
+#
+# Imported by the test_gentk.py and test_gentk_production.py scripts
+#
 
-client = gentk.client.client("http://127.0.0.1", "8000")
-client.project = "test.00"
+client = None
+
+def set_client(new_client, project):
+    global client
+    client = new_client
+    client.project = project
+
 
 def test_get_contactmap():
     tests = [
@@ -372,4 +379,3 @@ def test_get_datset_ids():
     for t in tests:
         ids = client.get_dataset_ids()
         assert(t['ids'] == ids)
-

@@ -28,6 +28,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+const Client = require("./Client");
+
 /**
  * @class ContactMap
  * 
@@ -104,16 +106,17 @@ class ContactMap {
      * @param {String} id
      * @returns {Promise<ContactMap>} 
      */
-    static async loadNew(id) {
-        return fetch(`/data/contact-map/${encodeURIComponent(id)}`)
-            .then( (res) => {
-                if (!res.ok)
-                    throw new Error(`HTTP Error: ${res.status} ${res.statusText}`);
-                return res.json();
-            })
-            .then( (data) => {
-                return new ContactMap(data['contacts']);
-            });
+    static loadNew(id) {
+        return new Promise( (resolve, reject) => {
+            try {
+                Client.TheClient.get_contactmap( (records) => {
+                    resolve( new ContactMap(records['contacts']) )
+                }, id);
+            }
+            catch (err) {
+                reject(err);
+            }
+        });
     }
 }
 
