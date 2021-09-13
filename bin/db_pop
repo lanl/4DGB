@@ -231,7 +231,7 @@ if jsondata["data"]["annotations"]["url"] != "None":
                                 'unconfirmed_transcript'
                              ]
             # old behavior (only 'gene' is not excluded)
-            # for release: remove ncRNA_gene
+            # for release: removed ncRNA_gene
             excluded_types = [ 
                                 'biological_region', 
                                 'CDS', 
@@ -242,7 +242,6 @@ if jsondata["data"]["annotations"]["url"] != "None":
                                 'miRNA', 
                                 'mRNA', 
                                 'ncRNA', 
-                                'ncRNA_gene', 
                                 'pseudogene', 
                                 'pseudogenic_transcript', 
                                 'rRNA', 

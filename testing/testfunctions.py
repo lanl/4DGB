@@ -96,7 +96,7 @@ def test_get_structure():
 def test_get_genes(): 
     
     result = client.get_genes()
-    ogResult = '1700011M02Rik'
+    ogResult = '1600025M17Rik'
     assert (result['genes'][0] == ogResult) 
 
 def test_get_array():

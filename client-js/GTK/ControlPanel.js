@@ -136,7 +136,7 @@ class ControlPanel extends EventEmitter {
         var row = this.controls.insertRow(cur_row); 
         cur_row += 1;
         var name = row.insertCell(0);
-        name.innerHTML = "Genes";
+        name.innerHTML = "Annotation";
             // a list of all genes
         this.genes = [];
                 // entry
