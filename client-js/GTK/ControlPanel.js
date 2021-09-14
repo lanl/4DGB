@@ -50,7 +50,7 @@ class ControlPanel extends EventEmitter {
         this.selection = new Selection();
         this.selection.client = Client.TheClient;
         this.selection.HACKInterval = TheInterval;
-        this.selection.addListener('selectionChanged', (function (e) { this.#syncronizeSelection(e) }).bind(this));
+        this.selection.addListener('selectionChanged', (function (e) { this.syncronizeSelection(e) }).bind(this));
 
         // build UI
         var root = document.getElementById(parent);
@@ -251,7 +251,7 @@ class ControlPanel extends EventEmitter {
     // locally synchronize the selection elements based on
     // the selection object
     //
-    #syncronizeSelection() {
+    syncronizeSelection() {
         this.geneentry.value        = this.selection.genes;
         this.locationentry.value    = this.selection.locations;
         this.segmententry.value     = this.selection.segments;
