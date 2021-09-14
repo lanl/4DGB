@@ -721,11 +721,11 @@ class ControlPanel extends EventEmitter {
     }
 
     onOpenDocumentation(e) {
-        window.open("https://www.nytimes.com", '_blank').focus();
+        window.open("https://github.com/lanl/4DGB/wiki/Documentation-v0.9", '_blank').focus();
     }
 
     onAboutDocumentation(e) {
-        window.open("https://github.com/lanl/4DGB", '_blank').focus();
+        window.open("https://github.com/lanl/4DGB/wiki/About-v0.9", '_blank').focus();
     }
 
     showUnmappedSegments(e) {
