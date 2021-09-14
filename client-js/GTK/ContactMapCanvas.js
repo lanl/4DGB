@@ -334,8 +334,15 @@ class ContactMapCanvas extends EventEmitter {
      * @param {ContactMapCanvas} other 
      */
     _syncBrush(other) {
-        const otherSelection = d3.brushSelection(other.brushSVG.node());
-        this.brush.move( this.brushSVG, otherSelection, new Event("syncBrush") );
+        // Get other selection (scaled to segments)
+        const otherSelection = other._scaleBrushSelection(
+            d3.brushSelection(other.brushSVG.node()),
+            other.xScale.invert, other.yScale.invert
+        );
+        // Scale back to pixels (using this contact map's current zoom)
+        const thisSelection = this._scaleBrushSelection(otherSelection, this.xScale, this.yScale);
+        // Scale other selection according to other contact map's zoom
+        this.brush.move( this.brushSVG, thisSelection, new Event("syncBrush") );
     }
 
     /**
