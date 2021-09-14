@@ -13,5 +13,7 @@ module.exports = {
     GeometryCanvas:     require('./GTK/GeometryCanvas'),
     Project:            require('./GTK/Project'),
     Segment:            require('./GTK/Segment'),
-    ViewerPanel:        require('./GTK/ViewerPanel')
+    Selection:          require('./GTK/Selection'),
+    ViewerPanel:        require('./GTK/ViewerPanel'),
+    Util:               require('./GTK/Util')
 }

@@ -177,18 +177,22 @@ div.gtk { padding: 5px;
     font-size: 20px;
 }
 
-.gtkviewcontainer .zoomsvg {
+.gtkcontactmapcontainer .zoomsvg {
+    box-sizing: border-box;
     border-style: solid;
     transition: border-color 0.2s;
+    transition: border-width 0.2s;
 }
 
-.gtkviewcontainer .zoomsvg[pointer-events=none] {
-    border-color: transparent;
+.gtkcontactmapcontainer .zoomsvg[pointer-events=none] {
+    border-width: 1px;
+    border-color: black;
     cursor: grab;
 }
 
-.gtkviewcontainer .zoomsvg[pointer-events=all] {
-    border-color: steelblue;
+.gtkcontactmapcontainer .zoomsvg[pointer-events=all] {
+    border-width: 4px;
+    border-color: rgb(59, 165, 252);
     cursor: grab;
 }
 

@@ -32,6 +32,7 @@ const EventEmitter      = require('events');
 const Client            = require('./Client');
 const GeometryCanvas    = require('./GeometryCanvas');
 const Selection         = require('./Selection');
+const Util              = require('./Util');
 
 var HACK_numbins = 200;
 
@@ -111,7 +112,7 @@ class ControlPanel extends EventEmitter {
         this.locationentry = document.createElement("input");
         this.locationentry.type = "text";
         cell.appendChild(this.locationentry);
-        this.locationentry.addEventListener('keypress', (function (e) { this.updateSelection(e, Selection.Selector.LOCATIONS) }).bind(this));
+        this.locationentry.addEventListener( 'keypress', ((e) => { this.confirmEntry(e, Selection.Selector.LOCATIONS) }).bind(this) );
                 // selection
         var cell = row.insertCell(2);
         this.locationchoice = document.createElement("select");
@@ -132,7 +133,7 @@ class ControlPanel extends EventEmitter {
         this.geneentry = document.createElement("input");
         this.geneentry.type = "text";
         cell.appendChild(this.geneentry);
-        this.geneentry.addEventListener('keypress', (function (e) { this.updateSelection(e, Selection.Selector.GENES) }).bind(this));
+        this.geneentry.addEventListener( 'keypress', ((e) => { this.confirmEntry(e, Selection.Selector.GENES) }).bind(this) );
                 // selection
         var cell = row.insertCell(2);
         this.genechoice = document.createElement("select");
@@ -152,7 +153,7 @@ class ControlPanel extends EventEmitter {
         this.segmententry = document.createElement("input");
         this.segmententry.type = "text";
         cell.appendChild(this.segmententry);
-        this.segmententry.addEventListener('keypress', (function (e) { this.updateSelection(e, Selection.Selector.SEGMENTS) }).bind(this));
+        this.segmententry.addEventListener( 'keypress', ((e) => { this.confirmEntry(e, Selection.Selector.SEGMENTS) }).bind(this) );
                 // selection
         var cell = row.insertCell(2);
 //      this.segmentchoice = document.createElement("select");
@@ -445,19 +446,19 @@ class ControlPanel extends EventEmitter {
             if (this.validateGenes()) {
                 var values = this.getSelectedGenesList();
                 this.selection.selectGenes(this.geneentry.value);
-                super.emit("geneChanged", values);
+                super.emit("geneChanged", values, e);
             }
         } else if (this.selector == Selection.Selector.LOCATIONS) {
             if (this.validateLocations()) {
                 var values = this.getSelectedLocationsList();
                 this.selection.selectLocations(this.locationentry.value);
-                super.emit("locationChanged", values[0]);
+                super.emit("locationChanged", values[0], e);
             }
         } else if (this.selector == Selection.Selector.SEGMENTS) {
             if (this.validateSegments()) {
                 this.selection.selectSegments(this.segmententry.value);
-                var expanded_values = this.valStringToListOfValues( this.segmententry.value );
-                super.emit("segmentChanged", expanded_values);
+                var expanded_values = Util.rangeStringToValues( this.segmententry.value );
+                super.emit("segmentChanged", expanded_values, e);
             }
         }
     }
@@ -484,16 +485,29 @@ class ControlPanel extends EventEmitter {
         e.currentTarget.className += " active";
     }
 
-    //
-    // when the user types <enter> (keyCode 13), evaluate
-    // where the action took place, and update the selection
-    //
-    updateSelection(e, type) {
-        if (e.keyCode == 13) {
-            if (Selection.SelectorValues.includes(type)) {
-                this.selector = type;
-                this.onSelect(e);
-            }
+    /**
+     * Called in response to a keypress in one of the text boxes.
+     * If the key is <enter>, to confirm a selection, trigger an
+     * update to the selection
+     * @param {KeyEvent} e 
+     * @param {Selection.Selector} type 
+     */
+    confirmEntry(e, type) {
+        if (e.keyCode == 13)
+            this.updateSelection(type, e)
+    }
+
+    /**
+     * Update the selection according to whatever is in the text box specified
+     * by type. 'sourceEvent' is the event that triggered this (if any) and will
+     * be passed along with any events that this triggers.
+     * @param {Selection.Selector} type 
+     * @param {Event?} sourceEvent 
+     */
+    updateSelection(type, sourceEvent) {
+        if (Selection.SelectorValues.includes(type)) {
+            this.selector = type;
+            this.onSelect(sourceEvent);
         }
     }
 
@@ -626,28 +640,6 @@ class ControlPanel extends EventEmitter {
         }
 
         return success; 
-    }
-
-    valStringToListOfValues( value ) {
-        var cleaned = value.replace(/\s/g, "");
-        var vsplit  = cleaned.split(",");
-
-        var values = [];
-        var step = 1;
-        for (var i=0; i < vsplit.length; i++) {
-
-            var hsplit = vsplit[i].split("-");
-            if (hsplit.length == 2) {
-                var start = parseInt(hsplit[0]);
-                var end   = parseInt(hsplit[1]);
-                var range = [...Array(end - start + 1)].map((_, i) => start + i);
-                values = values.concat(range);
-            } else {
-                values.push(parseInt(vsplit[i]));
-            }
-        }
-
-        return values;
     }
 
     initializeInfoTab(parent, project) {

@@ -31,6 +31,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const Project = require('./Project');
 const Dataset = require('./Dataset');
 const ContactMap = require('./ContactMap');
+const Util = require('./Util');
 
 const EventEmitter = require('events');
 
@@ -43,9 +44,15 @@ const EventEmitter = require('events');
  * down the spacebar, then they can use the scroll wheel to zoom in or out of the image and
  * click-and-drag to pan across it.
  * 
- * This class is also an EventEmitter, you can add a listener to the 'selectionChanged' event
- * to listen for changes made in the selection. This will be called with an array as an argument
- * where each element is a Segment ID to be included in the selection.
+ * This class is also an EventEmitter, which can emit the following events:
+ * 
+ * 'selectionChanged': Triggered when the selected area is changed
+ *      - First argument is an array segment IDs included in the selection.
+ *      - Second argument is the triggering d3-brush event
+ * 'selectionEnded': Triggered when the selection area is finished changing (i.e. when the user
+ * lets go of the mouse after dragging a selection).
+ *      - First argument is an array segment IDs included in the selection.
+ *      - Second argument is the triggering d3-brush event
  * 
  * TODO: The format for representing selections is meant to match the format used by the
  * GeometryCanvas class, and isn't really ideal for the ContactMap. In the future, we should have
@@ -282,28 +289,7 @@ class ContactMapCanvas extends EventEmitter {
      * @param {Number[]} segments
      */
     setSelection(segments, event) {
-
-        // Split an array of integers, into an array of arrays specifying the ranges of
-        // continous stretches of numbers.
-        function splitIntoRanges(array) {
-            if (array === undefined || array.length === 0) return [];
-            
-            const ranges = [ [array[0],array[0]] ];
-            if (array.length === 1) return ranges;
-
-            let currentRange = 0;
-            for (let i = 1; i < array.length; i++) {
-                if ( segments[i] === segments[i-1]+1) { // continue this range
-                    ranges[currentRange][1] = segments[i];
-                }
-                else { // start the next range
-                    ranges[++currentRange] = [segments[i],segments[i]];
-                }
-            }
-            return ranges;
-        }
-
-        const ranges = splitIntoRanges(segments);
+        const ranges = Util.valuesToRanges(segments);
         if (ranges.length === 1) {
             // If there was only one range, we set the second part of the selection equal to it
             ranges[1] = ranges[0];
@@ -334,8 +320,16 @@ class ContactMapCanvas extends EventEmitter {
      * @param {ContactMapCanvas} other 
      */
     _syncBrush(other) {
-        const otherSelection = d3.brushSelection(other.brushSVG.node());
-        this.brush.move( this.brushSVG, otherSelection, new Event("syncBrush") );
+        // Get other selection
+        let selection = d3.brushSelection(other.brushSVG.node());
+
+        if (selection !== null) {
+            // Scale to segments (using other canvas's zoom)
+            selection = other._scaleBrushSelection(selection, other.xScale.invert, other.yScale.invert);
+            // Scale back to pixels (using this contact map's current zoom)
+            selection = this._scaleBrushSelection(selection, this.xScale, this.yScale);
+        }
+        this.brush.move( this.brushSVG, selection, new Event("syncBrush") );
     }
 
     /**
@@ -434,15 +428,14 @@ class ContactMapCanvas extends EventEmitter {
             extents = [ [x1,x2], [y1,y2] ];
         }
 
-        let segments = {}; //segments is an object/hash initially to avoid duplicates
-        for (let extent of extents) {
-            for (let i = extent[0]; i <= extent[1]; i++) segments[i] = true;
+        const segments = Util.rangesToValues(extents);
+
+        this.emit('selectionChanged', segments, event);
+
+        // If this was triggered by a brush-end, then emit an event for that too
+        if (event.type === 'end') {
+            this.emit('selectionEnded', segments, event);
         }
-
-        // change segments to array of IDs
-        segments = Object.keys(segments).map( d => parseInt(d) );
-
-        this.emit('selectionChanged', segments);
     }
 
     /**
