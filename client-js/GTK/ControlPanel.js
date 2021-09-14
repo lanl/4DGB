@@ -286,8 +286,44 @@ class ControlPanel extends EventEmitter {
         color.addEventListener('change', (function (e) { this.onBackgroundColorChanged(e) }).bind(this));
         cell.appendChild(color);
 
+        // create the links section
+            // title
+        var row = cur_panel.insertRow(cur_row); 
+        cur_row += 1;
+        var cell = row.insertCell(0);
+        cell.colSpan = 3;
+        cell.innerHTML = "Links";
+        cell.className = "gtktitlecell";
+
+            // links
+        var row = cur_panel.insertRow(cur_row); 
+        cur_row += 1;
+        cell = row.insertCell(0);
+        cell.colSpan = 2;
+        cell.innerHTML = "4D Genome Browser Docs";
+            // button
+        var cell = row.insertCell(1);
+        this.openDocs = document.createElement("button");
+        this.openDocs.innerHTML = "4DGB Documentation";
+        cell.appendChild(this.openDocs);
+        this.openDocs.onclick = (function (e) { this.onOpenDocumentation(e) }).bind(this);
+
+            // links
+        var row = cur_panel.insertRow(cur_row); 
+        cur_row += 1;
+        cell = row.insertCell(0);
+        cell.colSpan = 2;
+        cell.innerHTML = "About 4D Genome Browser";
+            // button
+        var cell = row.insertCell(1);
+        this.aboutDocs = document.createElement("button");
+        this.aboutDocs.innerHTML = "About 4DGB";
+        cell.appendChild(this.aboutDocs);
+        this.aboutDocs.onclick = (function (e) { this.onAboutDocumentation(e) }).bind(this);
+
         // select the default tab
         this.globaltab.click();
+
     }
 
     //
@@ -692,6 +728,13 @@ class ControlPanel extends EventEmitter {
         super.emit("backgroundColorChanged");
     }
 
+    onOpenDocumentation(e) {
+        window.open("https://www.nytimes.com", '_blank').focus();
+    }
+
+    onAboutDocumentation(e) {
+        window.open("https://github.com/lanl/4DGB", '_blank').focus();
+    }
 
     showUnmappedSegments(e) {
         if (event.currentTarget.checked != GeometryCanvas.ShowUnmappedSegments) {
