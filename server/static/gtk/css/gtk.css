@@ -7,7 +7,7 @@
 }
 
 div.gtkpage {
-    width: 100%;
+    width: 2250;
     border: 1px solid gray;
 }
 
@@ -44,7 +44,6 @@ div.gtk { padding: 5px;
 }
 
 .gtkbody {
-
 }
 
 .gtkbodyrow {
@@ -87,6 +86,12 @@ div.gtk { padding: 5px;
     border-color: #000000;
     border-width: 1px;
     border-radius: 5px;
+}
+
+.gtkcontactmapcontainer {
+    position: relative;
+    margin: 5px;
+    line-height: 0;
 }
 
 .gtkoverlay {

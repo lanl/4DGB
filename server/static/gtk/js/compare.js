@@ -69,7 +69,7 @@ function getSegmentsForLocationRange( idRange ) {
 }
 
 function addTrackCallback() {
-    alert("track clicked")
+    // alert("track clicked")
 }
 
 //
@@ -97,15 +97,23 @@ function createTrack ( data ) {
         TheTrackPanel.pushContainer( title, addTrackCallback );
 
         var title = [TheTrackPanel.topTitle, TheTrackPanel.bottomTitle]
+        var position = [0, 1]
         for (let i = 0; i < TheNumPanels; i++) {
             GTK.Client.TheClient.get_sampled_array( (response) => {
                     var numlabels = response["data"].length;
                     var labels = generateTrackLabels( lrange[0], lrange[1], numlabels); 
-                    TheTrackPanel.addTrack( labels, response["data"], title[i]);
+                    TheTrackPanel.addTrackToCurrentContainer( labels, response["data"], title[i], position[i]);
                     var data = response["data"];
                 }, data.varid, i, lrange[0], lrange[1], data.numbins); 
         }
     }
+}
+
+//
+// clear all the data tracks 
+//
+function clearTracks ( ) {
+    TheTrackPanel.clear();
 }
 
 function linkCameras(a, b) {
@@ -233,6 +241,7 @@ function main( project ) {
     TheControls.addListener( "variableChanged",        variableChanged );
     TheControls.addListener( "colormapChanged",        colormapChanged );
     TheControls.addListener( "createTrack",            createTrack );
+    TheControls.addListener( "clearTracks",            clearTracks );
     TheControls.addListener( "render",                 renderAllPanels );
     TheControls.addListener( "backgroundColorChanged", updateBackgroundColor );
 }

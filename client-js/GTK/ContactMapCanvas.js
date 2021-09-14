@@ -105,7 +105,7 @@ class ContactMapCanvas extends EventEmitter {
 
         /** Div containing all the contents of the contact map widget */
         this.contdiv = document.createElement("div");
-        this.contdiv.className = "gtkviewcontainer";
+        this.contdiv.className = "gtkcontactmapcontainer";
         const gtkroot  = document.getElementById(rootElemID);
         gtkroot.appendChild(this.contdiv);
 

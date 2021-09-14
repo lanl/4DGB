@@ -3,7 +3,7 @@ class TrackChart {
     static Width = 400;
     static Height = 50;
 
-    constructor(parentID, title) {
+    constructor(title) {
         this.data;
         this.limitsY= [];
 
@@ -13,10 +13,11 @@ class TrackChart {
         this.container.className = "gtkattributechart";
         this.chartdiv  = document.createElement("div");
         this.container.appendChild(this.chartdiv);
-        var parent = document.getElementById(parentID);
-        parent.appendChild(this.container);
     }
 
+    get element() {
+        return this.container
+    }
 
     getMin() {
         // TODO: check on existence of data

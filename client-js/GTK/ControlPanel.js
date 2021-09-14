@@ -39,7 +39,7 @@ class ControlPanel extends EventEmitter {
 
     // TODO: need to update states consistently across app
     static HACK_state = false;
-    static HACK_color = "#D3D3D3"; 
+    static HACK_color = "#FFFFFF"; 
 
     constructor(project, parent) {
         super();
@@ -72,7 +72,7 @@ class ControlPanel extends EventEmitter {
         // control tab
         this.globaltab = document.createElement("button");
         this.globaltab.className = "tablinks";
-        this.globaltab.innerHTML = "Global";
+        this.globaltab.innerHTML = "Controls";
         this.globaltab.onclick = (function (e) { this.openTab(e, "globaltab") }).bind(this);
         this.tabdiv.appendChild(this.globaltab);
         this.globaltabcontent = document.createElement("div");
@@ -85,22 +85,10 @@ class ControlPanel extends EventEmitter {
         this.globaltabcontent.appendChild(this.controls);
 
         // info 
-        this.infotab = document.createElement("button");
-        this.infotab.className = "tablinks";
-        this.infotab.innerHTML = "Info";
-        this.infotab.onclick = (function (e) { this.openTab(e, "infotab") }).bind(this);
-        this.tabdiv.appendChild(this.infotab);
-        this.infotabcontent = document.createElement("div");
-        this.infotabcontent.className = "tabcontent";
-        this.infotabcontent.id = "infotab";
-        root.appendChild(this.infotabcontent);
-            // table
-        this.info = document.createElement("table");
-        this.info.className = "gtkcontroltable";
-        this.infotabcontent.appendChild(this.info);
+        // this.initializeInfoTab(root, project);
 
         // settings
-        this.initializeSettingsTab(root, project);
+        // this.initializeSettingsTab(root, project);
 
             // global controls
         var cur_row = 0;
@@ -224,13 +212,14 @@ class ControlPanel extends EventEmitter {
         this.updateColormapNames();
 
             // title
-        var row = this.controls.insertRow(cur_row); 
-        cur_row += 1;
-        var name = row.insertCell(0);
-        name.colSpan = 3;
-        name.innerHTML = "Data Track";
-        name.className = "gtktitlecell";
-
+        if (false) {
+            var row = this.controls.insertRow(cur_row); 
+            cur_row += 1;
+            var name = row.insertCell(0);
+            name.colSpan = 3;
+            name.innerHTML = "Data Track";
+            name.className = "gtktitlecell";
+        }
         // track creation button 
         var row = this.controls.insertRow(cur_row); 
         cur_row += 1;
@@ -242,6 +231,60 @@ class ControlPanel extends EventEmitter {
         this.createTrack.innerHTML = "Create Data Tracks";
         cell.appendChild(this.createTrack);
         this.createTrack.onclick = (function (e) { this.onCreateTrack(e) }).bind(this);
+
+        // track clear button 
+        var row = this.controls.insertRow(cur_row); 
+        cur_row += 1;
+        var name = row.insertCell(0);
+        name.innerHTML = "";
+            // button
+        var cell = row.insertCell(1);
+        this.clearTracks = document.createElement("button");
+        this.clearTracks.innerHTML = "Clear All Tracks";
+        cell.appendChild(this.clearTracks);
+        this.clearTracks.onclick = (function (e) { this.onClearTracks(e) }).bind(this);
+
+
+        // global settings (moved to front tab for simplicity)
+            // title
+        var cur_panel = this.controls; 
+        var row = cur_panel.insertRow(cur_row); 
+        cur_row += 1;
+        var cell = row.insertCell(0);
+        cell.colSpan = 3;
+        cell.innerHTML = "Settings";
+        cell.className = "gtktitlecell";
+
+        // unmapped  
+        var row = cur_panel.insertRow(cur_row); 
+        cur_row += 1;
+        cell = row.insertCell(0);
+        cell.colSpan = 2;
+        cell.innerHTML = "Show Unmapped Segments";
+
+        cell = row.insertCell(1);
+        var checkbox = document.createElement("input");
+        checkbox.setAttribute("type", "checkbox");
+        checkbox.checked = ControlPanel.HACK_state; 
+        checkbox.addEventListener('change', (function (e) { this.showUnmappedSegments(e) }).bind(this));
+        cell.appendChild(checkbox);
+
+        // background
+        var row = cur_panel.insertRow(cur_row); 
+        cur_row += 1;
+        cell = row.insertCell(0);
+        cell.colSpan = 2;
+        cell.innerHTML = "Background";
+
+        cell = row.insertCell(1);
+        var color = document.createElement("input");
+        color.id = "controlpanel-settings-background";
+        color.setAttribute("type", "color");
+        color.setAttribute("value", ControlPanel.HACK_color);
+            // TODO: clean up event notification (no need for second functions -
+            // instead do it like this
+        color.addEventListener('change', (function (e) { this.onBackgroundColorChanged(e) }).bind(this));
+        cell.appendChild(color);
 
         // select the default tab
         this.globaltab.click();
@@ -349,6 +392,12 @@ class ControlPanel extends EventEmitter {
                                     varid:      this.getCurrentVariableID(),
                                     numbins:    HACK_numbins, 
                                     locations:  this.getSelectedLocationsList()})
+    }
+
+    onClearTracks(e) {
+        if (confirm("Are you sure you want to clear the data tracks?")) {
+            super.emit("clearTracks")
+        }
     }
 
     //
@@ -565,6 +614,24 @@ class ControlPanel extends EventEmitter {
         return values;
     }
 
+    initializeInfoTab(parent, project) {
+        // create the tab
+        this.infotab = document.createElement("button");
+        this.infotab.className = "tablinks";
+        this.infotab.innerHTML = "Info";
+        this.infotab.onclick = (function (e) { this.openTab(e, "infotab") }).bind(this);
+        this.tabdiv.appendChild(this.infotab);
+        this.infotabcontent = document.createElement("div");
+        this.infotabcontent.className = "tabcontent";
+        this.infotabcontent.id = "infotab";
+        root.appendChild(this.infotabcontent);
+
+        // create the controls
+        this.info = document.createElement("table");
+        this.info.className = "gtkcontroltable";
+        this.infotabcontent.appendChild(this.info);
+    }
+
     initializeSettingsTab(parent, project) {
         // create the tab
         this.settingstab = document.createElement("button");
@@ -582,8 +649,6 @@ class ControlPanel extends EventEmitter {
         this.settings.className = "gtkcontroltable";
         this.settingstabcontent.appendChild(this.settings);
 
-        // controls
-        
         // title
         var cur_row = 0;
         var row = this.settings.insertRow(cur_row); 
