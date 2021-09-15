@@ -55,15 +55,15 @@ class ControlPanel extends EventEmitter {
 
         // build UI
         var root = document.getElementById(parent);
-        this.container = document.createElement("div");
-        this.container.className = "gtkviewerpanel";
-        root.appendChild(this.container);
+        // this.container = document.createElement("div");
+        // this.container.className = "gtkviewerpanel";
+        // root.appendChild(this.container);
 
         // title
-        this.title = document.createElement("div");
-        this.title.className = "gtktitle";
-        this.title.innerHTML = "&nbsp";
-        this.container.appendChild(this.title);
+        // this.title = document.createElement("div");
+        // this.title.className = "gtktitle";
+        // this.title.innerHTML = "&nbsp";
+        // this.container.appendChild(this.title);
 
         // tabs
         this.tabdiv = document.createElement("div");
