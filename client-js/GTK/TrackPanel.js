@@ -104,9 +104,9 @@ class TrackPanel {
     //
     addTrackToCurrentContainer(labels, values, title, position) { 
         var track = new TrackChart(title);
-        if ((this.charts.firstChild.childElementCount != 0) && (position == 0)) {
+        if ((this.charts.firstChild.childElementCount > 0) && (position == 0)) {
             // insert before
-            this.charts.firstChild.insertBefore(track.element, this.charts.firstChild.firstChild)
+            this.charts.firstChild.insertBefore(track.element, this.charts.firstChild.lastChild)
         } else {
             // append the item
             this.charts.firstChild.appendChild(track.element)

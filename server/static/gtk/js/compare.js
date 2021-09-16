@@ -88,7 +88,9 @@ function generateTrackLabels (start, end, numbins) {
 //
 function createTrack ( data ) {
 
-    for (var i = 0; i < data.locations.length; i++) {
+    // for (var i = 0; i < data.locations.length; i++) {
+    // HACK currently create tracks for the first range only
+    for (var i = 0; i < 1; i++) {
         var lrange = data.locations[i].split("-").map(Number);
 
         // create a title for the track
