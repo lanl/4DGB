@@ -10,11 +10,7 @@ test('client test', () => {
     client = new Client("http://127.0.0.1:8000");
 
     client.get_structure_arrays( (response) => {
-                            var streamname = "gtkclient_get-structure-arrays_test.json";
-                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
-                            writeStream.write(JSON.stringify(response));
-                            writeStream.write("\n");
-                            writeStream.end();
+                            expect(response).toStrictEqual({"arrays":[{"id":0,"max":22,"min":1,"name":"increasing int","type":"structure"},{"id":1,"max":22,"min":1,"name":"decreasing int","type":"structure"},{"id":2,"max":320.2,"min":110.1,"name":"increasing float","type":"structure"},{"id":3,"max":320.2,"min":110.1,"name":"decreasing float","type":"structure"},{"id":5,"max":2,"min":1,"name":"two domain","type":"structure"},{"id":6,"max":3,"min":1,"name":"three domain","type":"structure"},{"id":7,"max":0.3,"min":0,"name":"sampled H3K27me3","type":"structure"}]});
                         });
 
     client.get_sequence_arrays( (response) => {

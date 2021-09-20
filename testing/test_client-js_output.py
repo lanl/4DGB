@@ -8,7 +8,6 @@ def test_outputs():
                 "gtkclient_contactmap_test.json",
                 "gtkclient_genes_test.json",
                 "gtkclient_get-arrays_test.json",
-                "gtkclient_get-structure-arrays_test.json",
                 "gtkclient_structure_test.json"
             ]
 
