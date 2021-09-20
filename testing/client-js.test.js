@@ -18,28 +18,12 @@ test('client test', () => {
                         });
 
     client.get_arrays( (response) => {
-                            var streamname = "gtkclient_get-arrays_test.json";
-                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
-                            writeStream.write(JSON.stringify(response));
-                            writeStream.write("\n");
-                            writeStream.end();
+                            expect(response).toStrictEqual({"arrays":[{"id":0,"max":22,"min":1,"name":"increasing int","type":"structure"},{"id":1,"max":22,"min":1,"name":"decreasing int","type":"structure"},{"id":2,"max":320.2,"min":110.1,"name":"increasing float","type":"structure"},{"id":3,"max":320.2,"min":110.1,"name":"decreasing float","type":"structure"},{"id":5,"max":2,"min":1,"name":"two domain","type":"structure"},{"id":6,"max":3,"min":1,"name":"three domain","type":"structure"},{"id":7,"max":0.3,"min":0,"name":"sampled H3K27me3","type":"structure"}]});
                         }, 'structure');
 
     client.get_array( (response) => {
-                            var streamname = "gtkclient_array_test.json";
-                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
-                            writeStream.write(JSON.stringify(response));
-                            writeStream.write("\n");
-                            writeStream.end();
+                            expect(response).toStrictEqual({"data":{"dim":1,"max":22,"min":1,"type":"int","values":[1,2,3,4,5,6,7,8,9,10,11]},"name":"increasing int","tags":[],"type":"structure","version":"0.1"});
                         }, 0, 0);
-
-    client.get_contactmap( (response) => {
-                            var streamname = "gtkclient_contactmap_test.json";
-                            var writeStream = fs.createWriteStream(streamname, {flags: 'w'});
-                            writeStream.write(JSON.stringify(response));
-                            writeStream.write("\n");
-                            writeStream.end();
-                        }, 0);
 
     client.get_genes( (response) => {
                             var streamname = "gtkclient_genes_test.json";
@@ -99,6 +83,8 @@ test('client test', () => {
                             writeStream.end();
                         }, 0);
 
-    expect(false).toBe(false);
+    client.get_contactmap( (response) => {
+                            expect(response).toStrictEqual({"contacts":[{"value":1.22803363763796,"x":5,"y":8},{"value":1.22803363763796,"x":9,"y":4},{"value":1.22803363763796,"x":6,"y":3},{"value":1.22803363763796,"x":3,"y":8},{"value":2.46410161513775,"x":2,"y":3},{"value":2.46410161513775,"x":1,"y":10},{"value":3.46410161513775,"x":3,"y":3},{"value":2.04988805276466,"x":2,"y":8},{"value":1.22803363763796,"x":4,"y":9},{"value":0.635674490391564,"x":11,"y":3},{"value":1.46410161513775,"x":5,"y":3},{"value":2.04988805276466,"x":6,"y":8},{"value":0.635674490391564,"x":11,"y":7},{"value":2.46410161513775,"x":8,"y":1},{"value":1.46410161513775,"x":7,"y":9},{"value":2.46410161513775,"x":5,"y":6},{"value":1.22803363763796,"x":2,"y":7},{"value":1.46410161513775,"x":9,"y":11},{"value":1.46410161513775,"x":7,"y":5},{"value":2.46410161513775,"x":6,"y":7},{"value":1.22803363763796,"x":3,"y":6},{"value":2.04988805276466,"x":8,"y":10},{"value":2.46410161513775,"x":9,"y":2},{"value":2.46410161513775,"x":4,"y":5},{"value":3.46410161513775,"x":11,"y":11},{"value":3.46410161513775,"x":1,"y":1},{"value":1.22803363763796,"x":11,"y":8},{"value":1.46410161513775,"x":11,"y":9},{"value":1.46410161513775,"x":2,"y":6},{"value":1.46410161513775,"x":5,"y":7},{"value":3.46410161513775,"x":6,"y":6},{"value":0.635674490391564,"x":3,"y":7},{"value":2.04988805276466,"x":2,"y":4},{"value":1.46410161513775,"x":9,"y":3},{"value":2.04988805276466,"x":6,"y":4},{"value":1.22803363763796,"x":4,"y":1},{"value":1.46410161513775,"x":7,"y":1},{"value":2.46410161513775,"x":8,"y":9},{"value":2.46410161513775,"x":10,"y":9},{"value":2.04988805276466,"x":10,"y":8},{"value":2.46410161513775,"x":10,"y":11},{"value":2.46410161513775,"x":5,"y":4},{"value":2.46410161513775,"x":9,"y":8},{"value":2.46410161513775,"x":3,"y":4},{"value":0.635674490391564,"x":1,"y":5},{"value":3.46410161513775,"x":2,"y":2},{"value":1.22803363763796,"x":10,"y":7},{"value":3.46410161513775,"x":1,"y":9},{"value":1.46410161513775,"x":6,"y":2},{"value":1.46410161513775,"x":9,"y":7},{"value":0.464101615137754,"x":6,"y":11},{"value":1.22803363763796,"x":10,"y":3},{"value":1.22803363763796,"x":2,"y":11},{"value":0.635674490391564,"x":3,"y":11},{"value":1.22803363763796,"x":9,"y":6},{"value":1.22803363763796,"x":7,"y":10},{"value":0,"x":5,"y":11},{"value":1.22803363763796,"x":8,"y":5},{"value":1.22803363763796,"x":5,"y":2},{"value":1.01461187235458,"x":4,"y":10},{"value":2.46410161513775,"x":3,"y":2},{"value":0.635674490391564,"x":5,"y":9},{"value":2.46410161513775,"x":10,"y":1},{"value":3.46410161513775,"x":9,"y":1},{"value":1.46410161513775,"x":3,"y":9},{"value":2.46410161513775,"x":4,"y":3},{"value":0.635674490391564,"x":7,"y":3},{"value":1.46410161513775,"x":1,"y":11},{"value":1.46410161513775,"x":8,"y":4},{"value":2.46410161513775,"x":7,"y":8},{"value":2.46410161513775,"x":2,"y":9},{"value":0.464101615137754,"x":11,"y":4},{"value":1.46410161513775,"x":4,"y":8},{"value":2.46410161513775,"x":1,"y":2},{"value":1.22803363763796,"x":6,"y":9},{"value":3.46410161513775,"x":10,"y":10},{"value":1.01461187235458,"x":10,"y":6},{"value":1.22803363763796,"x":2,"y":5},{"value":2.46410161513775,"x":6,"y":5},{"value":3.46410161513775,"x":7,"y":7},{"value":1.22803363763796,"x":4,"y":7},{"value":2.04988805276466,"x":4,"y":6},{"value":2.04988805276466,"x":8,"y":2},{"value":1.22803363763796,"x":11,"y":2},{"value":1.22803363763796,"x":8,"y":11},{"value":3.46410161513775,"x":5,"y":5},{"value":2.46410161513775,"x":9,"y":10},{"value":0.464101615137754,"x":10,"y":5},{"value":1.22803363763796,"x":1,"y":4},{"value":1.46410161513775,"x":3,"y":5},{"value":2.46410161513775,"x":7,"y":6},{"value":2.04988805276466,"x":10,"y":2},{"value":0,"x":11,"y":5},{"value":1.22803363763796,"x":1,"y":6},{"value":3.46410161513775,"x":8,"y":8},{"value":1.22803363763796,"x":7,"y":4},{"value":3.46410161513775,"x":4,"y":4},{"value":1.22803363763796,"x":6,"y":1},{"value":2.46410161513775,"x":2,"y":1},{"value":1.46410161513775,"x":3,"y":1},{"value":3.46410161513775,"x":9,"y":9},{"value":0.635674490391564,"x":5,"y":1},{"value":1.22803363763796,"x":8,"y":3},{"value":1.46410161513775,"x":1,"y":7},{"value":1.01461187235458,"x":10,"y":4},{"value":2.46410161513775,"x":11,"y":10},{"value":1.22803363763796,"x":7,"y":2},{"value":0.464101615137754,"x":11,"y":6},{"value":0.464101615137754,"x":4,"y":11},{"value":0.635674490391564,"x":9,"y":5},{"value":2.04988805276466,"x":4,"y":2},{"value":0.464101615137754,"x":5,"y":10},{"value":0.635674490391564,"x":7,"y":11},{"value":2.04988805276466,"x":8,"y":6},{"value":2.46410161513775,"x":1,"y":8},{"value":1.22803363763796,"x":3,"y":10},{"value":1.46410161513775,"x":1,"y":3},{"value":2.04988805276466,"x":2,"y":10},{"value":1.01461187235458,"x":6,"y":10},{"value":2.46410161513775,"x":8,"y":7},{"value":1.46410161513775,"x":11,"y":1}]});
+                        }, 0);
 
 });
