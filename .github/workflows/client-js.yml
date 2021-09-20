@@ -39,5 +39,3 @@ jobs:
         sleep 5
         echo 'running javascript test'
         npm run test --detectOpenHandles testing/client-js.test.js
-        ls -la
-        pytest testing/test_client-js_output.py
