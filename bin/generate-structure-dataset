@@ -1,0 +1,112 @@
+#!/usr/bin/env python
+
+import math
+import random
+import pandas as pd
+import itertools
+
+def compute_distance(p0, p1):
+    return float(math.sqrt( math.pow(p1[0] - p0[0], 2) + 
+                            math.pow(p1[1] - p0[1], 2) + 
+                            math.pow(p1[2] - p0[2], 2) )) 
+    
+
+def write_contactmap_from_structure( sname, cmname ):
+    df = pd.read_csv(sname, index_col='id')
+    numsegs = len(df.index)
+    final_data = pd.DataFrame(index=range(1,numsegs+1), columns=range(1,numsegs+1))
+
+    distance = 0.0 
+    p0 = [0.0, 0.0, 0.0]
+    p1 = [0.0, 0.0, 0.0]
+    for pair in list(itertools.product(range(1,numsegs+1), range(1,numsegs+1))):
+        p0[0] = df.at[int(pair[0]), 'x']
+        p0[1] = df.at[int(pair[0]), 'y']
+        p0[2] = df.at[int(pair[0]), 'z']
+        p1[0] = df.at[int(pair[1]), 'x']
+        p1[1] = df.at[int(pair[1]), 'y']
+        p1[2] = df.at[int(pair[1]), 'z']
+        final_data[int(pair[0])][int(pair[1])] = compute_distance(p0, p1)
+
+    # normalize the data frame
+    column_maxes = final_data.max()
+    df_max = column_maxes.max()
+    normalized = final_data / df_max
+
+    # normalized.to_csv(cmname)
+    with open(cmname, 'w') as cfile:
+        for pair in list(itertools.product(range(1,numsegs+1), range(1,numsegs+1))):
+            cfile.write("{}\t{}\t{}\n".format(pair[0], pair[1], final_data[pair[0]][pair[1]]))
+
+def write_random_structure(fname, seglength):
+    curp = [0.0, 0.0, 0.0]
+    newp = [0.0, 0.0, 0.0]
+    with open(fname, "w") as sfile:
+        curid = 1
+
+        sfile.write("id,x,y,z\n")
+        for i in range(0,num_beads): 
+            phi   = random.randrange(0, 180)
+            theta = random.randrange(0, 360)
+            newp[0] = round(float(seglength) * round(math.cos(math.radians(theta) * math.sin(math.radians(phi))), 2), 2)
+            newp[1] = round(float(seglength) * round(math.sin(math.radians(theta) * math.sin(math.radians(phi))), 2), 2)
+            newp[2] = round(float(seglength) * round(math.cos(math.radians(phi)), 2), 2)
+
+            for j in range(3) :
+                if (newp[j] == -0.0) : newp[j] = 0.0
+
+            # randomly add or subtract point
+            if bool(random.getrandbits(1)) :
+                curp[0] = round(curp[0] + newp[0], 2)
+                curp[1] = round(curp[1] + newp[1], 2)
+                curp[2] = round(curp[2] + newp[2], 2)
+            else :
+                curp[0] = round(curp[0] - newp[0], 2)
+                curp[1] = round(curp[1] - newp[1], 2)
+                curp[2] = round(curp[2] - newp[2], 2)
+
+            sfile.write("{},{},{},{}\n".format(curid, curp[0], curp[1], curp[2]))
+
+            curid += 1
+
+# --------------------------------------------------------------------
+# compute a spiral cylinder dataset
+# --------------------------------------------------------------------
+radius          =  10
+num_beads       = 833 
+num_divisions   =  32
+slope           =   0.5
+theta_init      =   0
+theta_incr      = 360.0/float(num_divisions)
+z_incr          = float(slope)/float(num_divisions) 
+
+with open("spiral-structure.csv", "w") as sfile:
+    curid = 1
+    theta = float(theta_init)
+    z     = 0.0
+
+    sfile.write("id,x,y,z\n")
+    while (curid <= num_beads) :
+        x = round(float(radius) * round(math.cos(math.radians(theta)), 2), 2)
+        y = round(float(radius) * round(math.sin(math.radians(theta)), 2), 2)
+
+        if (x == -0.0) : x = 0.0
+        if (y == -0.0) : y = 0.0
+
+        sfile.write("{},{},{},{}\n".format(curid, x, y, z))
+        curid += 1
+        theta += theta_incr
+        z     += z_incr
+
+
+# --------------------------------------------------------------------
+# compute a random path dataset 
+# --------------------------------------------------------------------
+
+seglength = 2
+
+write_random_structure("random-structure_00.csv", seglength)
+write_random_structure("random-structure_01.csv", seglength)
+write_contactmap_from_structure("random-structure_00.csv", "random-structure-contactmap_00.tsv")
+write_contactmap_from_structure("random-structure_01.csv", "random-structure-contactmap_01.tsv")
+

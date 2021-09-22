@@ -103,21 +103,38 @@ for geom in jsondata["data"]["structure"]:
         # the first position is arbitrary, and will be re-computed after all values are inserted 
     prev = [0.0, 0.0, 0.0]
 
-    with open(infile, 'r') as indata:
-        for l in indata:
-            if l.startswith("ATOM"): 
-                    # start at position 26, based on the format of the file, to 
-                    # guarantee that you get the values (sometimes there is no
-                    # whitespace that you can split on)
-                v      = re.split(r'\s+', l[26:]) 
-                    # get the first few values
-                aid    = re.split(r'\s+', l)
-                cur    = [float(v[1]), float(v[2]), float(v[3])]
+    if (infile.endswith('.pdb')) :
+        print("    loading structure file (PDB)")
+        with open(infile, 'r') as indata:
+            for l in indata:
+                if l.startswith("ATOM"): 
+                        # start at position 26, based on the format of the file, to 
+                        # guarantee that you get the values (sometimes there is no
+                        # whitespace that you can split on)
+                    v      = re.split(r'\s+', l[26:]) 
+                        # get the first few values
+                    aid    = re.split(r'\s+', l)
+                    cur    = [float(v[1]), float(v[2]), float(v[3])]
+                    center = [ (prev[0]+cur[0])/2.0, (prev[1]+cur[1])/2.0, (prev[2]+cur[2])/2.0 ]
+                    c.execute(insert, [geom["id"], aid[1], position, position + geom["interval"], geom["interval"], 
+                        prev[0], prev[1], prev[2], cur[0], cur[1], cur[2], center[0], center[1], center[2]])
+                    prev = cur
+                    position = position + geom["interval"]
+    elif (infile.endswith('.csv')) :
+        print("    loading structure file (CSV)")
+        with open(infile, 'r') as indata:
+            df = pd.read_csv(infile)
+            for e in df.to_dict(orient='records'):
+                cur    = [float(e['x']), float(e['y']), float(e['z'])]
                 center = [ (prev[0]+cur[0])/2.0, (prev[1]+cur[1])/2.0, (prev[2]+cur[2])/2.0 ]
-                c.execute(insert, [geom["id"], aid[1], position, position + geom["interval"], geom["interval"], 
+                c.execute(insert, [geom["id"], e['id'], position, position + geom["interval"], geom["interval"], 
                     prev[0], prev[1], prev[2], cur[0], cur[1], cur[2], center[0], center[1], center[2]])
                 prev = cur
                 position = position + geom["interval"]
+
+    else :
+        print("ERROR: unknown structure file type: {}".format(infile))
+
 
     # compute an approximation for the endpoint of the first segment, 
     # based on the data this reflects the endpoint from the second 
@@ -196,18 +213,20 @@ print("")
 # ---------------------------------------------------------------------------
 # GENES table
 # ---------------------------------------------------------------------------
-if jsondata["data"]["annotations"]["url"] != "None":
-        # start from scratch
-    c.execute('''DROP TABLE IF EXISTS genes''')
-        # create the table
-    c.execute('''CREATE TABLE genes (id INTEGER PRIMARY KEY AUTOINCREMENT, start INTEGER, end INTEGER, length INTEGER, gID TEXT, gene_type TEXT, gene_name TEXT)''')
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS genes''')
+    # create the table
+c.execute('''CREATE TABLE genes (id INTEGER PRIMARY KEY AUTOINCREMENT, start INTEGER, end INTEGER, length INTEGER, gID TEXT, gene_type TEXT, gene_name TEXT)''')
 
-    # populate the table from a file
+# populate the table from a file
+insert = '''INSERT INTO genes (start,end,length,gID,gene_type,gene_name) VALUES(?,?,?,?,?,?)'''
+print("Creating genes table ...")
+
+# check if there is an annotations file in the project
+if "annotations" in jsondata["data"]:
     infile = os.path.join( project, jsondata["data"]["annotations"]["url"])
-    insert = '''INSERT INTO genes (start,end,length,gID,gene_type,gene_name) VALUES(?,?,?,?,?,?)'''
-    print("Creating genes table ...")
-    print("    reading: {}".format(infile))
     with open(infile, 'r') as indata:
+        print("    reading: {}".format(infile))
         alltypes = []
         noname_types = []
         for l in indata:
@@ -293,21 +312,18 @@ if jsondata["data"]["annotations"]["url"] != "None":
 
                     c.execute(insert, [v[3], v[4], length, values["ID"], values["biotype"], name]) 
 
-    # ---------------------------------------------------------
-    # if there is an annotations file, insert that data as well
-    # ---------------------------------------------------------
-    annotations_file = os.path.join( project, "source/annotations.csv" ) 
-    if os.path.isfile(annotations_file):
-        print("    processing annotations file: {}".format(annotations_file))
-        df = pd.read_csv(annotations_file)
-        for e in df.to_dict(orient='records'):
-            c.execute(insert, [ int(e['start']), int(e['end']), 
-                                int(e['end']) - int(e['start']),
-                                e['id'], e['type'], e['name'] ] 
-                     )
-
-else:
-    print("No annotation data")
+# ---------------------------------------------------------
+# if there is an annotations file, insert that data as well
+# ---------------------------------------------------------
+annotations_file = os.path.join( project, "source/annotations.csv" ) 
+if os.path.isfile(annotations_file):
+    print("    processing annotations file: {}".format(annotations_file))
+    df = pd.read_csv(annotations_file)
+    for e in df.to_dict(orient='records'):
+        c.execute(insert, [ int(e['start']), int(e['end']), 
+                            int(e['end']) - int(e['start']),
+                            e['id'], e['type'], e['name'] ] 
+                 )
 
 # ---------------------------------------------------------------------------
 # end of GENES table

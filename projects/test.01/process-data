@@ -1,0 +1,188 @@
+#!/usr/bin/env python
+
+import bbi
+import sys
+import numpy
+import decimal
+from shutil import copyfile
+from shutil import rmtree
+import os.path
+import pandas as pd
+
+PROJECT         = ""
+NUM_SEGMENTS    = 833
+INTERVAL        = 200000
+CUR_FILE        = -1
+INIT_MINVAL     = 1000000
+INIT_MAXVAL     = -INIT_MINVAL
+
+def float_range(start, numvalues, step):
+    curval = 0
+    while curval < numvalues: 
+        yield float(start)
+        start += decimal.Decimal(step)
+        curval += 1
+
+def get_curfilename_base():
+    global CUR_FILE
+    CUR_FILE += 1
+    return os.path.join(PROJECT, "source/array/{:04d}".format(CUR_FILE))
+
+def get_structure_array_metadata(name, type, min, max, npz_file):
+    array_metadata = '''{{
+"name"      : "{0}",
+"type"      : "structure",
+"version"   : "0.1",
+"tags"      : [],
+"data"      : {{
+    "type"  : "{1}",
+    "dim"   : 1,
+    "min"   : {2},
+    "max"   : {3},
+    "values" : [
+        {{
+            "id"  : "arr_0",
+            "url" : "{4}"
+        }},
+        {{
+            "id"  : "arr_1",
+            "url" : "{5}"
+        }}
+    ]
+}}
+}}
+'''.format(name, type, min, max, npz_file, npz_file)
+
+    return array_metadata
+
+def get_linked_structure_array_metadata(name, type, min, max, afile_npz, sourcefile_0, sourcefile_1):
+    array_metadata = '''{{
+"name"      : "{0}",
+"type"      : "structure",
+"version"   : "0.1",
+"tags"      : [],
+"data"      : {{
+    "type"  : "{1}",
+    "dim"   : 1,
+    "min"   : {2}, 
+    "max"   : {3}, 
+    "values" : [
+        {{
+            "id"  : "arr_0",
+            "url" : "{4}",
+            "sequence" : {{
+                "chrom" : "chrX",
+                "url" : "{5}"
+            }}
+        }},
+        {{
+            "id"  : "arr_1",
+            "url" : "{6}",
+            "sequence" : {{
+                "chrom" : "chrX",
+                "url" : "{7}"
+            }}
+        }}
+    ]
+}}
+}}
+'''.format(name, type, min, max, afile_npz, sourcefile_0, afile_npz, sourcefile_1)
+
+    return array_metadata
+
+def get_values_from_bedfile( fname, numvalues, interval, initval=0.0 ):
+    # create an array that is one longer than needed, so we can
+    # set values using 1-based indices
+    values =  [initval] * (numvalues + 1);
+
+    with open(fname, "r") as f:
+        lines = f.readlines()
+
+        for l in lines :
+            vals = l.strip().split(" ")
+            ID = int((int(vals[2]) + 1)/interval)
+            value = float(vals[3])
+            values[ID] = value
+
+        # remove the zeroth value
+        values.pop(0)
+    return values
+
+#
+# take columns of a csv file and create a normal array from them
+# 
+# no checking at the moment, but assumes that the dimension of 
+# the array and the number of columns are consistent with the
+# project definition
+#
+def create_structure_variable_from_csv( fname, varname, vartype, columns, fillvalue ) :
+    # get the current file names
+    afile = get_curfilename_base()
+    afile_json = afile + ".json"
+    afile_npz  = afile + ".npz"
+
+    # create arrays from the table
+    print("reading variables from: {}".format(fname))
+    df = pd.read_csv( fname, usecols=columns, engine='python' )
+
+    # find min and max
+    # TODO: do this natively in pandas
+    minval = INIT_MINVAL
+    maxval = INIT_MAXVAL
+    for c in columns :
+        curmin = df[c].min()
+        if (curmin < minval) :
+            minval = curmin 
+        curmax = df[c].max()
+        if (curmax > maxval) :
+            maxval = curmax 
+    # fill na with the minimum value
+    df.fillna(minval, inplace=True)
+
+    # write the files
+    print("saving file to: {}".format(afile_json))
+    print("saving file to: {}".format(afile_npz))
+    array_metadata = get_structure_array_metadata( varname, vartype, minval, maxval, afile_npz)
+    with open(afile_json, "w") as f:
+        f.write(array_metadata)
+
+    # TODO: expand this to write arbitrarily many arrays, per input data
+    # print(df[columns[0]])
+    # print(df[columns[1]])
+    numpy.savez_compressed(afile_npz, arr_0=df[columns[0]], arr_1=df[columns[1]]) 
+
+
+# ------------------------------------------------------------------------
+# ------------------------------------------------------------------------
+# project-specific operations
+# ------------------------------------------------------------------------
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+# create directories, if needed 
+# ------------------------------------------------------------------------
+if os.path.isdir(os.path.join(PROJECT, "source", "array")) :
+    rmtree(os.path.join(PROJECT, "source", "array"))
+os.mkdir(os.path.join(PROJECT, "source", "array"))
+
+# create arrays from a csv file
+fname = os.path.join(PROJECT, "source/variables.csv")
+variables = {
+                'segmentID' : {
+                    'columns'   : ['segmentID.1', 'segmentID.1'],
+                    'type'      : 'int',
+                    'file'      : fname,
+                    'fillvalue' : 'min'
+                },
+                'random' : {
+                    'columns'   : ['random.0', 'random.1'],
+                    'type'      : 'int',
+                    'file'      : fname,
+                    'fillvalue' : 'min'
+                }
+
+            }                    
+
+for var in variables:
+    v = variables[var]
+    create_structure_variable_from_csv( v['file'], var, v['type'], v['columns'], v['fillvalue'] ) 

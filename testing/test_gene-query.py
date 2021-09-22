@@ -5,13 +5,6 @@ Test = "test.00"
 Url  = "http://127.0.0.1"
 Port = "8000"
 
-# do a test on the release data
-if False:
-    Test = "release.2021-09-15"
-    Url  = "http://127.0.0.1"
-    Port = "8015"
-
-
 client = gentk.client.client(Url, Port)
 client.project = Test
 

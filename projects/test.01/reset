@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo "Clearing generated data ..."
+rm -rf generated
+
+echo "Clearing processed data ..."
+rm -rf source/array

@@ -42,7 +42,7 @@ class Segment {
 
     static Color = new THREE.Color(1.0, 0.0, 0.0); 
     static EndpointRadius = 0.1; 
-    static GeomEndpoint = new THREE.SphereBufferGeometry( 0.1, 8, 8, );
+    static GeomEndpoint = new THREE.SphereBufferGeometry( Segment.EndpointRadius, 8, 8, );
     static GhostOpacity = 0.2;
 
     constructor( ID, points, radius) { 

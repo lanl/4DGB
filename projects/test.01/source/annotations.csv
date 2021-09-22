@@ -1,0 +1,4 @@
+name,start,end,id,type
+first,72970797,73010038,first,gene 
+front,1,73000000,front,megadomain
+back,73000000,166000000,back,megadomain

@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+import math
+import random
+import pandas as pd
+
+# --------------------------------------------------------------------
+# compute variables and write out a csv file 
+# --------------------------------------------------------------------
+num_beads       = 833 
+
+variables = pd.DataFrame() 
+
+# segmentID
+data = []
+for i in range(833):
+    data.append(i+1); 
+variables['segmentID.0'] = data;
+variables['segmentID.1'] = data;
+
+# random 
+data = []
+for i in range(833):
+    data.append(random.randrange(0,100))
+variables['random.0'] = data;
+data = []
+for i in range(833):
+    data.append(random.randrange(0,100))
+variables['random.1'] = data;
+
+variables.to_csv( "variables.csv", index=False )
+

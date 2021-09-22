@@ -121,6 +121,10 @@ class GeometryCanvas {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(parseInt(gdata["scene"]["background"])); 
 
+        // axes
+        this.axes = new THREE.AxesHelper( 1 );
+        this.scene.add(this.axes);
+
         // add lights to the scene
         var lights = gdata["scene"]["lights"];
         var curLight;
@@ -152,6 +156,14 @@ class GeometryCanvas {
         this.geometry.load( this.dataset.id, this.scene, this );
     }
 
+    showAxes( state ) {
+        this.showAxes.visible = state;
+    }
+
+    showCentroid( state ) {
+        this.centroidMarker.visible = state;
+    }
+
     // color must be of the form #000000
     setBackgroundColor( color ) {
         this.scene.background.set(color)
@@ -166,6 +178,16 @@ class GeometryCanvas {
         // set the centroid
         instance.controls.target.set(instance.geometry.centroid.x, instance.geometry.centroid.y, instance.geometry.centroid.z);
         instance.controls.update();
+
+        // create geometry for the centroid
+        var cGeom = new THREE.SphereBufferGeometry( 0.5, 8, 8, );
+        var cMaterial = new THREE.MeshPhongMaterial();
+        this.centroidMarker = new THREE.Mesh(cGeom, cMaterial);
+        this.centroidMarker.position.x = instance.geometry.centroid.x;
+        this.centroidMarker.position.y = instance.geometry.centroid.y;
+        this.centroidMarker.position.z = instance.geometry.centroid.z;
+        this.scene.add(this.centroidMarker);
+        this.showCentroid(false);
         
         // set the colors
         // instance.paintByVariable();
