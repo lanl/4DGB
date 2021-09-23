@@ -212,6 +212,10 @@ class Geometry {
         this.LUT = new THREE.Lut( name, numdivs ); 
     }
 
+    getLUT() {
+        return this.LUT;
+    }
+
     setLUTParameters( min, max )
     {
         this.LUT.setMin(min);

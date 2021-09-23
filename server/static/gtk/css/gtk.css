@@ -148,6 +148,13 @@ div.gtk { padding: 5px;
     left: 0;
 }
 
+.gtkscalarbarcanvas {
+    z-index: 3;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
 .gtktrackscontainer {
     order: 1;
     flex-grow: 1;

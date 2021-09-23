@@ -165,12 +165,12 @@ function linkContactMapControls(controlPanel, contactMap) {
 
 function setVariable( id ) {
     GTK.Client.TheClient.get_array( (response) => {
-            ThePanels[0].geometrycanvas.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
+            ThePanels[0].geometrycanvas.setLUTParameters( TheControls.getCurrentVariableName(), response['data']['min'], response['data']['max'] ); 
             ThePanels[0].geometrycanvas.geometry.colorBy( response['data']['values']);
             ThePanels[0].geometrycanvas.render();
         }, id, 0); 
     GTK.Client.TheClient.get_array( (response) => {
-            ThePanels[1].geometrycanvas.geometry.setLUTParameters( response['data']['min'], response['data']['max'] ); 
+            ThePanels[1].geometrycanvas.setLUTParameters( TheControls.getCurrentVariableName(), response['data']['min'], response['data']['max'] ); 
             ThePanels[1].geometrycanvas.geometry.colorBy( response['data']['values']);
             ThePanels[1].geometrycanvas.render();
         }, id, 1); 
@@ -210,8 +210,8 @@ function variableChanged(e) {
 }
 
 function colormapChanged(e) {
-    ThePanels[0].geometrycanvas.geometry.setLUT(e);
-    ThePanels[1].geometrycanvas.geometry.setLUT(e);
+    ThePanels[0].geometrycanvas.setLUT(e);
+    ThePanels[1].geometrycanvas.setLUT(e);
     setVariable(TheControls.getCurrentVariableID());
 }
 
