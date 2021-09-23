@@ -30,7 +30,11 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class AxesCanvas {
 
-    constructor(rootElem, linkcamera) {
+    static Classname    = "gtkaxescanvas";
+    static ClearColor   = 0xffffff;
+    static ClearAlpha   = 0.5; 
+
+    constructor(rootElem, linkcamera, {width=100, height=100} = {}) {
         this.camera;
         this.linkCamera = linkcamera;
         this.canvas;
@@ -39,25 +43,22 @@ class AxesCanvas {
 
         // create elements
         var contdiv = document.createElement("div");
-        contdiv.className = "gtkaxescanvas";
+        contdiv.className = AxesCanvas.Classname; 
         rootElem.appendChild(contdiv);
 
-        var HACK_width = 100;
-        var HACK_height = HACK_width;
         this.canvas = document.createElement("canvas");
-        // this.canvas.id = "axesCanvas"; 
-        this.canvas.width  = HACK_width; 
-        this.canvas.height = HACK_height; 
+        this.canvas.width  = width; 
+        this.canvas.height = height; 
         contdiv.appendChild(this.canvas);
 
-        // this.renderer = new THREE.WebGLRenderer( {canvas: this.canvas, alpha: true } ); // clear
         this.renderer = new THREE.WebGLRenderer( {canvas: this.canvas, alpha: true } );
-        this.renderer.setClearColor( 0xffffff, 0 );
+        this.renderer.setClearColor( AxesCanvas.ClearColor, 0 );
+        this.renderer.setClearAlpha( AxesCanvas.ClearAlpha );
 
         this.scene = new THREE.Scene();
 
         var origin = new THREE.Vector3( 0,0,0 );
-        this.camera = new THREE.PerspectiveCamera( 50, HACK_width / HACK_height, 1, 1000 );
+        this.camera = new THREE.PerspectiveCamera( 50, width / height, 1, 1000 );
         this.camera.lookAt(this.scene.position);
 
         this.scene.add( new THREE.ArrowHelper( new THREE.Vector3( 1,0,0 ), origin, 60, 0x7F2020, 20, 10 ) );

@@ -124,8 +124,8 @@ class GeometryCanvas {
         this.scene.background = new THREE.Color(parseInt(gdata["scene"]["background"])); 
 
         // axes
-        this.axes = new THREE.AxesHelper( 1 );
-        this.scene.add(this.axes);
+        // this.axes = new THREE.AxesHelper( 1 );
+        // this.scene.add(this.axes);
 
         // add lights to the scene
         var lights = gdata["scene"]["lights"];
