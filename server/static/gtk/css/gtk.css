@@ -80,6 +80,7 @@ div.gtk { padding: 5px;
 
 .gtkviewcontainer {
     position: relative;
+    z-index: 1;
     margin: 5px;
     line-height: 0;
     border-style: solid;
@@ -138,6 +139,13 @@ div.gtk { padding: 5px;
     border-color: #d3d3d3;
     border-width: 1px;
     border-radius: 5px;
+}
+
+.gtkaxescanvas {
+    z-index: 2;
+    position: absolute;
+    bottom: 0;
+    left: 0;
 }
 
 .gtktrackscontainer {

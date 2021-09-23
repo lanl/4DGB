@@ -32,6 +32,7 @@ require('three/examples/js/controls/OrbitControls')
 
 const Project = require('./Project');
 const Geometry = require('./Geometry');
+const AxesCanvas = require('./AxesCanvas');
 
 class GeometryCanvas {
 
@@ -62,6 +63,7 @@ class GeometryCanvas {
             }
 
             this.renderer.render(this.scene, this.camera);
+            this.axesCanvas.render();
         }).bind(this);
 
         this.requestRenderIfNotRequested = (function() {
@@ -150,6 +152,9 @@ class GeometryCanvas {
                 console.log("Unknown light type in project: " + curLight["type"])
             }
         }
+
+        // axes
+        this.axesCanvas = new AxesCanvas(contdiv, this.camera);
 
         // load data
         this.geometry = new Geometry(gdata["geometry"]);

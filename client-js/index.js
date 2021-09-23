@@ -2,6 +2,7 @@
 module.exports = {
     ArrowSegment:       require('./GTK/ArrowSegment'),
     AttributeChart:     require('./GTK/AttributeChart'),
+    AxesCanvas:         require('./GTK/AxesCanvas'),
     ControlPanel:       require('./GTK/ControlPanel'),
     TrackPanel:         require('./GTK/TrackPanel'),
     TrackChart:         require('./GTK/TrackChart'),
