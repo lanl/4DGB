@@ -50,6 +50,7 @@ class ScalarBarCanvas {
         this.maxX       = this.minX; 
         this.maxY       = this.barTop + this.barHeight;
         this.fillColor  = "#000000";
+        this.strokeStyle = "#000000";
         this.numScalarBarDivs = 10;
 
         // LUT
@@ -83,14 +84,12 @@ class ScalarBarCanvas {
         this.redraw();
     }
 
-    setLUTParameters(min, max) {
-        this.minText = min.toFixed(2);
-        this.maxText = max.toFixed(2);
-
-        this.redraw();
-    }
-
     redraw () {
+        // set value labels
+        this.minText = this.LUT.minV.toFixed(2);
+        this.maxText = this.LUT.maxV.toFixed(2);
+
+        // draw labels
         var ctx = this.canvas.getContext("2d");
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         ctx.fillStyle = this.fillColor; 
@@ -102,11 +101,16 @@ class ScalarBarCanvas {
         var valIncr = parseFloat(Math.abs(this.LUT.maxV-this.LUT.minV)/parseFloat(this.numScalarBarDivs));
         var barIncr = parseFloat(Math.abs(this.barHeight/parseFloat(this.numScalarBarDivs)));
         for (let i = 0; i< this.numScalarBarDivs; i++) {
-            var curVal = this.LUT.maxV = parseFloat(i)*valIncr;
+            var curVal = this.LUT.maxV - parseFloat(i)*valIncr;
             var curBarIncr = parseFloat(i)*barIncr;
-            ctx.fillStyle = this.LUT.getColor( curVal ); 
-            ctx.strokeRect(this.barLeft, this.barTop+curBarIncr, this.barWidth, this.barHeight-curBarIncr); 
+            var fillColor = this.LUT.getColor( curVal ).getHexString(); 
+            ctx.fillStyle = "#" + fillColor; 
+            ctx.fillRect(this.barLeft, this.barTop+curBarIncr, this.barWidth, this.barHeight-curBarIncr); 
         }
+
+        // draw an outline around the colorbar
+        ctx.strokeStyle = this.strokeStyle;
+        ctx.strokeRect(this.barLeft, this.barTop, this.barWidth, this.barHeight); 
     }
 
 }

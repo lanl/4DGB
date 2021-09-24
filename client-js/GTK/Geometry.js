@@ -209,7 +209,7 @@ class Geometry {
 
     setLUT( name ) {
         var numdivs = 512;
-        this.LUT = new THREE.Lut( name, numdivs ); 
+        this.LUT.setColorMap( name, numdivs ); 
     }
 
     getLUT() {

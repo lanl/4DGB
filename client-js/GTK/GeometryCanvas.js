@@ -157,12 +157,14 @@ class GeometryCanvas {
         // axes
         this.axesCanvas = new AxesCanvas(contdiv, this.camera);
 
-        // scalar bar
-        this.scalarBarCanvas = new ScalarBarCanvas(contdiv);
-
         // load data
         this.geometry = new Geometry(gdata["geometry"]);
         this.geometry.load( this.dataset.id, this.scene, this );
+
+        // scalar bar
+        this.scalarBarCanvas = new ScalarBarCanvas(contdiv);
+            // share the geometry's LUT
+        this.scalarBarCanvas.setLUT(this.geometry.LUT);
     }
 
     showAxes( state ) {
@@ -257,13 +259,11 @@ class GeometryCanvas {
 
     setLUT (lut) {
         this.geometry.setLUT(lut);
-        this.scalarBarCanvas.setLUT(this.geometry.getLUT());
     }
 
     setLUTParameters (varname, min, max) {
         this.geometry.setLUTParameters(min, max);
         this.scalarBarCanvas.setTitle(varname);
-        this.scalarBarCanvas.setLUTParameters(min, max);
     }
 
 }
