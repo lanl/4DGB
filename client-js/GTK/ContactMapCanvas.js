@@ -263,8 +263,8 @@ class ContactMapCanvas extends EventEmitter {
          */
         this.lutNumBins   = 256;
         this.lut = new THREE.Lut( this.displayOpts["colormap"], this.lutNumBins ); 
-        this.lut.min = this.displayOpts["threshold"]; 
-        this.lut.max = 1.0;
+        this.lut.setMin(this.displayOpts["threshold"]);
+        this.lut.setMax(1.0);
             // the color value is of the form 0xCCCCCC, so we must convert it to 
             // #CCCCCC in order to use it with the canvas context 
         this.background = "#" + this.displayOpts["background"].substring(2); 
@@ -489,19 +489,14 @@ class ContactMapCanvas extends EventEmitter {
             const val = cm.data[i/4];
             const normalized = (val - cm.minValue) / (cm.maxValue - cm.minValue) * magnification;
 
-            if (normalized <= this.lut.min) {
-                pixels[i]   = this.lutNumBins-1; 
-                pixels[i+1] = this.lutNumBins-1;
-                pixels[i+2] = this.lutNumBins-1; 
+            // color using the lut 
+            const color = this.lut.getColor(normalized);
+            pixels[i]   = color.r*(255);
+            pixels[i+1] = color.g*(255);
+            pixels[i+2] = color.b*(255);
+            pixels[i+3] = 255; 
+            if (normalized <= this.lut.minV) {
                 pixels[i+3] = 0;
-            } else {
-                const color = this.lut.getColor(normalized);
-
-                // color using the lut 
-                pixels[i]   = color.r*(this.lutNumBins-1);
-                pixels[i+1] = color.g*(this.lutNumBins-1);
-                pixels[i+2] = color.b*(this.lutNumBins-1); 
-                pixels[i+3] = this.lutNumBins-1;
             }
         }
 
