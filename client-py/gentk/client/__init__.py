@@ -55,8 +55,8 @@ class client:
     def get_project_interval(self):
         return self._request('project/interval')
 
-    def get_structure(self, sid):
-        return self._request(f'data/structure/{sid}/segments')
+    def get_structure(self, structureID):
+        return self._request(f'data/structure/{structureID}/segments')
 
     def get_genes(self):
         return self._request('genes')
@@ -79,8 +79,8 @@ class client:
     def get_sequence_arrays(self):
         return self.get_arrays('sequence')
 
-    def get_arrays(self, atype):
-        return self._request(f'data/arrays/{atype}')
+    def get_arrays(self, type):
+        return self._request(f'data/arrays/{type}')
 
     def get_array(self, arrayID, arraySlice):
         return self._request(f'data/array/{arrayID}/{arraySlice}')
@@ -99,8 +99,8 @@ class client:
     def get_sampled_array(self, arrayID, arraySlice, begin, end, numsamples ):
         return self._request(f'data/samplearray/{arrayID}/{arraySlice}/{begin}/{end}/{numsamples}')
 
-    def get_segment_ids(self, sid ):
-        return self._request(f'data/structure/{sid}/segmentids')
+    def get_segment_ids(self, structureID):
+        return self._request(f'data/structure/{structureID}/segmentids')
 
     def get_dataset_ids(self):
         return self._request('datasets')

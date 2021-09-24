@@ -64,22 +64,29 @@ class Client {
     //
     // get the genes for a list of segments 
     //
-    get_genes_for_locations(callback, sid, locations) {
-        this._fetch(`/data/structure/${sid}/locations/${locations}/genes`, callback)
+    get_genes_for_locations(callback, structureID, locations) {
+        this._fetch(`/data/structure/${structureID}/locations/${locations}/genes`, callback)
     }
 
     //
     // get the genes for a list of segments 
     //
-    get_genes_for_segments(callback, sid, segids) {
-        this._fetch(`/data/structure/${sid}/segment/${segids}/genes`, callback);
+    get_genes_for_segments(callback, structureID, segIDs) {
+        this._fetch(`/data/structure/${structureID}/segment/${segIDs}/genes`, callback);
+    }
+
+    //
+    // get segments ids  
+    //
+    get_segment_ids(callback, structureID) {
+        this._fetch(`data/structure/${structureID}/segmentids`, callback)
     }
 
     //
     // get segments for a list of genes 
     //
-    get_segments_for_genes(callback, sid, genes) {
-        this._fetch(`/genes/${genes}/data/structure/${sid}`, callback);
+    get_segments_for_genes(callback, structureID, genes) {
+        this._fetch(`/genes/${genes}/data/structure/${structureID}`, callback);
     }
 
     //
@@ -93,8 +100,8 @@ class Client {
     //
     // get the structure for an ID
     //
-    get_structure(callback, sid) {
-        this._fetch(`/data/structure/${sid}/segments`, callback);
+    get_structure(callback, structureID) {
+        this._fetch(`/data/structure/${structureID}/segments`, callback);
     }
 
     //
