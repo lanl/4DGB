@@ -34,20 +34,22 @@ class ScalarBarCanvas {
     static DefaultLUTName   = "grayscale";
     static DefaultLUTDivs   = 512; 
 
-    constructor(rootElem, {width=80, height=100} = {}) {
+    constructor(rootElem, {width=75, height=100} = {}) {
         this.title;
         this.minText    = "Min";
         this.maxText    = "Max";
         this.offset     =  2;
+        this.tickSize   = 10;
         this.titleX     =  0;
         this.titleY     = 10;
         this.barTop     = 20;
         this.barLeft    =  1;
         this.barWidth   = 20;
         this.barHeight  = 70;
-        this.minX       = this.barLeft + this.barWidth + this.offset; 
+        this.padding    =  5;
+        this.minX       = width - this.padding; 
         this.minY       = this.barTop; 
-        this.maxX       = this.minX; 
+        this.maxX       = width - this.padding;
         this.maxY       = this.barTop + this.barHeight;
         this.fillColor   = "#000000";
         this.borderColor = "#000000";
@@ -113,7 +115,9 @@ class ScalarBarCanvas {
         var ctx = this.canvas.getContext("2d");
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         ctx.fillStyle = this.fontColor; 
+        ctx.textAlign = "left";
         ctx.fillText(this.title, this.titleX, this.titleY);
+        ctx.textAlign = "right";
         ctx.fillText(this.minText, this.minX, this.minY);
         ctx.fillText(this.maxText, this.maxX, this.maxY);
 
@@ -131,6 +135,33 @@ class ScalarBarCanvas {
         ctx.strokeStyle = this.borderColor;
         ctx.lineWidth   = 1;
         ctx.strokeRect(this.barLeft, this.barTop, this.barWidth, this.barHeight); 
+
+        // ticks
+        this.drawTicks();
+    }
+
+    drawTicks () {
+        var ctx = this.canvas.getContext("2d");
+        ctx.strokeStyle = this.borderColor;
+        ctx.lineWidth   = 1;
+
+        // top
+        ctx.beginPath();
+        ctx.moveTo(this.barLeft+this.barWidth, this.barTop);
+        ctx.lineTo(this.barLeft+this.barWidth+this.tickSize, this.barTop);
+        ctx.stroke();
+
+        // middle
+        ctx.beginPath();
+        ctx.moveTo(this.barLeft+this.barWidth, this.barTop+(0.5*this.barHeight));
+        ctx.lineTo(this.barLeft+this.barWidth+(0.5*this.tickSize), this.barTop+(0.5*this.barHeight));
+        ctx.stroke();
+
+        // bottom 
+        ctx.beginPath();
+        ctx.moveTo(this.barLeft+this.barWidth, this.barTop + this.barHeight);
+        ctx.lineTo(this.barLeft+this.barWidth+this.tickSize, this.barTop + this.barHeight);
+        ctx.stroke();
     }
 
 }
