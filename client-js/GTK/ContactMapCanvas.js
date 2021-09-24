@@ -34,8 +34,7 @@ const ContactMap = require('./ContactMap');
 const Util = require('./Util');
 const ScalarBarCanvas = require('./ScalarBarCanvas');
 
-const EventEmitter = require('events');
-
+const { Selection, Controller} = require('./selections');
 /**
  * @class ContactMapCanvas
  * 
@@ -44,22 +43,8 @@ const EventEmitter = require('events');
  * The user can click-and-drag on the image to select a region of the contact map. If the user holds
  * down the spacebar, then they can use the scroll wheel to zoom in or out of the image and
  * click-and-drag to pan across it.
- * 
- * This class is also an EventEmitter, which can emit the following events:
- * 
- * 'selectionChanged': Triggered when the selected area is changed
- *      - First argument is an array segment IDs included in the selection.
- *      - Second argument is the triggering d3-brush event
- * 'selectionEnded': Triggered when the selection area is finished changing (i.e. when the user
- * lets go of the mouse after dragging a selection).
- *      - First argument is an array segment IDs included in the selection.
- *      - Second argument is the triggering d3-brush event
- * 
- * TODO: The format for representing selections is meant to match the format used by the
- * GeometryCanvas class, and isn't really ideal for the ContactMap. In the future, we should have
- * an actual type that can represent Selections for either in a more efficient way.
  */
-class ContactMapCanvas extends EventEmitter {
+class ContactMapCanvas {
 
     /**
      * The DOM layout of the widget looks like this:
@@ -108,8 +93,12 @@ class ContactMapCanvas extends EventEmitter {
      * @param {String} rootElemID The DOM ID of the element this will be appended to.
      */
     constructor(project, dataset, rootElemID) {
-        super();
         const self = this;
+
+        /**
+         * @type {Controller} Selection controller used to sync selections with other components.
+         */
+        this.controller;
 
         /** Div containing all the contents of the contact map widget */
         this.contdiv = document.createElement("div");
@@ -283,59 +272,57 @@ class ContactMapCanvas extends EventEmitter {
     }
 
     /**
-     * Set the selection within the canvas.
-     * 
-     * This takes its 'segments' parameter in the same format that GeometryCanvas does,
-     * i.e. As an array of segment IDs to be included in the selection. This takes the first
-     * two contiguous sets of segment IDs that it finds in the list and uses that to set the
-     * brush selection.
-     * 
-     * Calling this function will *NOT* trigger the 'selectionChanged' event.
-     * 
-     * @param {Number[]} segments
+     * Set a new selection controller for the Contact Map Canvas.
+     * Changing the selection in the contact map will trigger 'selectionChanged' events
+     * in the controller, and the contact map will adjust its selection in response to
+     * those events from the controller.
+     * @param {Controller} controller 
      */
-    setSelection(segments, event) {
-        const ranges = Util.valuesToRanges(segments);
-        if (ranges.length === 1) {
-            // If there was only one range, we set the second part of the selection equal to it
-            ranges[1] = ranges[0];
-        }
-
-        let selection = null;
-        if (ranges.length >= 2) {
-            selection = this._scaleBrushSelection([
-                [ ranges[0][0], ranges[1][0] ],
-                [ ranges[0][1], ranges[1][1] ]
-            ], this.xScale, this.yScale)
-        }
-
-        // Move brush
-        this.brush.move( this.brushSVG, selection, new Event("setSelection") );
+    setController(controller) {
+        this.controller = controller;
+        this.controller.addListener('selectionChanged', (e) => this.onSelectionChanged(e) );
     }
 
     /**
-     * Set the brush selection in this contact map to be the same as the brush selection
-     * in another contact map widget. This will *NOT* trigger a 'selectionChanged' event.
-     * 
-     * Since there are multiple ways a selection of the same regions can be represented on the map,
-     * having a contact map set the selection of another through 'selectionChanged' event and
-     * setSelection method is not sufficient, since the second contact map's brush will usually
-     * be a different shape than the first's (even though it marks out an equivalent region). So
-     * this method exists as a hack to force the brushes of two contact maps to match.
-     * 
-     * @param {ContactMapCanvas} other 
+     * Called in response to 'selectionChanged' events. Moves the brush selection 
      */
-    _syncBrush(other) {
-        // Get other selection
-        let selection = d3.brushSelection(other.brushSVG.node());
+    onSelectionChanged(selectionEvent) {
+        const { selection, source, decoration } = selectionEvent;
+        // If the contact map hasn't loaded yet, ignore this event
+        if (!this.contactMap) return;
+        // If this was the same Contact Map that caused the selection update, ignore this event
+        if (source === this) return;
 
-        if (selection !== null) {
-            // Scale to segments (using other canvas's zoom)
-            selection = other._scaleBrushSelection(selection, other.xScale.invert, other.yScale.invert);
-            // Scale back to pixels (using this contact map's current zoom)
-            selection = this._scaleBrushSelection(selection, this.xScale, this.yScale);
+        let extents = null;
+        
+        // If the selection includes brush coordinates, we can just use those
+        if (decoration && decoration.brush) {
+            extents = this._scaleBrushSelection(decoration.brush, this.xScale, this.yScale);
         }
-        this.brush.move( this.brushSVG, selection, new Event("syncBrush") );
+        else {
+            // Otherwise, we determine the brush coordinates from the selection
+            const ranges = selection.asSegments();
+            // If there is only one range, set the second part of the selection equal to it
+            if (ranges.length === 1) ranges[1] = ranges[0];
+            
+            // If the selection is actually the entire area, then we don't need
+            // to set the brush coordinates (we'll just get rid of it)
+            const [ [x1,x2], [y1,y2] ] = ranges;
+            const bounds = this.contactMap.bounds;
+
+            // Check that selection *doesn't* match the entire area
+            if (
+                x1 !== bounds.x || x2 !== bounds.x2 ||
+                y1 !== bounds.y || y2 !== bounds.y2
+            ) {
+                // rewrite as coordinates of selection corners
+                extents = [ [x1,y1], [x2,y2] ];
+                extents = this._scaleBrushSelection(extents, this.xScale, this.yScale);
+            }
+        }
+
+        // Move brush
+        this.brush.move(this.brushSVG, extents, selectionEvent);
     }
 
     /**
@@ -402,46 +389,44 @@ class ContactMapCanvas extends EventEmitter {
      * ( call so that 'this' still refers to this ContactMapCanvas instance ) 
      */
     _onBrush(event) {
+        // If there's no selection controller, then no one cares about our new selection
+        if (this.controller === undefined) return;
+
         // Ignore if the brush moved as a result of panning/zooming
-        // or from calling an internal method.
+        // or by responding to a selectionChanged event
         if (event.sourceEvent && (
             event.sourceEvent.type === 'zoom' ||
-            event.sourceEvent.type === 'setSelection' ||
-            event.sourceEvent.type === 'syncBrush'
+            event.sourceEvent.type === 'selectionChanged'
         )) return;
 
-        // event.selection defines the coorindates (in pixels) of the corners of the
-        // selection. We convert that an array of segmentIDs that are included in the selection.
-        // (it's inefficient, but this is the same format that the GeometryCanvas class accepts)
+        // event.selection defines the coorindates (in pixels) of the corners of the selection.
+        // we can convert to an array of two ranges, specifying the start/end points along each axis
 
         const bounds = this.contactMap.bounds;
         let extents;
+        let brushSelection;
         if (event.selection === null) {
             // No selection with the brush is equivalent to just selecting the whole area
             extents = [
-                [ bounds.x, bounds.x+bounds.width-1  ],
-                [ bounds.y, bounds.y+bounds.height-1 ]
+                [ bounds.x, bounds.x2 ],
+                [ bounds.y, bounds.y2 ]
             ]
         }
         else {
             // Otherwise, get extents from brush selection
-            let [ [x1,y1],[x2,y2] ] = this._scaleBrushSelection(event.selection, this.xScale.invert, this.yScale.invert);
+            brushSelection = this._scaleBrushSelection(event.selection, this.xScale.invert, this.yScale.invert);
+            let [ [x1,y1],[x2,y2] ] = brushSelection;
             // Clamp selection to boundaries
-            x1 = Math.max( bounds.x,                     Math.floor(x1) );
-            x2 = Math.min( bounds.x + bounds.width - 1,  Math.ceil(x2)  );
-            y1 = Math.max( bounds.y,                     Math.floor(y1) );
-            y2 = Math.min( bounds.y + bounds.height - 1, Math.ceil(y2)  );
+            x1 = Math.max( bounds.x,  Math.floor(x1) );
+            x2 = Math.min( bounds.x2, Math.ceil(x2)  );
+            y1 = Math.max( bounds.y,  Math.floor(y1) );
+            y2 = Math.min( bounds.y2, Math.ceil(y2)  );
             extents = [ [x1,x2], [y1,y2] ];
         }
 
-        const segments = Util.rangesToValues(extents);
-
-        this.emit('selectionChanged', segments, event);
-
-        // If this was triggered by a brush-end, then emit an event for that too
-        if (event.type === 'end') {
-            this.emit('selectionEnded', segments, event);
-        }
+        // Update selection (and give brush coordinates along with it)
+        const selection = Selection.fromSegments(extents);
+        this.controller.updateSelection(selection, this, { brush: brushSelection });
     }
 
     /**

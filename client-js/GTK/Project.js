@@ -39,6 +39,7 @@ const ArrowSegment = require('./ArrowSegment');
 //
 class Project {
 
+    /** @type {Project} */
     static TheProject = null;
     
     // the server is expected to resolve the path requested 

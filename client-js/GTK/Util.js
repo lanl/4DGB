@@ -1,7 +1,7 @@
 /**
  * Utility Functions
  * 
- * Usually related to shuffling around the different ways components interpret selections.
+ * Usually related to shuffling around the different ways selection values can be represented.
  */
 
 /**
@@ -54,16 +54,7 @@ function rangeStringToRanges( str ) {
  */
 function valuesToRangeString( values ) {
     const ranges = valuesToRanges( values.slice().sort( (a,b) => a - b ) );
-    
-    const rangeStrs = [];
-    for (let range of ranges) {
-        if (range[0] === range[1])
-            rangeStrs.push(String(range[0]));
-        else
-            rangeStrs.push(`${range[0]}-${range[1]}`);
-    }
-
-    return rangeStrs.join(",");
+    return rangesToRangeString(ranges);
 }
 
 /**
@@ -99,7 +90,7 @@ function valuesToRanges(values) {
  * included in those ranges
  * 
  * example:
- *  [ [1,1], [2-5], [10-10] ] => [1,2,3,4,5,10]
+ *    [ [1,1], [2-5], [10-10] ] => [1,2,3,4,5,10]
  * 
  * @param {Int[][]} ranges
  * @returns {Int[]}
@@ -113,12 +104,51 @@ function rangesToValues(ranges) {
     return Object.keys(values).map( d => parseInt(d) ).sort((a,b) => a - b);
 }
 
+/**
+ * Given an array of arrays specifying ranges of values, return a string representing those values
+ * as a list of ranges.
+ * 
+ * example:
+ *     [ [1-1], [2-5], [10-10] ] => "1,2-5,10"
+ * 
+ * @param {Int[][]} ranges 
+ * @returns {String}
+ */
 function rangesToRangeString(ranges) {
-    throw new Error("rangesToRangeString() not implemented. No one's needed this yet!")
+    const rangeStrs = [];
+    for (let range of ranges) {
+        if (range[0] === range[1])
+            rangeStrs.push(String(range[0]));
+        else
+            rangeStrs.push(`${range[0]}-${range[1]}`);
+    }
+
+    return rangeStrs.join(",");
 }
+
+/**
+ * Given an array of arrays specifying ranges of values, compress those ranges so that none
+ * overlap.
+ * 
+ * example:
+ *  [ [8,8], [12, 25], [20,29] ] => [ [8,8], [12-29] ]
+ * 
+ * from: https://stackoverflow.com/questions/42093036
+**/
+compressRanges = (ranges) => ranges.slice()
+    .sort( (a,b) => a[0]-b[0] || a[1]-b[1] ) // Sort by range start
+    .reduce( (acc, d) => {                   // fold into new range list
+        const last = acc[acc.length-1] || [];
+        if (d[0] <= last[1]+1) {
+            if (last[1] < d[1]) last[1] = d[1];
+            return acc;
+        }
+        return acc.concat([d]);
+    }, []);
 
 module.exports = { 
     rangeStringToValues, rangeStringToRanges,
     valuesToRanges, valuesToRangeString,
-    rangesToValues, rangesToRangeString
+    rangesToValues, rangesToRangeString,
+    compressRanges
 }

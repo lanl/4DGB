@@ -27,10 +27,9 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const Client = require('./Client');
 const ContactMapCanvas = require('./ContactMapCanvas');
 const GeometryCanvas = require('./GeometryCanvas');
-const Segment = require('./Segment');
+const { Controller } = require('./selections');
 
 class ViewerPanel {
 
@@ -58,26 +57,15 @@ class ViewerPanel {
         cm_elem.id = "cm_elem-" + parent;
         this.container.appendChild(cm_elem);
         this.contactmapcanvas = new ContactMapCanvas( project, dataset, cm_elem.id )
-
-        // Update view when selection in contact map changes
-        this.contactmapcanvas.addListener('selectionChanged', (function(selection) {
-            this.geometrycanvas.setSegmentStates( selection, Segment.State.LIVE, Segment.State.GHOST );
-            this.geometrycanvas.render();
-        }).bind(this) );
     }
 
     /**
-     * Sets the selection within this panel's GeometryCanvas and ContactMapCanvas. It will *NOT*
-     * trigger the event listeners for either.
-     * 
-     * 'segments' is an array of segment IDs, specifying the segments that are included in the
-     * selection.
-     * @param {Number[]} segments 
+     * Shortcut to call `setController` on this panel's GeometryCanvas and ContactMapCanvas
+     * @param {Controller} controller 
      */
-    setSelection(segments) {
-        this.geometrycanvas.setSegmentStates( segments, Segment.State.LIVE, Segment.State.GHOST );
-        this.geometrycanvas.render();
-        this.contactmapcanvas.setSelection(segments);
+    setController(controller) {
+        this.contactmapcanvas.setController(controller);
+        this.geometrycanvas.setController(controller);
     }
 
 }
