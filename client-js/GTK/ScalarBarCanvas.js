@@ -48,9 +48,9 @@ class ScalarBarCanvas {
         this.barHeight  = 70;
         this.padding    =  5;
         this.minX       = width - this.padding; 
-        this.minY       = this.barTop; 
+        this.minY       = this.barTop + this.barHeight; 
         this.maxX       = width - this.padding;
-        this.maxY       = this.barTop + this.barHeight;
+        this.maxY       = this.barTop;
         this.fillColor   = "#000000";
         this.borderColor = "#000000";
         this.fontColor   = "#000000";

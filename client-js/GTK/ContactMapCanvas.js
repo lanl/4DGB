@@ -32,6 +32,7 @@ const Project = require('./Project');
 const Dataset = require('./Dataset');
 const ContactMap = require('./ContactMap');
 const Util = require('./Util');
+const ScalarBarCanvas = require('./ScalarBarCanvas');
 
 const EventEmitter = require('events');
 
@@ -274,6 +275,11 @@ class ContactMapCanvas extends EventEmitter {
 
         // Add to global list of instances
         ContactMapCanvas.instances.push( new WeakRef(this) );
+
+        // add a scalar bar
+        this.scalarBarCanvas = new ScalarBarCanvas(this.contdiv);
+        this.scalarBarCanvas.setLUT(this.lut);
+        this.scalarBarCanvas.title = "";
     }
 
     /**
