@@ -34,6 +34,9 @@ const Project = require('./Project');
 const Geometry = require('./Geometry');
 const AxesCanvas = require('./AxesCanvas');
 const ScalarBarCanvas = require('./ScalarBarCanvas');
+const Segment = require('./Segment');
+const Util = require('./Util');
+const { Selection, Controller } = require('./selections');
 
 class GeometryCanvas {
 
@@ -50,6 +53,11 @@ class GeometryCanvas {
         this.unmapped = [];
         this.loaded = false;
         this.setDataset(dataset);
+
+        /**
+         * @type {Controller} Selection controller used to sync selections with other components.
+        */
+        this.controller;
 
         this.render = (function() {
             this.renderRequested = undefined;
@@ -165,6 +173,21 @@ class GeometryCanvas {
         this.scalarBarCanvas = new ScalarBarCanvas(contdiv);
             // share the geometry's LUT
         this.scalarBarCanvas.setLUT(this.geometry.LUT);
+    }
+
+    /**
+     * Set a new selection controller for the Geometry Canvas.
+     * This will cause the displayed segments to react to 'selectionChanged' events
+     * from the controller.
+     * @param {Controller} controller 
+     */
+    setController(controller) {
+        this.controller = controller;
+        this.controller.addListener('selectionChanged', ({selection}) => {
+            const segmentIDs = Util.rangesToValues( selection.asSegments() );
+            this.setSegmentStates(segmentIDs, Segment.State.LIVE, Segment.State.GHOST);
+            this.render();
+        });
     }
 
     showAxes( state ) {

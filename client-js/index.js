@@ -15,7 +15,7 @@ module.exports = {
     Project:            require('./GTK/Project'),
     ScalarBarCanvas:    require('./GTK/ScalarBarCanvas'),
     Segment:            require('./GTK/Segment'),
-    Selection:          require('./GTK/Selection'),
+    Selections:         require('./GTK/selections'),
     ViewerPanel:        require('./GTK/ViewerPanel'),
     Util:               require('./GTK/Util')
 }

@@ -49,24 +49,6 @@ function updateBackgroundColor () {
     }
 }
 
-function getSegmentsForLocationRange( idRange ) {
-    var start = Math.ceil(idRange[0]/TheInterval);
-    var end   = Math.ceil(idRange[1]/TheInterval);
-    var size  = parseInt(end - start);
-    var segments = [];
-
-    if (size == 0) {
-        // begin and end are the same, and we need at least one
-        segments[0] = start;
-    } else {
-        // special case: endpoint was on a segment boundary
-        for (var i=0; i < size+1; i++) {
-            segments[i] = start + i;
-        }
-    }
-    return segments;
-}
-
 function addTrackCallback() {
     // alert("track clicked")
 }
@@ -131,38 +113,6 @@ function linkCameras(a, b) {
     });
 }
 
-
-
-/**
- * Given two ViewerPanels, link their selections so that changing the contact map selection in
- * one will change the other.
- * @param {GTK.ViewerPanel} a 
- * @param {GTK.ViewerPanel} b 
- */
-function linkContactMaps(a, b) {
-    a.contactmapcanvas.addListener('selectionChanged', (selection) => {
-        b.setSelection(selection);
-        b.contactmapcanvas._syncBrush(a.contactmapcanvas);
-    });
-    b.contactmapcanvas.addListener('selectionChanged', (selection) => {
-        a.setSelection(selection);
-        a.contactmapcanvas._syncBrush(b.contactmapcanvas);
-    });
-}
-
-/**
- * Given a ControlPanel and a ContactMapCanvas, establish listeners so that
- * the control panel will update its values when selection ends in the contact map
- * @param {GTK.ControlPanel} controlPanel 
- * @param {GTK.ContactMapCanvas} contactMap 
- */
-function linkContactMapControls(controlPanel, contactMap) {
-    contactMap.addListener('selectionEnded', (segments, e) => {
-        TheControls.segmententry.value = GTK.Util.valuesToRangeString(segments);
-        TheControls.updateSelection(GTK.Selection.Selector.SEGMENTS, e)
-    });
-}
-
 function setVariable( id ) {
     GTK.Client.TheClient.get_array( (response) => {
             ThePanels[0].geometrycanvas.setLUTParameters( TheControls.getCurrentVariableName(), response['data']['min'], response['data']['max'] ); 
@@ -174,35 +124,6 @@ function setVariable( id ) {
             ThePanels[1].geometrycanvas.geometry.colorBy( response['data']['values']);
             ThePanels[1].geometrycanvas.render();
         }, id, 1); 
-}
-function segmentChanged(values, sourceEvent) {
-    if (sourceEvent && sourceEvent.type === 'end') return; // ignore superfluous events created by
-                                                           // ending a click-and-drag selection
-    var segments = values.map(i=>Number(i)); 
-    for (let i = 0; i < TheNumPanels; i++) {
-        ThePanels[i].setSelection(segments);
-    }
-}
-
-function locationChanged(values, sourceEvent) {
-    // split the string and convert to ints
-    if (sourceEvent && sourceEvent.type === 'end') return; // ignore superfluous events created by
-                                                           // ending a click-and-drag selection
-    var lrange = values.split("-").map(Number);
-    var segments = getSegmentsForLocationRange( lrange );
-    for (let i = 0; i < TheNumPanels; i++) {
-        ThePanels[i].setSelection(segments);
-    }
-}
-
-function geneChanged(values, sourceEvent) {
-    if (sourceEvent && sourceEvent.type === 'end') return; // ignore superfluous events created by
-                                                           // ending a click-and-drag selection
-    for (let i = 0; i < TheNumPanels; i++) {
-        GTK.Client.TheClient.get_segments_for_genes( (response) => {
-                ThePanels[i].setSelection( response["segments"] );
-        }, i, values);
-    }
 }
 
 function variableChanged(e) {
@@ -256,13 +177,14 @@ function main( project ) {
         // camera
     linkCameras(ThePanels[0].geometrycanvas, ThePanels[1].geometrycanvas);
         // contact maps
-    linkContactMaps(ThePanels[0], ThePanels[1]);
-    linkContactMapControls(TheControls, ThePanels[0].contactmapcanvas);
-    linkContactMapControls(TheControls, ThePanels[1].contactmapcanvas);
+    //linkContactMaps(ThePanels[0], ThePanels[1]);
+    //linkContactMapControls(TheControls, ThePanels[0].contactmapcanvas);
+    //linkContactMapControls(TheControls, ThePanels[1].contactmapcanvas);
+        // selection controller
+    TheControls.setController(TheController);
+    ThePanels[0].setController(TheController);
+    ThePanels[1].setController(TheController);
         // events
-    TheControls.addListener( "locationChanged",        locationChanged );
-    TheControls.addListener( "geneChanged",            geneChanged );
-    TheControls.addListener( "segmentChanged",         segmentChanged );
     TheControls.addListener( "variableChanged",        variableChanged );
     TheControls.addListener( "colormapChanged",        colormapChanged );
     TheControls.addListener( "createTrack",            createTrack );
@@ -276,6 +198,7 @@ function main( project ) {
 //
 GTK.Project.TheProject = new GTK.Project( GTKProjectName );
 GTK.Client.TheClient  = new GTK.Client();
+const TheController   = new GTK.Selections.Controller();
 var view;
 
 main( GTK.Project.TheProject );

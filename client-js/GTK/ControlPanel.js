@@ -29,10 +29,12 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 const EventEmitter      = require('events');
+
 const Client            = require('./Client');
 const GeometryCanvas    = require('./GeometryCanvas');
-const Selection         = require('./Selection');
 const Util              = require('./Util');
+
+const { Selection, Controller, UNIT } = require('./selections');
 
 var HACK_numbins = 200;
 
@@ -45,13 +47,20 @@ class ControlPanel extends EventEmitter {
     constructor(project, parent) {
         super();
 
-        // misc 
-        this.selector = Selection.Selector.NONE; 
-        this.prevSelector = Selection.Selector.NONE; 
-        this.selection = new Selection();
-        this.selection.client = Client.TheClient;
-        this.selection.HACKInterval = TheInterval;
-        this.selection.addListener('selectionChanged', (function (e) { this.syncronizeSelection(e) }).bind(this));
+        /** 
+         * @type {Controller} Selection controller used to sync selections
+         * with other components. By default, this constructs its own controller,
+         * (so that the text boxes still respond to each-other)
+         * although you'll probably want to override it with `setController`
+         **/
+        this.controller = new Controller();
+        this.controller.addListener('selectionChanged', (e) => this.onSelectionChanged(e) );
+        this.controller.addListener('selectionDebounced', (e) => this.onSelectionChanged(e) );
+
+        /**
+         * @type {Selection} Currently displayed selection
+         */
+        this.currentSelection;
 
         // build UI
         var root = document.getElementById(parent);
@@ -85,6 +94,12 @@ class ControlPanel extends EventEmitter {
         this.controls.className = "gtkcontroltable";
         this.globaltabcontent.appendChild(this.controls);
 
+        /** 
+         * @type {UNIT} Represents the unit of the text box that the user last
+         * edited. This used to pick which unit to use when the "Select" button is pressed.
+         **/
+        this.lastUpdated;
+
         // info 
         // this.initializeInfoTab(root, project);
 
@@ -112,7 +127,8 @@ class ControlPanel extends EventEmitter {
         this.locationentry = document.createElement("input");
         this.locationentry.type = "text";
         cell.appendChild(this.locationentry);
-        this.locationentry.addEventListener( 'keypress', ((e) => { this.confirmEntry(e, Selection.Selector.LOCATIONS) }).bind(this) );
+        this.locationentry.addEventListener( 'keypress', ((e) => { this.triggerSelection(e, UNIT.LOCATION) }).bind(this) );
+        this.locationentry.addEventListener( 'oninput', () => { this.lastUpdated = UNIT.LOCATION } );
                 // selection
         var cell = row.insertCell(2);
         this.locationchoice = document.createElement("select");
@@ -133,7 +149,8 @@ class ControlPanel extends EventEmitter {
         this.geneentry = document.createElement("input");
         this.geneentry.type = "text";
         cell.appendChild(this.geneentry);
-        this.geneentry.addEventListener( 'keypress', ((e) => { this.confirmEntry(e, Selection.Selector.GENES) }).bind(this) );
+        this.geneentry.addEventListener( 'keypress', ((e) => { this.triggerSelection(e, UNIT.GENE) }).bind(this) );
+        this.geneentry.addEventListener( 'oninput', () => { this.lastUpdated = UNIT.GENE } );
                 // selection
         var cell = row.insertCell(2);
         this.genechoice = document.createElement("select");
@@ -153,7 +170,8 @@ class ControlPanel extends EventEmitter {
         this.segmententry = document.createElement("input");
         this.segmententry.type = "text";
         cell.appendChild(this.segmententry);
-        this.segmententry.addEventListener( 'keypress', ((e) => { this.confirmEntry(e, Selection.Selector.SEGMENTS) }).bind(this) );
+        this.segmententry.addEventListener( 'keypress', ((e) => { this.triggerSelection(e, UNIT.SEGMENT) }).bind(this) );
+        this.segmententry.addEventListener( 'oninput', () => { this.lastUpdated = UNIT.SEGMENT } );
                 // selection
         var cell = row.insertCell(2);
 //      this.segmentchoice = document.createElement("select");
@@ -174,7 +192,7 @@ class ControlPanel extends EventEmitter {
         this.select = document.createElement("button");
         this.select.innerHTML = "Select";
         cell.appendChild(this.select);
-        this.select.onclick = (function (e) { this.onSelect(e) }).bind(this);
+        this.select.onclick = (function (e) { this.triggerSelection(e, this.lastUpdated) }).bind(this);
 
             // title
         var row = this.controls.insertRow(cur_row); 
@@ -327,14 +345,17 @@ class ControlPanel extends EventEmitter {
 
     }
 
-    //
-    // locally synchronize the selection elements based on
-    // the selection object
-    //
-    syncronizeSelection() {
-        this.geneentry.value        = this.selection.genes;
-        this.locationentry.value    = this.selection.locations;
-        this.segmententry.value     = this.selection.segments;
+    /**
+     * Set a new selection controller for the Control Panel.
+     * Changing the selection in the control panel will trigger 'selectionChanged' events
+     * in the controller, and the control panel will also respond to those events from
+     * the controller.
+     * @param {Controller} controller 
+     */
+    setController(controller) {
+        this.controller = controller;
+        this.controller.addListener('selectionChanged',   (e) => this.onSelectionChanged(e)   );
+        this.controller.addListener('selectionDebounced', (e) => this.onSelectionDebounced(e) );
     }
 
     //
@@ -437,31 +458,75 @@ class ControlPanel extends EventEmitter {
         }
     }
 
-    //
-    // based on the UI element that is controlling the selection,
-    // update the rest of the UI
-    //
-    onSelect(e) {
-        if (this.selector == Selection.Selector.GENES) {
-            if (this.validateGenes()) {
-                var values = this.getSelectedGenesList();
-                this.selection.selectGenes(this.geneentry.value);
-                super.emit("geneChanged", values, e);
-            }
-        } else if (this.selector == Selection.Selector.LOCATIONS) {
-            if (this.validateLocations()) {
-                var values = this.getSelectedLocationsList();
-                this.selection.selectLocations(this.locationentry.value);
-                super.emit("locationChanged", values[0], e);
-            }
-        } else if (this.selector == Selection.Selector.SEGMENTS) {
-            if (this.validateSegments()) {
-                this.selection.selectSegments(this.segmententry.value);
-                var expanded_values = Util.rangeStringToValues( this.segmententry.value );
-                super.emit("segmentChanged", expanded_values, e);
-            }
+    /**
+     * Called by an event listener on either the "Select" button or one of the three
+     * text boxes for defining a selection. Triggers an update to the Selection Controller
+     * @param {Event} e source event
+     * @param {UNIT} unit Unit to use to create the selection
+     */
+    triggerSelection(e, unit) {
+        // If this was from a keypress (meaning it came from one of the text boxes)
+        // but the key *wasn't* <Enter>, then ignore this.
+        if (e.type === 'keypress') {
+            this.lastUpdated = unit;
+            if (e.keyCode !== 13 /*enter key*/) return;
+        }
+
+        switch (unit) {
+            // update selection based off selected unit type
+            case UNIT.LOCATION:
+                if (this.validateLocations()) {
+                    const locations = Util.rangeStringToRanges( this.locationentry.value );
+                    this.controller.updateSelection( Selection.fromLocations(locations), this );
+                }
+                break;
+
+            case UNIT.SEGMENT:
+                if (this.validateSegments()) {
+                    const segments = Util.rangeStringToRanges( this.segmententry.value );
+                    this.controller.updateSelection( Selection.fromSegments(segments), this );
+                }
+                break;
+
+            case UNIT.GENE:
+                if (this.validateGenes()) {
+                    const genes = this.geneentry.value.replace(/\s+/g, '').split(",");
+                    this.controller.updateSelection( Selection.fromGenes(genes), this );
+                }
+                break;
         }
     }
+
+    /**
+     * Called in response to the 'selectionChanged' event on the selection controller
+     */
+    onSelectionChanged(selectionEvent) {
+        const { selection } = selectionEvent;
+        this.currentSelection = selection;
+        this.locationentry.value = Util.rangesToRangeString( selection.asLocations() );
+        this.segmententry.value  = Util.rangesToRangeString( selection.asSegments()  );
+        // To prevent excess fetch calls, we don't retrieve the genes until the selection
+        // has stabilized (via the selectionDebounced) event
+    }
+
+    /**
+     * Called in response to the 'selectionDebounced' event on the selection controller.
+     * Fetches gene data for the selection and writes it in the text box
+     */
+    onSelectionDebounced(selectionEvent) {
+        const { selection } = selectionEvent;
+        selection.asGenes().then( (genes) => {
+            // If the selection changed again by the time this resolves, forget it
+            if (this.currentSelection !== selection) return;
+            this.geneentry.value = genes.join(',') 
+        });
+    }
+
+    /**
+     * 
+     * @param {*} e 
+     * @param {*} tabname 
+     */
 
     openTab(e, tabname) {
         // Declare all variables
@@ -483,32 +548,6 @@ class ControlPanel extends EventEmitter {
         var tab = document.getElementById(tabname);
         tab.style.display = "block";
         e.currentTarget.className += " active";
-    }
-
-    /**
-     * Called in response to a keypress in one of the text boxes.
-     * If the key is <enter>, to confirm a selection, trigger an
-     * update to the selection
-     * @param {KeyEvent} e 
-     * @param {Selection.Selector} type 
-     */
-    confirmEntry(e, type) {
-        if (e.keyCode == 13)
-            this.updateSelection(type, e)
-    }
-
-    /**
-     * Update the selection according to whatever is in the text box specified
-     * by type. 'sourceEvent' is the event that triggered this (if any) and will
-     * be passed along with any events that this triggers.
-     * @param {Selection.Selector} type 
-     * @param {Event?} sourceEvent 
-     */
-    updateSelection(type, sourceEvent) {
-        if (Selection.SelectorValues.includes(type)) {
-            this.selector = type;
-            this.onSelect(sourceEvent);
-        }
     }
 
     // general entry helper functions
@@ -547,14 +586,11 @@ class ControlPanel extends EventEmitter {
     }
 
     addLocation() {
-        this.selector = Selection.Selector.LOCATIONS;
-
-        // bookkeeping
         this.eraseEntry(this.geneentry);
         this.eraseEntry(this.segmententry);
-        if (this.prevSelector != this.selector) {
+        if (this.lastUpdated != UNIT.LOCATION) {
             this.eraseEntry(this.locationentry);
-            this.prevSelector = this.selector;
+            this.lastUpdated = UNIT.LOCATION;
         }
 
         this.addValueToEntry( this.locationentry, this.getCurrentLocation(), this.getSelectedLocationsList() ); 
@@ -581,14 +617,11 @@ class ControlPanel extends EventEmitter {
     }
 
     addGene(e) {
-        this.selector = Selection.Selector.GENES;
-
-        // bookkeeping
         this.eraseEntry(this.locationentry);
         this.eraseEntry(this.segmententry);
-        if (this.prevSelector != this.selector) {
+        if (this.lastUpdated != UNIT.GENE) {
             this.eraseEntry(this.geneentry);
-            this.prevSelector = this.selector;
+            this.lastUpdated = UNIT.GENE;
         }
 
         this.addValueToEntry( this.geneentry, this.getCurrentGene(), this.getSelectedGenesList() ); 
@@ -615,14 +648,11 @@ class ControlPanel extends EventEmitter {
     }
 
     addSegment(e) {
-        this.selector = Selection.Selector.SEGMENTS;
-
-        // bookkeeping
         this.eraseEntry(this.locationentry);
         this.eraseEntry(this.geneentry);
-        if (this.prevSelector != this.selector) {
+        if (this.lastUpdated != UNIT.SEGMENT) {
             this.eraseEntry(this.segmententry);
-            this.prevSelector = this.selector;
+            this.lastUpdated = UNIT.SEGMENT;
         }
 
         this.addValueToEntry( this.segmententry, this.getCurrentSegment(), this.getSelectedSegmentsList() ); 

@@ -67,6 +67,8 @@ class ContactMap {
         this.bounds = {
             x: range.minX,
             y: range.minY,
+            x2: range.maxX,
+            y2: range.maxY,
             width: range.maxX - range.minX + 1,
             height: range.maxY - range.minY + 1
         }

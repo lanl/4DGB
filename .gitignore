@@ -4,6 +4,7 @@ projects/test.02/
 projects/test.00/generated/
 projects/release.2021-09-15
 projects/release.2021-09-15.05-19
+server/static/*.pdf
 __pycache__/
 venv/
 node_modules/
@@ -16,3 +17,4 @@ client-js/gtk-dist/
 gtk.min.js
 gtkclient_*_test.json
 testing/scratch
+
