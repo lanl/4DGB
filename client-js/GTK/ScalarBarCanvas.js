@@ -34,15 +34,15 @@ class ScalarBarCanvas {
     static DefaultLUTName   = "grayscale";
     static DefaultLUTDivs   = 512; 
 
-    constructor(rootElem, {width=100, height=100} = {}) {
+    constructor(rootElem, {width=80, height=100} = {}) {
         this.title      = "Variable Name";
         this.minText    = "Min";
         this.maxText    = "Max";
-        this.offset     = 2;
-        this.titleX     = 10;
+        this.offset     =  2;
+        this.titleX     =  0;
         this.titleY     = 10;
         this.barTop     = 20;
-        this.barLeft    = 20;
+        this.barLeft    =  1;
         this.barWidth   = 20;
         this.barHeight  = 70;
         this.minX       = this.barLeft + this.barWidth + this.offset; 
@@ -110,6 +110,7 @@ class ScalarBarCanvas {
 
         // draw an outline around the colorbar
         ctx.strokeStyle = this.strokeStyle;
+        ctx.lineWidth   = 1;
         ctx.strokeRect(this.barLeft, this.barTop, this.barWidth, this.barHeight); 
     }
 
