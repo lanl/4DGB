@@ -33,6 +33,7 @@ require('three/examples/js/controls/OrbitControls')
 const Project = require('./Project');
 const Geometry = require('./Geometry');
 const AxesCanvas = require('./AxesCanvas');
+const ScalarBarCanvas = require('./ScalarBarCanvas');
 
 class GeometryCanvas {
 
@@ -159,6 +160,11 @@ class GeometryCanvas {
         // load data
         this.geometry = new Geometry(gdata["geometry"]);
         this.geometry.load( this.dataset.id, this.scene, this );
+
+        // scalar bar
+        this.scalarBarCanvas = new ScalarBarCanvas(contdiv);
+            // share the geometry's LUT
+        this.scalarBarCanvas.setLUT(this.geometry.LUT);
     }
 
     showAxes( state ) {
@@ -249,6 +255,15 @@ class GeometryCanvas {
         if (this.loaded) {
             this.showUnmappedSegments(this.ShowUnmappedSegments);
         }
+    }
+
+    setLUT (lut) {
+        this.geometry.setLUT(lut);
+    }
+
+    setLUTParameters (varname, min, max) {
+        this.geometry.setLUTParameters(min, max);
+        this.scalarBarCanvas.setTitle(varname);
     }
 
 }
