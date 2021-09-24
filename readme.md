@@ -36,22 +36,22 @@ npm install
 python3 release/<project>/server/gtkserver.py --port 8000
 ```
 
-For example, to run the `test.00` project in this repository:
+For example, to run the `test.01` project in this repository:
 
 ```sh
-./bin/make_release test.00
-python3 release/test.00/server/gtkserver.py --port 8000
+./bin/make_release test.01
+python3 release/test.01/server/gtkserver.py --port 8000
 ```
 
-From there, open a web browser to `http://127.0.0.1:8000/viewer.html?gtkproject=test.00` to view the project:
+From there, open a web browser to `localhost:8000` to view the project page:
 
 <div align="center">
-<img src="doc/img/test.00.png"></img>
+<img src="doc/img/test.01_project-page.png"></img>
 </div>
 
-You can see the comparison app with the following URL `http://127.0.0.1:8000/compare.html?gtkproject=test.00`
+Clicking on the grey zone or the image of the app will take you to the running instance:
 <div align="center">
-<img src="server/static/img/compare_test.00_thumb.png"></img>
+<img src="doc/img/test.01.png"></img>
 </div>
 
 ## To run a public instance
