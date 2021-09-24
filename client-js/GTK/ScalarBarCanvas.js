@@ -35,7 +35,7 @@ class ScalarBarCanvas {
     static DefaultLUTDivs   = 512; 
 
     constructor(rootElem, {width=80, height=100} = {}) {
-        this.title      = "Variable Name";
+        this.title;
         this.minText    = "Min";
         this.maxText    = "Max";
         this.offset     =  2;
@@ -49,8 +49,9 @@ class ScalarBarCanvas {
         this.minY       = this.barTop; 
         this.maxX       = this.minX; 
         this.maxY       = this.barTop + this.barHeight;
-        this.fillColor  = "#000000";
-        this.strokeStyle = "#000000";
+        this.fillColor   = "#000000";
+        this.borderColor = "#000000";
+        this.fontColor   = "#000000";
         this.numScalarBarDivs = 10;
 
         // LUT
@@ -72,10 +73,29 @@ class ScalarBarCanvas {
         this.redraw();
     }
 
-    setTitle( title ) {
-        this.title = title;
+    set borderColor(c) {
+        this._borderColor = c;
+    }
 
+    get borderColor() {
+        return this._borderColor;
+    }
+
+    set fontColor(c) {
+        this._fontColor = c;
+    }
+
+    get fontColor() {
+        return this._fontColor;
+    }
+
+    set title( title ) {
+        this._title = title;
         this.redraw();
+    }
+
+    get title() {
+        return this._title;
     }
 
     setLUT(LUT) {
@@ -92,7 +112,7 @@ class ScalarBarCanvas {
         // draw labels
         var ctx = this.canvas.getContext("2d");
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        ctx.fillStyle = this.fillColor; 
+        ctx.fillStyle = this.fontColor; 
         ctx.fillText(this.title, this.titleX, this.titleY);
         ctx.fillText(this.minText, this.minX, this.minY);
         ctx.fillText(this.maxText, this.maxX, this.maxY);
@@ -103,13 +123,12 @@ class ScalarBarCanvas {
         for (let i = 0; i< this.numScalarBarDivs; i++) {
             var curVal = this.LUT.maxV - parseFloat(i)*valIncr;
             var curBarIncr = parseFloat(i)*barIncr;
-            var fillColor = this.LUT.getColor( curVal ).getHexString(); 
-            ctx.fillStyle = "#" + fillColor; 
+            ctx.fillStyle = "#" + this.LUT.getColor( curVal ).getHexString(); 
             ctx.fillRect(this.barLeft, this.barTop+curBarIncr, this.barWidth, this.barHeight-curBarIncr); 
         }
 
         // draw an outline around the colorbar
-        ctx.strokeStyle = this.strokeStyle;
+        ctx.strokeStyle = this.borderColor;
         ctx.lineWidth   = 1;
         ctx.strokeRect(this.barLeft, this.barTop, this.barWidth, this.barHeight); 
     }

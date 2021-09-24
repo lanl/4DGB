@@ -263,7 +263,7 @@ class GeometryCanvas {
 
     setLUTParameters (varname, min, max) {
         this.geometry.setLUTParameters(min, max);
-        this.scalarBarCanvas.setTitle(varname);
+        this.scalarBarCanvas.title = varname;
     }
 
 }

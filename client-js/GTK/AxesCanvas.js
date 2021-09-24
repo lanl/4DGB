@@ -32,7 +32,7 @@ class AxesCanvas {
 
     static Classname    = "gtkaxescanvas";
     static ClearColor   = 0xffffff;
-    static ClearAlpha   = 0.5; 
+    static ClearAlpha   = 0.0; 
 
     constructor(rootElem, linkcamera, {width=100, height=100} = {}) {
         this.camera;
