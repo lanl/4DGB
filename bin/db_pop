@@ -88,7 +88,7 @@ print("")
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS structure''')
     # create the table 
-c.execute('''CREATE TABLE structure (structureid INT, segid INT, startid INTEGER, endid INTEGER, length INT, startx REAL, starty REAL, startz REAL, endx REAL, endy REAL, endz REAL, centerx REAL, centery REAL, centerz REAL)''')
+c.execute('''CREATE TABLE structure (structureid INT, segid INT, startid INT, endid INT, length INT, startx REAL, starty REAL, startz REAL, endx REAL, endy REAL, endz REAL, centerx REAL, centery REAL, centerz REAL)''')
 
 # parse all structure files, and insert data into the table
 # a segment is based on two points from the file - the 
@@ -120,6 +120,7 @@ for geom in jsondata["data"]["structure"]:
                         prev[0], prev[1], prev[2], cur[0], cur[1], cur[2], center[0], center[1], center[2]])
                     prev = cur
                     position = position + geom["interval"]
+
     elif (infile.endswith('.csv')) :
         print("    loading structure file (CSV)")
         with open(infile, 'r') as indata:
@@ -216,7 +217,7 @@ print("")
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS genes''')
     # create the table
-c.execute('''CREATE TABLE genes (id INTEGER PRIMARY KEY AUTOINCREMENT, start INTEGER, end INTEGER, length INTEGER, gID TEXT, gene_type TEXT, gene_name TEXT)''')
+c.execute('''CREATE TABLE genes (id INT PRIMARY KEY AUTOINCREMENT, start INT, end INT, length INT, gID TEXT, gene_type TEXT, gene_name TEXT)''')
 
 # populate the table from a file
 insert = '''INSERT INTO genes (start,end,length,gID,gene_type,gene_name) VALUES(?,?,?,?,?,?)'''

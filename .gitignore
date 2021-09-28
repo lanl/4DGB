@@ -1,6 +1,9 @@
 .DS_Store
 release/
+doc/database.pdf
 projects/test.02/
+projects/test.01/generated
+projects/test.01/source/array
 projects/test.00/generated/
 projects/release.2021-09-15
 projects/release.2021-09-15.05-19
