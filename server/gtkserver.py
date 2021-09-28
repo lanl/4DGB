@@ -265,7 +265,7 @@ def UnmappedData(identifier):
 @app.route('/data/structure/<identifier>/segments')
 def SegmentData(identifier):
     conn    = db_connect.connect()
-    query   = conn.execute("SELECT segid, startid, length, startx, starty, startz, endx, endy, endz FROM structure WHERE structureid == {} ORDER BY segid".format(identifier))
+    query   = conn.execute("SELECT segid, startid, length, startx, starty, startz, endx, endy, endz FROM structure WHERE id == {} ORDER BY segid".format(identifier))
     data    = []
     lengths = []
     for b in query.cursor.fetchall():
@@ -285,7 +285,7 @@ def SegmentData(identifier):
 @app.route('/data/structure/<identifier>/segmentids')
 def SegmentIds(identifier):
     conn    = db_connect.connect()
-    query   = conn.execute("SELECT segid FROM structure WHERE structureid == {} ORDER BY segid".format(identifier))
+    query   = conn.execute("SELECT segid FROM structure WHERE id == {} ORDER BY segid".format(identifier))
     data    = []
     for b in query.cursor.fetchall():
         data.append(b[0])
@@ -375,20 +375,20 @@ def GenesForSegments(structureid, segmentids):
         if (match != None):
             # this is a range
                 # get the start
-            query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, match.group('start'))
+            query   = conn.execute("SELECT startid, endid FROM structure WHERE id = ? AND segid = ?", structureid, match.group('start'))
             results = query.cursor.fetchall()
             if (len(results) != 0):
                 seg_start = results[0][0]
 
                 # get the end
-            query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, match.group('end'))
+            query   = conn.execute("SELECT startid, endid FROM structure WHERE id = ? AND segid = ?", structureid, match.group('end'))
             results = query.cursor.fetchall()
 
             if (len(results) != 0):
                 seg_end = results[0][1]
         else:
             # find all genes that intersect with these segments 
-            query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, s)
+            query   = conn.execute("SELECT startid, endid FROM structure WHERE id = ? AND segid = ?", structureid, s)
             results = query.cursor.fetchall()
 
             # query and create a list of genes 
@@ -464,7 +464,7 @@ def SegmentsForGene(names, structureid):
             g_start = results[0]
             g_end   = results[1]
 
-            query = conn.execute("SELECT segid from structure WHERE structureid = ? AND \
+            query = conn.execute("SELECT segid from structure WHERE id = ? AND \
                                       ( ( startid BETWEEN ? AND ? ) OR ( endid BETWEEN ? AND ? ) OR \
                                         ( startid > ? AND endid < ? ) OR ( startid < ? AND endid > ? ) ) ORDER BY segid", 
                                       structureid, g_start, g_end, g_start, g_end, g_start, g_end, g_start, g_end)
