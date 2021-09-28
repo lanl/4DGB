@@ -148,15 +148,14 @@ class GeometryCanvas {
             if (curLight["type"] == "directional") {
                 light = new THREE.DirectionalLight(curLight["color"], curLight["intensity"]);
                 light.position.set(curLight["position"][0], curLight["position"][1], curLight["position"][2] );
-                if ("castshadow" in curLight) {
-                    light.castShadow = curLight["castshadow"];
-                    light.shadow.camera.near = 0.5;
-                    light.shadow.camera.far = 500; 
-                    var size = 10;
-                    light.shadow.camera.top     =  size 
-                    light.shadow.camera.bottom  = -size;
-                    light.shadow.camera.left    =  size;
-                    light.shadow.camera.right   = -size;
+                if ("shadow" in curLight) {
+                    light.castShadow            = curLight["shadow"]["castshadow"];
+                    light.shadow.camera.near    = curLight["shadow"]["camera"]["near"];
+                    light.shadow.camera.far     = curLight["shadow"]["camera"]["far"];
+                    light.shadow.camera.top     = curLight["shadow"]["camera"]["top"];
+                    light.shadow.camera.bottom  = curLight["shadow"]["camera"]["bottom"];
+                    light.shadow.camera.left    = curLight["shadow"]["camera"]["left"];
+                    light.shadow.camera.right   = curLight["shadow"]["camera"]["right"];
                 }
                 //  debugging
                 if (false) {
