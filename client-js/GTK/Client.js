@@ -40,6 +40,10 @@ class Client {
             .then(data => callback(data));
     }
 
+    get_project(callback) {
+        this._fetch('/project/project.json', callback);
+    }
+
     //
     // get the project interval 
     //

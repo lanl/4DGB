@@ -259,13 +259,36 @@ class Selection {
      * once complete.
      */
     async _fetchGeneData() {
-        const segmentRanges = Util.rangesToRangeString(this._segmentRanges);
-
+        
         // If a fetch is already underway, just wait for that one to finish
-        this._geneFetch = this._geneFetch || new Promise( (resolve,reject) => {
-            try { this._client.get_genes_for_segments( resolve, 0, segmentRanges ); }
-            catch (err) { reject(err); }
-        });
+        // otherwise, start a new one
+        if (this._geneFetch === undefined) {
+            // How we get the gene data depends on the unit this selection was created with
+            switch (this._constructedFrom) {
+                case UNIT.LOCATION:
+                    // Fetch with Client.get_genes_for_locations
+                    const locationRanges = Util.rangesToRangeString(this._locationRanges);
+                    this._geneFetch = new Promise( (resolve,reject) => {
+                        try { this._client.get_genes_for_locations( resolve, 0, locationRanges ); }
+                        catch (err) { reject(err); }
+                    });
+                    break;
+
+                case UNIT.SEGMENT:
+                    // Fetch with Client.get_genes_for_segments
+                    const segmentRanges = Util.rangesToRangeString(this._segmentRanges);
+                    this._geneFetch = new Promise( (resolve,reject) => {
+                        try { this._client.get_genes_for_segments( resolve, 0, segmentRanges ); }
+                        catch (err) { reject(err); }
+                    });
+                    break;
+
+                case UNIT.GENE:
+                    // This shouldn't happen, but whatever. We have the gene data already anyway
+                    this._geneFetch = new Promise( (resolve) => resolve(this._genes) );
+                    break;
+            }
+        }
 
         const res = await this._geneFetch;
         this._genes = res['genes'];
@@ -291,12 +314,58 @@ class Selection {
 
     _locationRangesToSegmentRanges(ranges) {
         const interval = this._project.getInterval();
-        return ranges.map( ([start,end]) => [ Math.floor(start/interval), Math.ceil(end/interval)] );
+        return ranges.map( ([start,end]) => {
+            const span = end - start;
+            const segments = [ Math.ceil(start/interval), Math.ceil(end/interval)];
+
+            // the first part of the range is on a boundary
+            if (segments[0]*interval === start) {
+                if      ( span === interval ) segments[0] = segments[1]; // the location range is a single segment
+                else if ( span >   interval ) segments[0]++;
+            }
+
+            return segments;
+        });
     }
 
     _segmentRangesToLocationRanges(ranges) {
         const interval = this._project.getInterval();
-        return ranges.map( ([start,end]) => [ Math.floor(start)*interval, Math.ceil(end)*interval] );
+        return ranges.map( ([start,end]) => [ Math.floor(start-1)*interval, Math.floor(end)*interval] );
+    }
+
+    //
+    // given a segment range, return the location range that
+    // encompasses it
+    //
+    getLocationRangeForSegmentRange( sRange ) {
+        var start = (sRange[0]-1)*this.HACKInterval; 
+        var end   = sRange[1]*this.HACKInterval; 
+
+        return [start, end]
+    }
+
+    //
+    // given a location range, return the segment range that
+    // encompasses it
+    //
+    getSegmentRangeForLocationRange( lRange ) {
+        var start = Math.ceil(lRange[0]/this.HACKInterval);
+        var end   = Math.ceil(lRange[1]/this.HACKInterval);
+        var span  = lRange[1] - lRange[0];
+
+        var segments = [start, end];
+
+        // the first part of the range is on a boundary
+        if ( (start*this.HACKInterval == lRange[0]) ) {
+            if (span == this.HACKInterval) {
+                // the location range is a single segment
+                segments = [end, end]
+            } else if (span > this.HACKInterval) {
+                segments = [start + 1, end]
+            }
+        }
+
+        return segments; 
     }
 
     /**
