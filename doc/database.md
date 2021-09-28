@@ -41,6 +41,14 @@ toc:            false
 
 ## Tables (cont'd)
 
+- structure_metadata
+
+| id | num_segments | interval | unmapped |
+|----|--------------|----------|----------|
+|int | int          | int      | text     | 
+
+## Tables (cont'd)
+
 - array
 
 | id  | name | type | min | max | url | 
