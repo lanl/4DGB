@@ -30,6 +30,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 const Segment = require('./Segment')
+const THREE   = require('three')
 
 /*
  *

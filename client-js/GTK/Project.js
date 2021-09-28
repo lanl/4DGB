@@ -31,6 +31,15 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const Segment = require('./Segment');
 const ArrowSegment = require('./ArrowSegment');
+const THREE = require('three');
+const Client = require('./Client');
+
+/**********************
+ * MODULE-PRIVATE STUFF
+***********************/
+
+/** Project's constructor keeps itself private by requiring this module-private object */
+const CONSTRUCTOR_PASS = { foo: "🤷" }; // it's 2021, an emoji won't break the code, right?
 
 //
 // class responsible for loading the GTK Project data
@@ -41,20 +50,11 @@ class Project {
 
     /** @type {Project} */
     static TheProject = null;
-    
-    // the server is expected to resolve the path requested 
-    constructor( path ) {
-        // by convention, projects are stored in the 'projects' directory on the 
-        // server. This is hidden from the user, who is only requesting the project name
-        this.pfile = "/project/project.json";
+    constructor(pass, data) {
+        if (pass !== CONSTRUCTOR_PASS)
+            throw new Error("Project's constructor is private! Please use the static (and async) Project.getProject()");
 
-        const request = new XMLHttpRequest();
-        request.open('GET', this.pfile, false);
-        request.send(null);
-
-        if (request.readyState == 4 && (request.status == 0 || request.status == 200)) {
-            this.project = JSON.parse(request.responseText);
-        }
+        this.project = data;
 
         // set up class constants, etc.
         var app = this.getApplicationData("gtk")
@@ -68,6 +68,23 @@ class Project {
                                                                  g["endpoint"]["segments"], 
                                                                  g["endpoint"]["segments"] );
         Segment.GhostOpacity   = g["ghost"]["opacity"];
+    }
+
+    /**
+     * Returns a promise that resolves into a Project instance representing the project hosted
+     * on the server.
+     * @returns {Promise<Project>}
+     */
+    static async getProject() {
+        if (Client.TheClient === undefined)
+            throw new Error("Project cannot be created until the global 'Client.TheClient' has been set");
+
+        const project_data = await new Promise( (resolve, reject) => {
+            try { Client.TheClient.get_project( resolve ); }
+            catch (err) { reject(err); }
+        });
+
+        return new Project(CONSTRUCTOR_PASS, project_data);
     }
 
     getInterval() {

@@ -1,8 +1,9 @@
-const Client    = require('../client-js/GTK/Client.js');
-const Selection = require('../client-js/GTK/selection.js');
-
-var TestTypes = ["location", "segment", "gene"]
-TestTypes = ["location", "segment"]
+// Selection requires a static Client and Project be set before
+// its constructed
+const Client        = require('../client-js/GTK/Client');
+const Project       = require('../client-js/GTK/Project');
+const Util          = require('../client-js/GTK/Util');
+const { Selection } = require('../client-js/GTK/selections');
 
 var LocationTests = [
                 {
@@ -145,64 +146,55 @@ var GeneTests = [
                 }
             ]
 
-//
-// run each of the calls, and produce a file on disc with the output
-//
-test('selection test', () => {
-    // test.01
-    client = new Client("http://127.0.0.1", 8000);
+/**
+ * Convert a suite of tests to a form consumable by test.concurrent.each
+ */
+const convert_test = ({test, locations, segments, genes, note}) => [
+    note || `Test #${test}`,
+    Util.compressRanges( Util.rangeStringToRanges(locations) ),
+    Util.compressRanges( Util.rangeStringToRanges(segments)  ),
+    genes.split(',')
+];
 
-    // location-setting tests
-    for (const t of LocationTests) {
-        var selection = new Selection();
-        selection.client = client;
-        selection.HACKInterval = 400000; 
-        selection.marker = t['test'];
-
-        // for each instance, create a unique callback that tests the results
-        selection.addListener( "selectionChanged",  ((selection) => {
-                var ID = selection.marker; 
-                expect(selection.locations).toBe(LocationTests[ID]['locations']);
-                expect(selection.segments).toBe(LocationTests[ID]['segments']);
-                expect(selection.genes).toBe(LocationTests[ID]['genes']);
-            }).bind(selection));
-
-        selection.selectLocations( t['locations'] );
-    }
-
-    // segment-setting tests
-    for (const t of SegmentTests) {
-        var selection = new Selection();
-        selection.client = client;
-        selection.HACKInterval = 400000; 
-        selection.marker = t['test'];
-
-        // for each instance, create a unique callback that tests the results
-        selection.addListener( "selectionChanged",  ((selection) => {
-                var ID = selection.marker; 
-                expect(selection.locations).toBe(SegmentTests[ID]['locations']);
-                expect(selection.segments).toBe(SegmentTests[ID]['segments']);
-                expect(selection.genes).toBe(SegmentTests[ID]['genes']);
-            }).bind(selection));
-
-        selection.selectSegments( t['segments'] );
-    }
-
-    // gene-setting tests
-    for (const t of GeneTests) {
-        var selection = new Selection();
-        selection.client = client;
-        selection.HACKInterval = 400000; 
-        selection.marker = t['test'];
-
-        // for each instance, create a unique callback that tests the results
-        selection.addListener( "selectionChanged",  ((selection) => {
-                var ID = selection.marker; 
-                expect(selection.locations).toBe(GeneTests[ID]['locations']);
-                expect(selection.segments).toBe(GeneTests[ID]['segments']);
-                expect(selection.genes).toBe(GeneTests[ID]['genes']);
-            }).bind(selection));
-
-        selection.selectGenes( t['genes'] );
-    }
+beforeAll( async () => {
+    // This should be run against the 'test.01' project!
+    Client.TheClient   = new Client("http://127.0.0.1:8000");
+    Project.TheProject = await Project.getProject();
 });
+
+// Location Tests
+test.concurrent.each( LocationTests.map(convert_test) )(
+    'Select by Location: %s', 
+    async (_, locations, segments, genes) => {
+        const selection = Selection.fromLocations(locations);
+
+        expect( selection.asLocations()    ).toEqual( locations );
+        expect( selection.asSegments()     ).toEqual( segments  );
+        expect( await selection.asGenes()  ).toEqual( genes     );
+    }
+);
+
+
+// Segment Tests
+test.concurrent.each( SegmentTests.map(convert_test) )(
+    'Select by Segment: %s', 
+    async (_, locations, segments, genes) => {
+        const selection = Selection.fromSegments(segments);
+
+        expect( selection.asLocations()    ).toEqual( locations );
+        expect( selection.asSegments()     ).toEqual( segments  );
+        expect( await selection.asGenes()  ).toEqual( genes     );
+    }
+);
+
+// Gene Tests
+test.concurrent.each( GeneTests.map(convert_test) )(
+    'Select by Genes: %s', 
+    async (_, locations, segments, genes) => {
+        const selection = await Selection.fromGenes(genes);
+
+        expect( selection.asLocations()    ).toEqual( locations );
+        expect( selection.asSegments()     ).toEqual( segments  );
+        expect( await selection.asGenes()  ).toEqual( genes     );
+    }
+);
