@@ -123,6 +123,8 @@ class CurveSegment extends Segment {
                                                     CurveSegment.SegmentNumSections, 
                                                     false);
             this.spanMesh = new THREE.Mesh( geometry, newMaterial );
+            this.spanMesh.castShadow = true;
+            this.spanMesh.receiveShadow = true;
 
             this.root.add(this.spanMesh);
         }

@@ -110,6 +110,7 @@ class GeometryCanvas {
 
         // renderer
         this.renderer = new THREE.WebGLRenderer({canvas: this.canvas, antialias: true});
+        this.renderer.shadowMap.enabled = true;
 
         // camera
         var cam = gdata["scene"]["camera"];
@@ -133,8 +134,10 @@ class GeometryCanvas {
         this.scene.background = new THREE.Color(parseInt(gdata["scene"]["background"])); 
 
         // axes
-        // this.axes = new THREE.AxesHelper( 1 );
-        // this.scene.add(this.axes);
+        if (false) {
+            this.axes = new THREE.AxesHelper( 1 );
+            this.scene.add(this.axes);
+        }
 
         // add lights to the scene
         var lights = gdata["scene"]["lights"];
@@ -143,9 +146,23 @@ class GeometryCanvas {
         for (var l in Object.keys(lights)) {
             curLight = lights[l];
             if (curLight["type"] == "directional") {
-                var light = new THREE.DirectionalLight(curLight["color"], curLight["intensity"]);
+                light = new THREE.DirectionalLight(curLight["color"], curLight["intensity"]);
                 light.position.set(curLight["position"][0], curLight["position"][1], curLight["position"][2] );
-                light.castShadow = curLight["castshadow"] ;
+                if ("castshadow" in curLight) {
+                    light.castShadow = curLight["castshadow"];
+                    light.shadow.camera.near = 0.5;
+                    light.shadow.camera.far = 500; 
+                    var size = 10;
+                    light.shadow.camera.top     =  size 
+                    light.shadow.camera.bottom  = -size;
+                    light.shadow.camera.left    =  size;
+                    light.shadow.camera.right   = -size;
+                }
+                //  debugging
+                if (false) {
+                    const helper = new THREE.CameraHelper( light.shadow.camera );
+                    this.scene.add(helper);
+                }
                 this.scene.add(light);
                 
             } else if (curLight["type"] == "point") {

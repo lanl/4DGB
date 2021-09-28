@@ -164,6 +164,11 @@ class Segment {
                     this.endpointMesh.material.opacity = 1.0;
                     this.spanMesh.material.transparent = false;
                     this.spanMesh.material.opacity = 1.0;
+                    // shadow
+                    this.endpointMesh.castShadow    = true;
+                    this.endpointMesh.receiveShadow = true;
+                    this.spanMesh.castShadow        = true;
+                    this.spanMesh.receiveShadow     = true;
                     result = true;
                     break;
                 case Segment.State.GHOST:
@@ -177,6 +182,11 @@ class Segment {
                     this.endpointMesh.material.opacity = Segment.GhostOpacity; 
                     this.spanMesh.material.transparent = true;
                     this.spanMesh.material.opacity =  Segment.GhostOpacity;
+                    // shadow
+                    this.endpointMesh.castShadow    = false;
+                    this.endpointMesh.receiveShadow = false;
+                    this.spanMesh.castShadow        = false;
+                    this.spanMesh.receiveShadow     = false;
                     result = true;
                     break;
                 case Segment.State.SKELETON:
