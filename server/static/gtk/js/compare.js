@@ -196,9 +196,11 @@ function main( project ) {
 //
 // create the project object and load data 
 //
-GTK.Project.TheProject = new GTK.Project( GTKProjectName );
-GTK.Client.TheClient  = new GTK.Client();
-const TheController   = new GTK.Selections.Controller();
 var view;
+const TheController   = new GTK.Selections.Controller();
 
-main( GTK.Project.TheProject );
+GTK.Client.TheClient  = new GTK.Client();
+GTK.Project.getProject().then( (project) => {
+    GTK.Project.TheProject = project;
+    main(project);
+});
