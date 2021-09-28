@@ -55,9 +55,9 @@ toc:            false
 |-----|------|------|-----|-----|-----|
 | int | text | text | real| real| text|
 
-- contact
+- contactmap
 
-| mapid  | x | y | value |
+| id  | x | y | value |
 |--------|---|---|-------|
 | int    |int|int| real  |
 

@@ -89,7 +89,7 @@ print("")
 c.execute('''DROP TABLE IF EXISTS structure''')
 c.execute('''DROP TABLE IF EXISTS structure_metadata''')
     # create the table 
-c.execute('''CREATE TABLE structure (id INT, segid INT, startid INT, endid INT, length INT, startx REAL, starty REAL, startz REAL, endx REAL, endy REAL, endz REAL, centerx REAL, centery REAL, centerz REAL)''')
+c.execute('''CREATE TABLE structure (structureid INT, segid INT, startid INT, endid INT, length INT, startx REAL, starty REAL, startz REAL, endx REAL, endy REAL, endz REAL, centerx REAL, centery REAL, centerz REAL)''')
 c.execute('''CREATE TABLE structure_metadata (id INT, num_segments INT, interval INT, unmapped TEXT)''')
 
 # parse all structure files, and insert data into the table
@@ -99,7 +99,7 @@ c.execute('''CREATE TABLE structure_metadata (id INT, num_segments INT, interval
 print("Creating structure table ...")
 for geom in jsondata["data"]["structure"]:
     infile = os.path.join( project, geom["url"])
-    insert = '''INSERT INTO structure (id,segid,startid,endid,length,startx,starty,startz,endx,endy,endz,centerx,centery,centerz) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
+    insert = '''INSERT INTO structure (structureid,segid,startid,endid,length,startx,starty,startz,endx,endy,endz,centerx,centery,centerz) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
     meta_insert = '''INSERT INTO structure_metadata (id,num_segments,interval,unmapped) VALUES(?,?,?,?)'''
     print("    reading: {}".format(infile))
     position = 0 
@@ -148,15 +148,15 @@ for geom in jsondata["data"]["structure"]:
     # based on the data this reflects the endpoint from the second 
     # segment around the endpoint of the first segment
         # first
-    query  = conn.execute("SELECT * FROM structure where segid == 1 AND id == {}".format(geom["id"]))
+    query  = conn.execute("SELECT * FROM structure where segid == 1 AND structureid == {}".format(geom["id"]))
     first  = query.fetchone()
         # second point
-    query  = conn.execute("SELECT * FROM structure where segid == 2 AND id == {}".format(geom["id"]))
+    query  = conn.execute("SELECT * FROM structure where segid == 2 AND structureid == {}".format(geom["id"]))
     point = query.fetchone()
         # compute new values and insert
     new    = [ (2.0*point[5] - point[8]), (2.0*point[6] - point[9]), (2.0*point[7] - point[10]) ]
     center = [ (new[0]+first[8])/2.0, (new[1]+first[9])/2.0, (new[2]+first[10])/2.0 ]
-    c.execute("update structure set startx = {}, starty = {}, startz = {}, centerx = {}, centery = {}, centerz = {} where segid == 1 AND id == {}".format(new[0], new[1], new[2], center[0], center[1], center[2], geom["id"]))
+    c.execute("update structure set startx = {}, starty = {}, startz = {}, centerx = {}, centery = {}, centerz = {} where segid == 1 AND structureid == {}".format(new[0], new[1], new[2], center[0], center[1], center[2], geom["id"]))
 
 print("")
 
@@ -195,13 +195,13 @@ print("")
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS contactmap''')
     # create the table 
-c.execute('''CREATE TABLE contactmap (mapid INT, x INT, y INT, value REAL)''')
+c.execute('''CREATE TABLE contactmap (id INT, x INT, y INT, value REAL)''')
 
 print("Creating contactmap records table")
 for contact_map in jsondata["data"]["md-contact-map"]:
     map_id = contact_map["id"]
     infile = os.path.join( project, contact_map["url"] )
-    insert = '''INSERT INTO contactmap (mapid,x,y,value) VALUES (?,?,?,?)'''
+    insert = '''INSERT INTO contactmap (id,x,y,value) VALUES (?,?,?,?)'''
 
     print("    reading: {}".format(infile))
     with open(infile, 'r') as indata:
