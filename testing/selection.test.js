@@ -1,5 +1,5 @@
 const Client    = require('../client-js/GTK/Client.js');
-const Selection = require('../client-js/GTK/Selection.js');
+const Selection = require('../client-js/GTK/selection.js');
 
 var TestTypes = ["location", "segment", "gene"]
 TestTypes = ["location", "segment"]
