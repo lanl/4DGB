@@ -35,9 +35,8 @@ class Dataset {
         this.id             = d["id"];
         this.name           = d["name"];
         this.structure      = d["structure"]["id"]; 
-        this.hic            = d["structure"]["hic"];
         this.md_contact_mp  = d["structure"]["md-contact-map"];
-        this.epigenetics    = d["structure"]["epigenetics"];
+        this.epigenetics    = d["epigenetics"];
     }
 }
 

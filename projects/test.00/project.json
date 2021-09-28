@@ -60,31 +60,17 @@
             "url" : "source/array/0007.json"
         }
     ],
-    "hic" : [
-        {
-            "id"        : 0,
-            "url"       : "source/0/file.hic",
-            "unmapped-segments": [ ]
-        },
-        {
-            "id"        : 1,
-            "url"       : "source/1/file.hic",
-            "unmapped-segments": [ ]
-        }
-    ],
     "md-contact-map": [
         {
             "id"        : 0,
             "version"   : "1.0",
             "url"       : "source/0/contactmap.tsv",
-            "hic"       : 0,
             "interval"  : 400000
         },
         {
             "id"        : 1,
             "version"   : "1.0",
             "url"       : "source/1/contactmap.tsv",
-            "hic"       : 1,
             "interval"  : 400000
         }
     ],
@@ -124,7 +110,6 @@
         "name" : "Test Dataset 0",
         "structure": {
             "id": 0,
-            "hic": 0,
             "md-contact-map": 0
         },
         "epigenetics": 0
@@ -134,7 +119,6 @@
         "name" : "Test Dataset 1",
         "structure": {
             "id": 1,
-            "hic": 1,
             "md-contact-map": 1
         },
         "epigenetics" : 1,

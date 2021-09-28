@@ -248,10 +248,10 @@ class GeometryCanvas {
     }
 
     initializeUnmappedSegments() {
-        var dset = Project.TheProject.getData("hic", this.dataset.hic);
-        
-        if ("unmapped-segments" in dset) {
-            var umList = dset["unmapped-segments"];
+        var structure = Project.TheProject.getData("structure", this.dataset.structure);
+
+        if ("unmapped_segments" in structure) {
+            var umList = structure["unmapped_segments"];
             for ( var l=0; l<umList.length;l++ ) {
                 var start = umList[l][0];
                 var end   = umList[l][1];

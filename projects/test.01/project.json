@@ -33,55 +33,17 @@
             "url" : "source/array/0001.json"
         }
     ],
-    "hic" : [
-        {
-            "id"        : 0,
-            "url"       : "none",
-            "unmapped-segments": [
-                                    [   1, 25],
-                                    [118, 168],
-                                    [257, 265],
-                                    [401, 407],
-                                    [547, 547],
-                                    [558, 559],
-                                    [574, 574],
-                                    [576, 579],
-                                    [600, 616],
-                                    [721, 734],
-                                    [831, 833]
-                                ]
-        },
-        {
-            "id"        : 1,
-            "url"       : "none",
-            "unmapped-segments": [
-                                    [   1, 25],
-                                    [118, 168],
-                                    [257, 265],
-                                    [401, 407],
-                                    [547, 547],
-                                    [558, 559],
-                                    [574, 574],
-                                    [576, 579],
-                                    [600, 616],
-                                    [721, 734],
-                                    [831, 833]
-                                ]
-        }
-    ],
     "md-contact-map": [
         {
             "id"        : 0,
             "version"   : "1.0",
             "url"       : "source/0/contactmap.tsv",
-            "hic"       : 0,
             "interval"  : 200000
         },
         {
             "id"        : 1,
             "version"   : "1.0",
             "url"       : "source/1/contactmap.tsv",
-            "hic"       : 1,
             "interval"  : 200000
         }
     ],
@@ -145,7 +107,6 @@
         "name" : "Generated Sequence A",
         "structure": {
             "id": 0,
-            "hic": 0,
             "md-contact-map": 0
         },
         "epigenetics": 0
@@ -155,7 +116,6 @@
         "name" : "Generated Sequence B",
         "structure": {
             "id": 1,
-            "hic": 1,
             "md-contact-map": 1
         },
         "epigenetics" : 1
