@@ -60,31 +60,17 @@
             "url" : "source/array/0007.json"
         }
     ],
-    "hic" : [
-        {
-            "id"        : 0,
-            "url"       : "source/0/file.hic",
-            "unmapped-segments": [ ]
-        },
-        {
-            "id"        : 1,
-            "url"       : "source/1/file.hic",
-            "unmapped-segments": [ ]
-        }
-    ],
     "md-contact-map": [
         {
             "id"        : 0,
             "version"   : "1.0",
             "url"       : "source/0/contactmap.tsv",
-            "hic"       : 0,
             "interval"  : 400000
         },
         {
             "id"        : 1,
             "version"   : "1.0",
             "url"       : "source/1/contactmap.tsv",
-            "hic"       : 1,
             "interval"  : 400000
         }
     ],
@@ -98,7 +84,9 @@
                 "version" : "0.1"
             },
             "md-contact-map" : 0,
-            "interval" : 400000
+            "interval" : 400000,
+            "num_segments" : 11,
+            "unmapped_segments": [ ]
         },
         {
             "id": 1,
@@ -109,7 +97,9 @@
                 "version" : "0.1"
             },
             "md-contact-map" : 1,
-            "interval" : 400000
+            "interval" : 400000,
+            "num_segments" : 11,
+            "unmapped_segments": [ ]
         }
     ]
 },
@@ -120,7 +110,6 @@
         "name" : "Test Dataset 0",
         "structure": {
             "id": 0,
-            "hic": 0,
             "md-contact-map": 0
         },
         "epigenetics": 0
@@ -130,7 +119,6 @@
         "name" : "Test Dataset 1",
         "structure": {
             "id": 1,
-            "hic": 1,
             "md-contact-map": 1
         },
         "epigenetics" : 1,
@@ -200,16 +188,28 @@
                     "position": [0.0, 0.0, 100.0] 
                 },
                 "lights": [
-                    { "label": "point Light 0",
-                      "type"        : "point",
-                      "color"       : "0x404040",
-                      "old_color"   : "0xFDF4DC", 
-                      "intensity"   : 1.0,
-                      "distance"    : 0,
-                      "decay"       : 1,
-                      "position"    : [10,10,10] 
+                    { 
+                        "label"     : "Directional Light 0",
+                        "type"      : "directional",
+                        "color"     : "0xFDF4DC", 
+                        "intensity" : 1,
+                        "distance"  : 0,
+                        "decay"     : 1,
+                        "position"  : [20,0,20], 
+                        "intensity" : 0.8,
+                        "shadow"    : {
+                            "castshadow" : true,
+                            "camera" : {
+                                "near"  : 0.5,
+                                "far"   : 500,
+                                "top"   :  10,
+                                "bottom": -10,
+                                "left"  :  10,
+                                "right" : -10
+                            }
+                        }
                     },
-                    { "label": "Ambient Light 0",
+                    { "label"       : "Ambient Light 0",
                       "type"        : "ambient",
                       "color"       : "0x404040",
                       "intensity"   : 0.25

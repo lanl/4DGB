@@ -87,8 +87,10 @@ print("")
 # ---------------------------------------------------------------------------
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS structure''')
+c.execute('''DROP TABLE IF EXISTS structure_metadata''')
     # create the table 
-c.execute('''CREATE TABLE structure (structureid INT, segid INT, startid INTEGER, endid INTEGER, length INT, startx REAL, starty REAL, startz REAL, endx REAL, endy REAL, endz REAL, centerx REAL, centery REAL, centerz REAL)''')
+c.execute('''CREATE TABLE structure (structureid INT, segid INT, startid INT, endid INT, length INT, startx REAL, starty REAL, startz REAL, endx REAL, endy REAL, endz REAL, centerx REAL, centery REAL, centerz REAL)''')
+c.execute('''CREATE TABLE structure_metadata (id INT, num_segments INT, interval INT, unmapped TEXT)''')
 
 # parse all structure files, and insert data into the table
 # a segment is based on two points from the file - the 
@@ -98,11 +100,16 @@ print("Creating structure table ...")
 for geom in jsondata["data"]["structure"]:
     infile = os.path.join( project, geom["url"])
     insert = '''INSERT INTO structure (structureid,segid,startid,endid,length,startx,starty,startz,endx,endy,endz,centerx,centery,centerz) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
+    meta_insert = '''INSERT INTO structure_metadata (id,num_segments,interval,unmapped) VALUES(?,?,?,?)'''
     print("    reading: {}".format(infile))
     position = 0 
         # the first position is arbitrary, and will be re-computed after all values are inserted 
     prev = [0.0, 0.0, 0.0]
 
+    # create metadata entry
+    c.execute(meta_insert, [geom["id"], geom["num_segments"], geom["interval"], json.dumps(geom["unmapped_segments"])] )
+
+    # create structure data entries
     if (infile.endswith('.pdb')) :
         print("    loading structure file (PDB)")
         with open(infile, 'r') as indata:
@@ -120,6 +127,7 @@ for geom in jsondata["data"]["structure"]:
                         prev[0], prev[1], prev[2], cur[0], cur[1], cur[2], center[0], center[1], center[2]])
                     prev = cur
                     position = position + geom["interval"]
+
     elif (infile.endswith('.csv')) :
         print("    loading structure file (CSV)")
         with open(infile, 'r') as indata:
@@ -185,15 +193,15 @@ print("")
 # ---------------------------------------------------------------------------
 
     # start from scratch
-c.execute('''DROP TABLE IF EXISTS contact''')
+c.execute('''DROP TABLE IF EXISTS contactmap''')
     # create the table 
-c.execute('''CREATE TABLE contact (mapid INT, x INT, y INT, value REAL)''')
+c.execute('''CREATE TABLE contactmap (mapid INT, x INT, y INT, value REAL)''')
 
-print("Creating contact records table")
+print("Creating contactmap records table")
 for contact_map in jsondata["data"]["md-contact-map"]:
     map_id = contact_map["id"]
     infile = os.path.join( project, contact_map["url"] )
-    insert = '''INSERT INTO contact (mapid,x,y,value) VALUES (?,?,?,?)'''
+    insert = '''INSERT INTO contactmap (mapid,x,y,value) VALUES (?,?,?,?)'''
 
     print("    reading: {}".format(infile))
     with open(infile, 'r') as indata:
@@ -216,7 +224,7 @@ print("")
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS genes''')
     # create the table
-c.execute('''CREATE TABLE genes (id INTEGER PRIMARY KEY AUTOINCREMENT, start INTEGER, end INTEGER, length INTEGER, gID TEXT, gene_type TEXT, gene_name TEXT)''')
+c.execute('''CREATE TABLE genes (id INTEGER PRIMARY KEY AUTOINCREMENT, start INT, end INT, length INT, gID TEXT, gene_type TEXT, gene_name TEXT)''')
 
 # populate the table from a file
 insert = '''INSERT INTO genes (start,end,length,gID,gene_type,gene_name) VALUES(?,?,?,?,?,?)'''

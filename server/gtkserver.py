@@ -232,6 +232,36 @@ def SetArray():
 #
 # return the segments of a structure
 #
+@app.route('/data/structure/<identifier>/unmapped')
+def UnmappedData(identifier):
+    conn    = db_connect.connect()
+    query   = conn.execute("SELECT num_segments,unmapped FROM structure_metadata WHERE id == {}".format(identifier))
+    results = query.cursor.fetchone()
+
+    num_elements = results[0]
+    # we are creating a 1-based array
+    data = numpy.zeros(num_elements + 1)
+
+    elem = results[1].replace(" ", "")
+    elem = elem[1:]
+    elem = elem[:-1]
+    for e in elem.split("],["):
+        e = e.replace("]", "")
+        e = e.replace("[", "")
+
+        nums = e.split(",")
+        for i in range(int(nums[0]), int(nums[1]) + 1):
+            data[i] = 1
+
+    # remove the 0th element
+    final = numpy.delete(data, 0)
+
+    return jsonify({ 'unmapped': list(final) })
+
+
+#
+# return the segments of a structure
+#
 @app.route('/data/structure/<identifier>/segments')
 def SegmentData(identifier):
     conn    = db_connect.connect()
@@ -268,7 +298,7 @@ def SegmentIds(identifier):
 @app.route('/data/contact-map/<identifier>')
 def ContactMap(identifier):
     conn    = db_connect.connect()
-    query   = conn.execute("SELECT x, y, value FROM contact WHERE mapid == ?", [identifier])
+    query   = conn.execute("SELECT x, y, value FROM contactmap WHERE mapid == ?", [identifier])
     data    = []
     for c in query.cursor.fetchall():
         data.append({

@@ -110,6 +110,7 @@ class GeometryCanvas {
 
         // renderer
         this.renderer = new THREE.WebGLRenderer({canvas: this.canvas, antialias: true});
+        this.renderer.shadowMap.enabled = true;
 
         // camera
         var cam = gdata["scene"]["camera"];
@@ -133,8 +134,10 @@ class GeometryCanvas {
         this.scene.background = new THREE.Color(parseInt(gdata["scene"]["background"])); 
 
         // axes
-        // this.axes = new THREE.AxesHelper( 1 );
-        // this.scene.add(this.axes);
+        if (false) {
+            this.axes = new THREE.AxesHelper( 1 );
+            this.scene.add(this.axes);
+        }
 
         // add lights to the scene
         var lights = gdata["scene"]["lights"];
@@ -143,9 +146,22 @@ class GeometryCanvas {
         for (var l in Object.keys(lights)) {
             curLight = lights[l];
             if (curLight["type"] == "directional") {
-                var light = new THREE.DirectionalLight(curLight["color"], curLight["intensity"]);
+                light = new THREE.DirectionalLight(curLight["color"], curLight["intensity"]);
                 light.position.set(curLight["position"][0], curLight["position"][1], curLight["position"][2] );
-                light.castShadow = curLight["castshadow"] ;
+                if ("shadow" in curLight) {
+                    light.castShadow            = curLight["shadow"]["castshadow"];
+                    light.shadow.camera.near    = curLight["shadow"]["camera"]["near"];
+                    light.shadow.camera.far     = curLight["shadow"]["camera"]["far"];
+                    light.shadow.camera.top     = curLight["shadow"]["camera"]["top"];
+                    light.shadow.camera.bottom  = curLight["shadow"]["camera"]["bottom"];
+                    light.shadow.camera.left    = curLight["shadow"]["camera"]["left"];
+                    light.shadow.camera.right   = curLight["shadow"]["camera"]["right"];
+                }
+                //  debugging
+                if (false) {
+                    const helper = new THREE.CameraHelper( light.shadow.camera );
+                    this.scene.add(helper);
+                }
                 this.scene.add(light);
                 
             } else if (curLight["type"] == "point") {
@@ -248,10 +264,10 @@ class GeometryCanvas {
     }
 
     initializeUnmappedSegments() {
-        var dset = Project.TheProject.getData("hic", this.dataset.hic);
-        
-        if ("unmapped-segments" in dset) {
-            var umList = dset["unmapped-segments"];
+        var structure = Project.TheProject.getData("structure", this.dataset.structure);
+
+        if ("unmapped_segments" in structure) {
+            var umList = structure["unmapped_segments"];
             for ( var l=0; l<umList.length;l++ ) {
                 var start = umList[l][0];
                 var end   = umList[l][1];

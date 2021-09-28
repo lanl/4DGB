@@ -109,6 +109,13 @@ class Client {
     }
 
     //
+    // get the unmapped segments for a structure 
+    //
+    get_structure_unmapped_segments(callback, structureID) {
+        this._fetch(`/data/structure/${structureID}/unmapped`, callback);
+    }
+
+    //
     // get an array 
     //
     get_array(callback, arrayID, arraySlice) {

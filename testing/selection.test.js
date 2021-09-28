@@ -2,9 +2,7 @@
 // its constructed
 const Client        = require('../client-js/GTK/Client');
 const Project       = require('../client-js/GTK/Project');
-
 const Util          = require('../client-js/GTK/Util');
-
 const { Selection } = require('../client-js/GTK/selections');
 
 var LocationTests = [

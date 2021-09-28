@@ -58,6 +58,9 @@ class client:
     def get_structure(self, structureID):
         return self._request(f'data/structure/{structureID}/segments')
 
+    def get_structure_unmapped_segments(self, structureID):
+        return self._request(f'data/structure/{structureID}/unmapped')
+
     def get_genes(self):
         return self._request('genes')
 
