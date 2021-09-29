@@ -47,7 +47,6 @@ class CurveSegment extends Segment {
     static SegmentRadius        =  0.05;
     static SegmentNumpoints     = 10;
     static SegmentNumSections   =  8;
-    static Linewidth            =  5;
 
     //
     // constructor is handed four points:
