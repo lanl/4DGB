@@ -50,7 +50,7 @@ class Geometry {
      *
      * @param {dictionary} s This is a dictionary of values used to construct the Geometry
      */
-    constructor( s ) {
+    constructor( g ) {
         // scene
         this.scene;
 
@@ -63,10 +63,10 @@ class Geometry {
             // this.segments is a dictionary because:
             // 1. the indices are not zero-based (they start at 1) 
             // 2. the indices may not be consecutive over the entire set of segments
-        this.segmentType = 'curve'; 
+        this.segmentType = g["segment"]["glyph"]["type"];
         this.segments = {};
-        this.LUT = new THREE.Lut( s["colormap"]["name"], s["colormap"]["divs"] );
-        this.opacityClamp = s["colormap"]["opacity-clamp"]
+        this.LUT = new THREE.Lut( g["colormap"]["name"], g["colormap"]["divs"] );
+        this.opacityClamp = g["colormap"]["opacity-clamp"]
     }
 
     // sets the state of a list of segments. Two values are needed:
@@ -175,7 +175,7 @@ class Geometry {
                     }
 
                     center.add(points['1'])
-                    const newSeg = new CurveSegment(i, points, 0.01); 
+                    const newSeg = new CurveSegment(i, points, CurveSegment.SegmentRadius); 
                     newSeg.addToParent(this.root);
                     this.segments[i] = newSeg;
                 }

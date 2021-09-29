@@ -195,13 +195,13 @@ print("")
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS contactmap''')
     # create the table 
-c.execute('''CREATE TABLE contactmap (mapid INT, x INT, y INT, value REAL)''')
+c.execute('''CREATE TABLE contactmap (id INT, x INT, y INT, value REAL)''')
 
 print("Creating contactmap records table")
 for contact_map in jsondata["data"]["md-contact-map"]:
     map_id = contact_map["id"]
     infile = os.path.join( project, contact_map["url"] )
-    insert = '''INSERT INTO contactmap (mapid,x,y,value) VALUES (?,?,?,?)'''
+    insert = '''INSERT INTO contactmap (id,x,y,value) VALUES (?,?,?,?)'''
 
     print("    reading: {}".format(infile))
     with open(infile, 'r') as indata:

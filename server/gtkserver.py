@@ -298,7 +298,7 @@ def SegmentIds(identifier):
 @app.route('/data/contact-map/<identifier>')
 def ContactMap(identifier):
     conn    = db_connect.connect()
-    query   = conn.execute("SELECT x, y, value FROM contactmap WHERE mapid == ?", [identifier])
+    query   = conn.execute("SELECT x, y, value FROM contactmap WHERE id == ?", [identifier])
     data    = []
     for c in query.cursor.fetchall():
         data.append({

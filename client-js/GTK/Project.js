@@ -31,6 +31,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const Segment = require('./Segment');
 const ArrowSegment = require('./ArrowSegment');
+const CurveSegment = require('./CurveSegment');
 const THREE = require('three');
 const Client = require('./Client');
 
@@ -57,11 +58,20 @@ class Project {
         this.project = data;
 
         // set up class constants, etc.
+        // TODO: make this a factory pattern, to offload constants to the classes
         var app = this.getApplicationData("gtk")
         var g   = app["geometrycanvas"]["geometry"]["segment"]["glyph"]
-        ArrowSegment.RadiusBegin    = g["span"]["radius-beg"];
-        ArrowSegment.RadiusEnd      = g["span"]["radius-end"];
-        // HACK set super class
+        if (g["type"] == "arrow") {
+            ArrowSegment.RadiusBegin    = g["span"]["radius-beg"];
+            ArrowSegment.RadiusEnd      = g["span"]["radius-end"];
+        } else if (g["type"] == "curve") {
+            // TODO: check for all of these before setting
+            CurveSegment.CurveTension         = g["span"]["tension"];
+            CurveSegment.SegmentRadius        = g["span"]["radius"]; 
+            CurveSegment.SegmentNumpoints     = g["span"]["num-points"]; 
+            CurveSegment.SegmentNumSections   = g["span"]["num-sections"]; 
+        }
+        // HACK set super class statics
         Segment.Color          = new THREE.Color(parseInt(g["color"]));
         Segment.EndpointRadius = g["endpoint"]["radius"]; 
         Segment.GeomEndpoint   = new THREE.SphereBufferGeometry( g["endpoint"]["radius"], 
