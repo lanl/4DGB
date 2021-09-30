@@ -55,6 +55,12 @@ fi
 echo ""
 echo "Making a release for project '$PROJECT'"
 
+# Check for a process-data script and run it if its there
+if [ -x "$SRC/process-data" ] ; then
+    echo "Pre-processing project data ..."
+    ( cd "$SRC" && ./process-data )
+fi
+
 # initialize the database
 echo ""
 echo "Initializing database ..."
