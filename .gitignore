@@ -4,6 +4,10 @@ doc/database.pdf
 projects/test.02/
 projects/test.01/generated
 projects/test.01/source/array
+projects/test.01/source/*/*.pdb
+projects/test.01/source/*.gff3
+projects/test.01/source/*/*.dms
+projects/test.01/source/*/*Binned*.csv
 projects/test.00/generated/
 projects/release.2021-09-15
 projects/release.2021-09-15.05-19
