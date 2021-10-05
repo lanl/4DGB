@@ -5,11 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "gtkserver test.00",
+            "name": "gtkserver test.01",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/release/test.00/server/gtkserver.py",
-            "console": "integratedTerminal"
+            "program": "${workspaceFolder}/server/gtkserver.py",
+            "args": [ 
+                "--database", "${workspaceFolder}/release/test.01/server/static/project/generated/generated-project.db",
+                "--project",  "${workspaceFolder}/release/test.01/server/static/project"
+            ],
+            "console": "integratedTerminal",
+            
         },
         {
             "name": "Test Server",

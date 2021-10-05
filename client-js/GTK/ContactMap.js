@@ -46,6 +46,10 @@ class ContactMap {
      * @param {Object[]} records 
      */
     constructor(records) {
+        if (records.length === 0) {
+            throw new Error("Cannot create Contact Map (no records given)");
+        }
+
 
         // first pass over data: determine x/y bounds
 
