@@ -35,12 +35,15 @@ const Util = require('./Util');
 const ScalarBarCanvas = require('./ScalarBarCanvas');
 
 const { Selection, Controller} = require('./selections');
+
+const MAX_ZOOM = 10;
+
 /**
  * @class ContactMapCanvas
  * 
  * Widget displaying contact map data on a canvas.
  * 
- * The user can click-and-drag on the image to select a region of the contact map. If the user holds
+ * The user can click-and-drag on the image to select regions of the contact map. If the user holds
  * down the spacebar, then they can use the scroll wheel to zoom in or out of the image and
  * click-and-drag to pan across it.
  */
@@ -54,22 +57,33 @@ class ContactMapCanvas {
         *              - g (xaxis)
         *              - g (yaxis)
         *          - canvas
+        *          - button (clear brushes)
         *          - svg (this.brushSVG)
+        *              - g (brushgroup) (multiple of these)
         *          - svg (this.zoomSVG)
      * 
      * Click-and-drag selection, and zooming/panning are implemented using D3's brush and zoom
-     * tools respectively. However, brush and zoom aren't normally designed to work together, so
-     * a work-around is used:
+     * tools respectively. However, d3-brush doesn't allow for multiple selected regions and doesn't
+     * normally work alongside d3-zoom. So a few hacks are used:
      * 
-     * The SVG element which handles zooming is overlayed on top of the SVG that handles brushing,
-     * but has it's 'pointer-events' attribute set to 'none'. So, by default, mouse events go
-     * through the zoomSVG and are recieved by the brushSVG, meaning that clicking and dragging over
-     * the canvas will create a selection with the brush. When this script is loaded, it adds
-     * 'keyup' and 'keydown' event listeners to the whole window which will listen for a particular
-     * key (in this case, the spacebar) and toggle the 'pointer-events' attribute on the zoomSVG
-     * of all active instances of this class to 'all'. So, while the spacebar is held down, mouse
-     * events are recieved by the zoomSVG and now clicking and dragging over the canvas will pan
-     * the viewport, while scrolling with zoom in or out.
+     * For multiple brush selections: We use a variation of a solution devised by Ludwig Schubert
+     * here ( https://github.com/ludwigschubert/d3-brush-multiple ). In essence, we create multiple
+     * SVG groups with one for each brush. When a selection is made in one, we turn off pointer
+     * events in its .overlay object. This makes it so that its brush can still be moved, but
+     * clicking outside the brush area will fall through to the next brush layer and create a new
+     * brush, instead of overriding the old brush. The _onBrushEnd function (tied to the brushes'
+     * 'end' event) handles selectively turning pointer events on or off and ensures that there is
+     * always a free brush layer to create a new selection.
+     *
+     * For zooming and panning: The SVG element which handles zooming is overlayed on top of the SVG
+     * that handles brushing, but has it's 'pointer-events' attribute set to 'none'. So, by default,
+     * mouse events go through the zoomSVG and are recieved by the brushSVG, meaning that clicking
+     * and dragging over the canvas will create a selection with the brushes. When this script is
+     * loaded, it adds 'keyup' and 'keydown' event listeners to the whole window which will listen
+     * for a particular key (in this case, the spacebar) and toggle the 'pointer-events' attribute
+     * on the zoomSVG of all active instances of this class to 'all'. So, while the spacebar is held
+     * down, mouse events are recieved by the zoomSVG and now clicking and dragging over the canvas
+     * will pan the viewport, while scrolling with zoom in or out.
      * 
     */
 
@@ -117,15 +131,25 @@ class ContactMapCanvas {
          * Margins separating the canvas from the edges of the widget
          * (the axes are placed in these margins)
          */
-        this.margin = { top: 25, right: 25, bottom: 25, left: 25 };
+        this.margin = { top: 25, right: 25, bottom: 30, left: 30 };
         this.margin.innerWidth  = this.displayOpts["width"]  - ( this.margin.left + this.margin.right  );
         this.margin.innerHeight = this.displayOpts["height"] - ( this.margin.top  + this.margin.bottom );
+
+        /**
+         * the brush extents are sized to fit the entire contact map even when
+         * zoomed in all the way. That way, brushes can be moved outside of the viewport
+         * when zooming and panning
+         */
+        this.brushExtents = [
+            [ -this.margin.innerWidth * (MAX_ZOOM-1), -this.margin.innerHeight * (MAX_ZOOM-1) ],
+            [ this.margin.innerWidth * MAX_ZOOM,      this.margin.innerHeight * MAX_ZOOM ]
+        ];
 
         /**
          * The div acting as the widget's "bounding box".
          * This is what enforces the size of the whole widget. It has an explicit width and height
          * and doesn't have it's position set to 'absolute' like most other pieces, so the contdiv
-         * will expand to match this SVG's width and height.
+         * will expand to match this div's width and height.
          */
         this.boundingDiv = d3.create('div')
             .attr('style', `
@@ -150,11 +174,10 @@ class ContactMapCanvas {
                 right:  0px;
             `);
         this.boundingDiv.appendChild(this.baseSVG.node());
-        //this.contdiv.appendChild(this.baseSVG.node());
 
         // Sets CSS attributes on a selection to make it work
         // as an overlay that fits within the margins
-        const overlay = g => g
+        const overlay = (g) => g
             .attr('width',  self.margin.innerWidth )
             .attr('height', self.margin.innerHeight)
             .attr('style', `
@@ -168,7 +191,6 @@ class ContactMapCanvas {
         /** A d3 selection of the canvas*/
         this.canvas = d3.create('canvas').call(overlay);
         this.boundingDiv.appendChild(this.canvas.node());
-        //this.contdiv.appendChild(this.canvas.node());
 
         /** A d3 selection of a text label displaying help to the user */
         /**
@@ -182,18 +204,27 @@ class ContactMapCanvas {
         this.contdiv.appendChild(this.helpLabel.node());
         **/
 
+        /** A d3 selection of a button to clear all of the selection brushes */
+        this.clearButton = d3.create('button')
+            .attr('style', `
+                position: absolute;
+                bottom: 2px;
+                left: ${self.margin.left+5}px
+            `)
+            .text("Clear")
+            .on('click', () => this._clearBrushes() );
+        this.boundingDiv.appendChild(this.clearButton.node());
+
         /** A d3 selection of the SVG handling brush selection */
         this.brushSVG = d3.create('svg').call(overlay)
             .classed('brushsvg', true);
         this.boundingDiv.appendChild(this.brushSVG.node());
-        //this.contdiv.appendChild(this.brushSVG.node());
             
-            /** A d3 selection of the SVG handling zooming/panning */
-            this.zoomSVG = d3.create('svg').call(overlay)
+        /** A d3 selection of the SVG handling zooming/panning */
+        this.zoomSVG = d3.create('svg').call(overlay)
             .classed('zoomsvg', true)
             .attr('pointer-events', 'none');
         this.boundingDiv.appendChild(this.zoomSVG.node());
-       //this.contdiv.appendChild(this.zoomSVG.node());
 
         // Placeholders for fields that aren't initialized until after
         // the data loads
@@ -205,24 +236,24 @@ class ContactMapCanvas {
         this.contactMap = null;
 
         /**
-         * @type {ImageData} The contact map rendered to ImageData (one pixel per bin)
+         * @type {ImageData} The contact map rendered to ImageData (one pixel per segment)
          * This is null when first constructed, but will be set once data has finished loading
          */
         this.imageData = null;
 
         /**
-         * A d3 scale mapping (fractional) bin numbers to pixels on the canvas along the x-axis.
+         * A d3 scale mapping (fractional) segment numbers to pixels on the canvas along the x-axis.
          * This is null when first constructed, but will be set once data has finished loading
          */
         this.xScale = null;
         /**
-         * A d3 scale mapping (fractional) bin numbers to pixels on the canvas along the y-axis.
+         * A d3 scale mapping (fractional) segment numbers to pixels on the canvas along the y-axis.
          * This is null when first constructed, but will be set once data has finished loading
          */
         this.yScale = null;
 
         /**
-         * A d3 scale mapping (fractional) bin numbers to pixels on the canvas along the x-axis.
+         * A d3 scale mapping (fractional) segment numbers to pixels on the canvas along the x-axis.
          * This scale doesn't take into account zooming or panning, and always represents the
          * scale used when fully zoomed-out.
          * This is null when first constructed, but will be set once data has finished loading
@@ -230,7 +261,7 @@ class ContactMapCanvas {
         this.xScaleOriginal = null;
 
         /**
-         * A d3 scale mapping (fractional) bin numbers to pixels on the canvas along the y-axis.
+         * A d3 scale mapping (fractional) segment numbers to pixels on the canvas along the y-axis.
          * This scale doesn't take into account zooming or panning, and always represents the
          * scale used when fully zoomed-out.
          * This is null when first constructed, but will be set once data has finished loading
@@ -238,9 +269,9 @@ class ContactMapCanvas {
         this.yScaleOriginal = null;
 
         /**
-         * A d3-brush function used to handle click-and-drag selection
+         * Array of d3-brush instances controlling the different selection brushes
          */
-        this.brush = null;
+        this.brushes = [];
 
         /**
          * A d3-zoom function used to handle zooming and panning
@@ -259,8 +290,51 @@ class ContactMapCanvas {
         this.background = "#" + this.displayOpts["background"].substring(2); 
 
         // Load data
-        ContactMap.loadNew( dataset.md_contact_mp )
-            .then( (contactMap) => this._afterLoad(contactMap) );
+        ContactMap.loadNew( dataset.md_contact_mp ).then( (contactMap) => {
+            /***********************************************************************
+             * This chunk is called after the contact map data has finished loading
+            *************************************************************************/
+            this.contactMap = contactMap;
+
+            // Render image
+            this.imageData = this._renderToImageData(contactMap);
+
+            const rect = contactMap.bounds;
+            const margin = this.margin;
+
+            // Initialize scales
+            this.xScaleOriginal = d3.scaleLinear()
+                .domain([ rect.x, rect.x + rect.width    ])
+                .range ([ 0,      this.margin.innerWidth ]);
+            this.yScaleOriginal = d3.scaleLinear()
+                .domain([ rect.y, rect.y + rect.height    ])
+                .range ([ 0,      this.margin.innerHeight ]);
+
+            this.xScale = this.xScaleOriginal.copy();
+            this.yScale = this.yScaleOriginal.copy();
+
+            // Create and add axes
+            this.baseSVG.append('g')
+                .classed('xaxis', true)
+                .attr('transform', `translate(${margin.left},${margin.top})`)
+                .call( d3.axisTop(this.xScale) );
+            this.baseSVG.append('g')
+                .classed('yaxis', true)
+                .attr('transform', `translate(${margin.left},${margin.top})`)
+                .call( d3.axisLeft(this.yScale) );
+
+            // Add the first brush
+            this._addBrush();
+
+            // Add zoom
+            this.zoom = d3.zoom()
+                .scaleExtent([1, MAX_ZOOM])
+                .translateExtent([ [0,0], [margin.innerWidth, margin.innerHeight] ])
+                .on( 'zoom', (e) => { this._onZoom(e) } );
+            this.zoomSVG.call(this.zoom);
+
+            this._redrawCanvas();
+        });
 
         // Add to global list of instances
         ContactMapCanvas.instances.push( new WeakRef(this) );
@@ -284,107 +358,86 @@ class ContactMapCanvas {
     }
 
     /**
-     * Called in response to 'selectionChanged' events. Moves the brush selection 
+     * Called in response to 'selectionChanged' events. Moves the brushes
      */
     onSelectionChanged(selectionEvent) {
         const { selection, source, decoration } = selectionEvent;
-        // If the contact map hasn't loaded yet, ignore this event
-        if (!this.contactMap) return;
-        // If this was the same Contact Map that caused the selection update, ignore this event
+
+        // Ignore an event that was generated by this very same Contact Map
         if (source === this) return;
 
-        let extents = null;
-        
-        // If the selection includes brush coordinates, we can just use those
-        if (decoration && decoration.brush) {
-            extents = this._scaleBrushSelection(decoration.brush, this.xScale, this.yScale);
+        if (decoration && decoration.brushes) {
+            // If the event has a set of brush coordinates with it (because it came from
+            // another contact map), we can just use those
+            this._redrawBrushes( decoration.brushes );
         }
         else {
-            // Otherwise, we determine the brush coordinates from the selection
-            const ranges = selection.asSegments();
-            // If there is only one range, set the second part of the selection equal to it
-            if (ranges.length === 1) ranges[1] = ranges[0];
-            
-            // If the selection is actually the entire area, then we don't need
-            // to set the brush coordinates (we'll just get rid of it)
-            const [ [x1,x2], [y1,y2] ] = ranges;
-            const bounds = this.contactMap.bounds;
+            // Otherwise, we determine our brush coordinates based off the selected segments
+            const brushCoords = selection.asSegments()
+                // split into pairs of ranges (it's ok if we leave one alone at the end)
+                .reduce( (acc, range) => {
+                    const last = acc[acc.length-1];
+                    if (last.length === 2) acc.push([range])
+                    else last.push(range)
+                    return acc;
+                }, [[]])
+                // convert to brush coordintes
+                .map( this._segmentRangesToBrushCoords );
+    
+            this._redrawBrushes( brushCoords );
+        }
+    }
 
-            // Check that selection *doesn't* match the entire area
-            if (
-                x1 !== bounds.x || x2 !== bounds.x2 ||
-                y1 !== bounds.y || y2 !== bounds.y2
-            ) {
-                // rewrite as coordinates of selection corners
-                extents = [ [x1,y1], [x2,y2] ];
-                extents = this._scaleBrushSelection(extents, this.xScale, this.yScale);
-            }
+    /**
+     * Add a new brush layer to the Contact Map. The new SVG 'g' object will be
+     * placed before all the others and have a 'brushid' attribute to identify
+     * its corresponding brush as an index in this.brushes.
+     */
+    _addBrush() {
+        const brushID = this.brushes.length;
+        const brush = d3.brush()
+            .extent(this.brushExtents)
+            .on( 'brush', (e) => { this._onBrush(e, brushID);    })
+            .on( 'end',   (e) => { this._onBrushEnd(e, brushID); });
+        
+        this.brushSVG.insert('g', ':first-child')
+            .classed('brushgroup', true)
+            .attr('brushid', brushID)
+            .call(brush);
+
+        this.brushes.push(brush);
+    }
+
+    /**
+     * Called whenever a brush has finished moving. Sets the 'pointer-events'
+     * attribute on the associated brush overlay, and ensures there is at least
+     * one free brush layer.
+     * ( call so that 'this' still refers to this ContactMapCanvas instance ) 
+     */
+    _onBrushEnd(event, brushID) {
+        const brushGroup = this.brushSVG.select(`[brushid="${brushID}"]`);
+
+        if (event.selection === null) {
+            // If the brush was just cleared, we can allow this layer to
+            // replace the brush again
+            brushGroup.select('.overlay').attr('pointer-events', 'all');
+            return;
         }
 
-        // Move brush
-        this.brush.move(this.brushSVG, extents, selectionEvent);
+        // Otherwise, there is a selection on the brush that was just moved
+        // so we disable the ability to replace the brush on this layer
+        brushGroup.select('.overlay').attr('pointer-events', 'none');
+
+        // if every active brush has a selection, then we need to
+        // add a new brush layer
+        const brushGroups = this.brushSVG.selectAll('.brushgroup').nodes()
+        if (brushGroups.every( d3.brushSelection ) ) {
+            this._addBrush();
+        }
     }
 
     /**
-     * Called automatically after contact map data has been loaded
-     * @param {ContactMap} contactMap 
-     */
-    _afterLoad(contactMap) {
-        this.contactMap = contactMap;
-
-        // Render image
-        this.imageData = this._renderToImageData(contactMap);
-
-        const rect = contactMap.bounds;
-        const margin = this.margin;
-
-        // Initialize scales
-        this.xScaleOriginal = d3.scaleLinear()
-            .domain([ rect.x, rect.x + rect.width    ])
-            .range ([ 0,      this.margin.innerWidth ]);
-        this.yScaleOriginal = d3.scaleLinear()
-            .domain([ rect.y, rect.y + rect.height    ])
-            .range ([ 0,      this.margin.innerHeight ]);
-
-        this.xScale = this.xScaleOriginal.copy();
-        this.yScale = this.yScaleOriginal.copy();
-
-        // Create and add axes
-        this.baseSVG.append('g')
-            .classed('xaxis', true)
-            .attr('transform', `translate(${margin.left},${margin.top})`)
-            .call( d3.axisTop(this.xScale) );
-        this.baseSVG.append('g')
-            .classed('yaxis', true)
-            .attr('transform', `translate(${margin.left},${margin.top})`)
-            .call( d3.axisLeft(this.yScale) );
-
-        const MAX_ZOOM = 10;
-
-        // Add brush
-        this.brush = d3.brush()
-            // the brush extents are sized to fit the entire contact map even when
-            // zoomed in all the way. That way, brushes can be moved outside of the viewport
-            // when zooming and panning
-            .extent([
-                [ -margin.innerWidth * (MAX_ZOOM-1), -margin.innerHeight * (MAX_ZOOM-1) ],
-                [ margin.innerWidth * MAX_ZOOM,      margin.innerHeight * MAX_ZOOM ]
-            ])
-            .on( 'brush end', (e) => { this._onBrush(e) } );
-        this.brushSVG.call(this.brush);
-
-        // Add zoom
-        this.zoom = d3.zoom()
-            .scaleExtent([1, MAX_ZOOM])
-            .translateExtent([ [0,0], [margin.innerWidth, margin.innerHeight] ])
-            .on( 'zoom', (e) => { this._onZoom(e) } );
-        this.zoomSVG.call(this.zoom);
-
-        this._redrawCanvas();
-    }
-
-    /**
-     * Handler for the d3-brush "brush" event, called whenever the
+     * Handler for the d3-brush "brush" event, called whenever a
      * brush selection changes.
      * ( call so that 'this' still refers to this ContactMapCanvas instance ) 
      */
@@ -392,41 +445,45 @@ class ContactMapCanvas {
         // If there's no selection controller, then no one cares about our new selection
         if (this.controller === undefined) return;
 
-        // Ignore if the brush moved as a result of panning/zooming
-        // or by responding to a selectionChanged event
+        // Ignore if the brush moved as a result of a function we called
         if (event.sourceEvent && (
             event.sourceEvent.type === 'zoom' ||
-            event.sourceEvent.type === 'selectionChanged'
+            event.sourceEvent.type === 'selectionChanged' ||
+            event.sourceEvent.type === 'redraw'
         )) return;
 
-        // event.selection defines the coorindates (in pixels) of the corners of the selection.
-        // we can convert to an array of two ranges, specifying the start/end points along each axis
+        const brushCoords = this._getBrushCoords();
 
-        const bounds = this.contactMap.bounds;
-        let extents;
-        let brushSelection;
-        if (event.selection === null) {
-            // No selection with the brush is equivalent to just selecting the whole area
-            extents = [
-                [ bounds.x, bounds.x2 ],
-                [ bounds.y, bounds.y2 ]
-            ]
-        }
-        else {
-            // Otherwise, get extents from brush selection
-            brushSelection = this._scaleBrushSelection(event.selection, this.xScale.invert, this.yScale.invert);
-            let [ [x1,y1],[x2,y2] ] = brushSelection;
-            // Clamp selection to boundaries
-            x1 = Math.max( bounds.x,  Math.floor(x1) );
-            x2 = Math.min( bounds.x2, Math.ceil(x2)  );
-            y1 = Math.max( bounds.y,  Math.floor(y1) );
-            y2 = Math.min( bounds.y2, Math.ceil(y2)  );
-            extents = [ [x1,x2], [y1,y2] ];
-        }
+        const segmentRanges = Util.compressRanges(
+            brushCoords.reduce( (acc, sel) =>
+                acc.concat( sel ? this._brushCoordsToSegmentRanges(sel) : [] )
+            , [] )
+        );
 
         // Update selection (and give brush coordinates along with it)
-        const selection = Selection.fromSegments(extents);
-        this.controller.updateSelection(selection, this, { brush: brushSelection });
+        const selection = Selection.fromSegments(segmentRanges);
+        this.controller.updateSelection(selection, this, { brushes: brushCoords });
+    }
+
+    /**
+     * Clear all of the brush selections. This will fire an update to the Selection Controller
+     * equivalent to selecting the entire area.
+     */
+    _clearBrushes() {
+        // Clear brushes
+        this._redrawBrushes( [] );
+
+        // If there's no selection controller, don't bother
+        if (this.controller === undefined) return;
+
+        // Get a selection of the entire area
+        const bounds = this.contactMap.bounds;
+        const selection = Selection.fromSegments([
+            [ bounds.x, bounds.x2 ],
+            [ bounds.y, bounds.y2 ]
+        ]);
+
+        this.controller.updateSelection(selection, this, { brushes: [] });
     }
 
     /**
@@ -437,27 +494,47 @@ class ContactMapCanvas {
     _onZoom(event) {
         const trans = event.transform;
 
-        // Get brush selection
-        let selection = d3.brushSelection( this.brushSVG.node() );
-        if (selection !== null) {
-            selection = this._scaleBrushSelection(selection, this.xScale.invert, this.yScale.invert);
-        }
+        const preZoomSelections = this._getBrushCoords();
 
         // Transform scales
         this.xScale = trans.rescaleX(this.xScaleOriginal);
         this.yScale = trans.rescaleY(this.yScaleOriginal);
 
-        // Move brush to new position after transformation
-        if (selection !== null) {
-            selection = this._scaleBrushSelection(selection, this.xScale, this.yScale);
-            this.brush.move( this.brushSVG, selection, event );
-        }
-
         // Redraw axes
         this.baseSVG.select('.xaxis').call( d3.axisTop(this.xScale) );
         this.baseSVG.select('.yaxis').call( d3.axisLeft(this.yScale) );
 
+        this._redrawBrushes( preZoomSelections );
         this._redrawCanvas();
+    }
+
+    /**
+     * Given an array of brush coordinate pairs (as returned by this._getBrushCoords, for example),
+     * move the brushes in the contact map to match the appropriate selections. This will 
+     * automatically add new brushes or clear extra ones if needed.
+     * 
+     * The units for the provided brush coordinates *MUST* be in terms of segment number *NOT*
+     * in pixels.
+     * 
+     * NOTE: This won't delete excess brush layers, only clear their selections.
+     */
+    _redrawBrushes(coords) {
+
+        const diff = coords.length - this.brushes.length;
+        // If there are more selections than we have brushes, add some new brushes
+        for (let x = diff; x > 0; x--) this._addBrush();
+        // If we have more brushes than there are selections, append some null selections
+        for (let x = -diff; x > 0; x--) coords.push(null);
+
+        const scaled = coords.map( (s) => this._scaleBrushCoords(s, this.xScale, this.yScale) );
+
+        for (let i in scaled) {
+            const brush = this.brushes[i];
+            const group = this.brushSVG.select(`[brushid="${i}"]`);
+
+            brush.move(group, scaled[i], new Event('redraw'));
+        }
+
     }
 
     /**
@@ -520,10 +597,59 @@ class ContactMapCanvas {
     }
 
     /**
+     * Convert a pair of brush coordinates to a pair of segment ranges. The units for the
+     * brush coordinates *MUST* be in segment numbers, *NOT* pixels.
+     * @param {Int[][]} coords - Brush coordinates given as the coordinates of the two
+     * corners of the selection e.g. [ [x1,y1], [x2,y2] ]
+     * @returns {Int[][]} - Segment ranges given as the start and end along each axis
+     * e.g. [ [x1,x2], [y1,y2] ]
+     */
+    _brushCoordsToSegmentRanges(coords) {
+        const bounds = this.contactMap.bounds;
+        let [ [x1,y1], [x2,y2] ] = coords;
+        // Clamp selection to boundaries
+        x1 = Math.max( bounds.x,  Math.floor(x1) );
+        x2 = Math.min( bounds.x2, Math.ceil(x2)  );
+        y1 = Math.max( bounds.y,  Math.floor(y1) );
+        y2 = Math.min( bounds.y2, Math.ceil(y2)  );
+        return [ [x1,x2], [y1,y2] ];
+
+    }
+
+    /**
+     * Convert a pair of (or one or zero) segment ranges to an appropriate pair of brush
+     * coordinates. The units for the brush coordinates will be in segment numbers *NOT* pixels.
+     * @param {Int[][]} ranges - Segment ranges given as the start and end along each axis
+     * e.g. [ [x1,x2], [y1,y2] ]
+     * @returns {Int[][]} - Brush coordinates given as the coordinates of the two
+     * corners of the selection e.g. [ [x1,y1], [x2,y2] ]
+     */
+    _segmentRangesToBrushCoords(ranges) {
+        if (ranges.length === 0) return null;
+        const [ x1, x2 ] = ranges[0];
+        const [ y1, y2 ] = ranges.length > 1 ? ranges[1] : ranges[0];
+        return [ [x1,y1], [x2,y2] ];
+    }
+
+    /**
+     * Get an array of the coordinate paris for every brush selection. The coordinate pairs
+     * will be in the same order as their corresponding brushes in this.brushes, so they can
+     * be matched by index.
+     */
+    _getBrushCoords() {
+        return this.brushSVG.selectAll('.brushgroup').nodes()
+            .sort( (a,b) => a.getAttribute('brushid') - b.getAttribute('brushid') )
+            .map(d3.brushSelection)
+            .map( (s) => this._scaleBrushCoords(s, this.xScale.invert, this.yScale.invert)
+        );
+    }
+
+    /**
      * Given a selection from a d3 brush, return a selection scaled according
      * to the given scales for x/y axes.
      */
-    _scaleBrushSelection(selection, xScale, yScale) {
+    _scaleBrushCoords(selection, xScale, yScale) {
+        if (selection === null) return null;
         return selection.map( ([x,y]) => [ xScale(x), yScale(y) ] );
     }
 
