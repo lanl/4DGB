@@ -194,6 +194,13 @@ class ControlPanel extends EventEmitter {
         cell.appendChild(this.select);
         this.select.onclick = (function (e) { this.triggerSelection(e, this.lastUpdated) }).bind(this);
 
+            // selection permalink button
+        cell = row.insertCell(2);
+        this.permalinkButton = document.createElement("button");
+        this.permalinkButton.innerText = "Permalink";
+        cell.appendChild(this.permalinkButton);
+        this.permalinkButton.onclick = (e) => { this.createPermalink() };
+
             // title
         var row = this.controls.insertRow(cur_row); 
         cur_row += 1;
@@ -520,6 +527,25 @@ class ControlPanel extends EventEmitter {
             if (this.currentSelection !== selection) return;
             this.geneentry.value = genes.join(',') 
         });
+    }
+
+    /**
+     * Create a URL that contains the current selection as a query parameter
+     * and copy it to the sytstem clipboard
+     */
+    createPermalink() {
+        if (this.currentSelection === undefined) return;
+
+        const serialized = this.currentSelection.serialize();
+
+        const permalink = new URL(window.location.href);
+        permalink.searchParams.set('selection', serialized);
+
+        window.alert(
+        `Use this URL to share your current selection:
+        
+        ${permalink.toString()}
+        `);
     }
 
     /**

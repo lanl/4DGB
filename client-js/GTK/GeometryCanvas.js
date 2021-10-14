@@ -56,8 +56,15 @@ class GeometryCanvas {
 
         /**
          * @type {Controller} Selection controller used to sync selections with other components.
-        */
+         */
         this.controller;
+
+        /**
+         * If a 'selectionChanged' event is triggered before the Geometry has finished
+         * loading, this will get set to that selection event's object. It will be applied
+         * as soon as loading has finished.
+         */
+        this.pendingSelection = null;
 
         this.render = (function() {
             this.renderRequested = undefined;
@@ -199,11 +206,24 @@ class GeometryCanvas {
      */
     setController(controller) {
         this.controller = controller;
-        this.controller.addListener('selectionChanged', ({selection}) => {
-            const segmentIDs = Util.rangesToValues( selection.asSegments() );
-            this.setSegmentStates(segmentIDs, Segment.State.LIVE, Segment.State.GHOST);
-            this.render();
-        });
+        this.controller.addListener('selectionChanged', (e) => this.onSelectionChanged(e) );
+    }
+
+    /**
+     * Called in response to 'selectionChanged' events. Sets the visibility of segments
+     */
+    onSelectionChanged(selectionEvent) {
+        // If we haven't finished loading, put this selection event on hold
+        // (It'll be triggered again as soon as loading has finished)
+        if (!this.loaded) {
+            this.pendingSelection = selectionEvent;
+            return;
+        }
+
+        const {selection} = selectionEvent;
+        const segmentIDs = Util.rangesToValues( selection.asSegments() );
+        this.setSegmentStates(segmentIDs, Segment.State.LIVE, Segment.State.GHOST);
+        this.render();
     }
 
     showAxes( state ) {
@@ -247,6 +267,10 @@ class GeometryCanvas {
         // instance.geometry.setSegmentVisible(instance.unmapped, false);
 
         this.loaded = true;
+        // If a selection was set while we were loading, apply it now
+        if (this.pendingSelection) {
+            this.onSelectionChanged(this.pendingSelection);
+        }
     }
 
     // render on changes
