@@ -183,14 +183,28 @@ class Geometry {
                 // TODO: report error
             }
 
-            // compute centroid
+            // centroid
             var numSegs = this.getNumSegments(); 
             this.centroid = center.divideScalar(numSegs);
+
+            // create geometry for the centroid
+            var cGeom = new THREE.SphereBufferGeometry( 0.5, 8, 8, );
+            var cMaterial = new THREE.MeshPhongMaterial();
+            this.centroidMarker = new THREE.Mesh(cGeom, cMaterial);
+            this.centroidMarker.position.x = this.centroid.x;
+            this.centroidMarker.position.y = this.centroid.y;
+            this.centroidMarker.position.z = this.centroid.z;
+            this.centroidMarker.visible = true;
+            this.scene.add(this.centroidMarker);
             
             if (caller != "None") {
                 caller.postLoad(caller);
             }
         }, this.geometry );
+    }
+
+    showCentroid(state) {
+        this.centroidMarker.visible = state;
     }
 
     //

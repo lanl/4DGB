@@ -209,6 +209,11 @@ class GeometryCanvas {
         this.controller.addListener('selectionChanged', (e) => this.onSelectionChanged(e) );
     }
 
+    setRotationCenter( center ) {
+        this.controls.target.set(center.x, center.y, center.z);
+        this.controls.update();
+    }
+
     /**
      * Called in response to 'selectionChanged' events. Sets the visibility of segments
      */
@@ -231,7 +236,7 @@ class GeometryCanvas {
     }
 
     showCentroid( state ) {
-        this.centroidMarker.visible = state;
+        this.geometry.showCentroid(state);
     }
 
     // color must be of the form #000000
@@ -246,19 +251,8 @@ class GeometryCanvas {
     // update after data loaded
     postLoad(instance) {
         // set the centroid
-        instance.controls.target.set(instance.geometry.centroid.x, instance.geometry.centroid.y, instance.geometry.centroid.z);
-        instance.controls.update();
+        instance.setRotationCenter( instance.geometry.centroid );
 
-        // create geometry for the centroid
-        var cGeom = new THREE.SphereBufferGeometry( 0.5, 8, 8, );
-        var cMaterial = new THREE.MeshPhongMaterial();
-        this.centroidMarker = new THREE.Mesh(cGeom, cMaterial);
-        this.centroidMarker.position.x = instance.geometry.centroid.x;
-        this.centroidMarker.position.y = instance.geometry.centroid.y;
-        this.centroidMarker.position.z = instance.geometry.centroid.z;
-        this.scene.add(this.centroidMarker);
-        this.showCentroid(false);
-        
         // set the colors
         // instance.paintByVariable();
          
