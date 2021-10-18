@@ -255,6 +255,44 @@ class Selection {
     }
 
     /**
+     * Save this selection to a base64url-encoded JSON string
+     * A selection can be re-created from that string with the static
+     * deserialize method.
+     * @returns {String}
+     */
+    serialize() {
+        const unit = this._constructedFrom;
+        const value = unit === UNIT.LOCATION ? this._locationRanges
+                    : unit === UNIT.SEGMENT  ? this._segmentRanges
+                    : this._genes;
+
+        return Util.objToBase64url( {unit, value} );
+    }
+
+    /**
+     * Create a selection from a base64url-encoded JSON string such
+     * as one returned by the serialize method.
+     * 
+     * If the serialized selection indicates that it was constructed based off
+     * a list of genes, the returned selection will _actually_ be a Promise that
+     * resolves into the selection.
+     * @param {String} str
+     * @returns {Selection|Promise<Selection}
+     */
+    static deserialize(str) {
+        const {unit, value} = Util.base64urlToObj(str);
+
+        const selection = new Selection(CONSTRUCTOR_PASS, unit, value);
+
+        if (unit === UNIT.GENE) {
+            return selection._fetchLocationData().then( () => { return selection } );
+        }
+        else {
+            return selection;
+        }
+    }
+
+    /**
      * Fetch gene information based on this selection's segment information and set `_genes`
      * once complete.
      */

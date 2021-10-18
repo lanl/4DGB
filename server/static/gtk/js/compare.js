@@ -191,6 +191,13 @@ function main( project ) {
     TheControls.addListener( "clearTracks",            clearTracks );
     TheControls.addListener( "render",                 renderAllPanels );
     TheControls.addListener( "backgroundColorChanged", updateBackgroundColor );
+
+    // Load a selection from the query parameters if there is one
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('selection')) {
+        const selection = GTK.Selections.Selection.deserialize( params.get('selection') );
+        TheController.updateSelection(selection);
+    }
 }
 
 //

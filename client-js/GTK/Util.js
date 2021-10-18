@@ -146,9 +146,50 @@ compressRanges = (ranges) => ranges.slice()
         return acc.concat([d]);
     }, []);
 
+/**
+ * Serialize an object to base64url.
+ * This converts the object to JSON, then encodes it in base64url
+ * @param {*} obj 
+ * @returns {String}
+ */
+function objToBase64url(obj) {
+    // convert to a utf8 binary string
+    // using the hack described here:
+    // https://developer.mozilla.org/en-US/docs/Glossary/Base64#solution_1_%E2%80%93_escaping_the_string_before_encoding_it
+    const as_utf8 = unescape( encodeURIComponent( JSON.stringify(obj) ) );
+
+    const as_base64url = btoa(as_utf8)
+        .replace('+', '-')
+        .replace('/', '_');
+    
+    return as_base64url;
+}
+
+/**
+ * Deserialize a base64url string to an object (assuming
+ * the string encodes some JSON)
+ * @param {String} base64_str A string in base64url
+ * @returns {Object}
+ */
+function base64urlToObj(base64_str) {
+
+    // convert to regular base64
+    const as_base64 = base64_str
+        .replace('-', '+')
+        .replace('_', '/');
+
+    // convert to string
+    // using the hack described here:
+    // https://developer.mozilla.org/en-US/docs/Glossary/Base64#solution_1_%E2%80%93_escaping_the_string_before_encoding_it
+    const as_obj = JSON.parse( decodeURIComponent( escape( atob(as_base64) ) ) );
+
+    return as_obj;
+}
+
 module.exports = { 
     rangeStringToValues, rangeStringToRanges,
     valuesToRanges, valuesToRangeString,
     rangesToValues, rangesToRangeString,
-    compressRanges
+    compressRanges,
+    objToBase64url, base64urlToObj
 }
