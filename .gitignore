@@ -25,4 +25,5 @@ client-js/gtk-dist/
 gtk.min.js
 gtkclient_*_test.json
 testing/scratch
+package-lock.json
 
