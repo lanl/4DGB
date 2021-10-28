@@ -28,13 +28,14 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+const Component = require('./Component');
 const Project = require('./Project');
 const Dataset = require('./Dataset');
 const ContactMap = require('./ContactMap');
 const Util = require('./Util');
 const ScalarBarCanvas = require('./ScalarBarCanvas');
 
-const { Selection, Controller} = require('./selections');
+const { Selection } = require('./selections');
 
 const MAX_ZOOM = 10;
 
@@ -47,7 +48,7 @@ const MAX_ZOOM = 10;
  * down the spacebar, then they can use the scroll wheel to zoom in or out of the image and
  * click-and-drag to pan across it.
  */
-class ContactMapCanvas {
+class ContactMapCanvas extends Component {
 
     /**
      * The DOM layout of the widget looks like this:
@@ -107,12 +108,8 @@ class ContactMapCanvas {
      * @param {String} rootElemID The DOM ID of the element this will be appended to.
      */
     constructor(project, dataset, rootElemID) {
+        super();
         const self = this;
-
-        /**
-         * @type {Controller} Selection controller used to sync selections with other components.
-         */
-        this.controller;
 
         /** Div containing all the contents of the contact map widget */
         this.contdiv = document.createElement("div");
@@ -284,9 +281,9 @@ class ContactMapCanvas {
         this.loaded = false;
 
         /**
-         * If a 'selectionChanged' event is triggered before the Contact Map has finished
-         * loading, this will get set to that selection event's object. It will be applied
-         * as soon as loading has finished.
+         * If onSelectionChanged is triggered before this has finished loading the contact map,
+         * then this will get set to the arguments for that call. It will be triggered again as
+         * soon as loading has finished. 
          */
         this.pendingSelection = null;
 
@@ -350,7 +347,10 @@ class ContactMapCanvas {
             this.loaded = true;
             // If a selection was set while we were loading, apply it now
             if (this.pendingSelection) {
-                this.onSelectionChanged(this.pendingSelection);
+                this.onSelectionChanged(
+                    this.pendingSelection.selection,
+                    this.pendingSelection.options
+                );
             }
         });
 
@@ -364,27 +364,15 @@ class ContactMapCanvas {
     }
 
     /**
-     * Set a new selection controller for the Contact Map Canvas.
-     * Changing the selection in the contact map will trigger 'selectionChanged' events
-     * in the controller, and the contact map will adjust its selection in response to
-     * those events from the controller.
-     * @param {Controller} controller 
-     */
-    setController(controller) {
-        this.controller = controller;
-        this.controller.addListener('selectionChanged', (e) => this.onSelectionChanged(e) );
-    }
-
-    /**
      * Called in response to 'selectionChanged' events. Moves the brushes
      */
-    onSelectionChanged(selectionEvent) {
-        const { selection, source, decoration } = selectionEvent;
+    onSelectionChanged(selection, options) {
+        const { source, decoration } = options;
 
         // If we haven't finished loading, put this selection event on hold
         // (It'll be triggered again as soon as loading has finished)
         if (!this.loaded) {
-            this.pendingSelection = selectionEvent;
+            this.pendingSelection = { selection, options };
             return;
         }
 
