@@ -28,11 +28,6 @@
  *      - Selection: An immutable object representing a selection. A selection can be constructed
  *                   by specifying any of the three units mentioned above. Once constructed, there
  *                   are methods to get the selection described in any of the three units.
- *
- *      - Controller: An event emitter/reciever which allows components to stay in sync with the
- *                    selections they make. For example, a Contact Map widget and Geometry widget
- *                    can both listen to the same instance of Controller so that a selection
- *                    being made on one will affect the other and vice-versa.
  *  
  */
 
@@ -417,62 +412,4 @@ class Selection {
 
 }
 
-/*####################################
-  #
-  #    CONTROLLER
-  #
-  ###################################*/
-
-/**
- * An EventEmitter used to control multiple components that wish to keep their selections in-sync
- * with one-another. This will emit the event 'selectionChanged', providing an object with the
- * following fields:
- *
- * - `selection`: The new Selection
- * - `source`: The Object that triggered the change. i.e. The object that calls `updateSelection`.
- * Typically, a listener will check to see if this is the same as itself and then ignore the event.
- * - `decoration`: Any other object that a caller chooses to attach when updating the selection.
- * - `type`: The string 'selectionChanged'
- * 
- * In cases where the selection will change rapidly (like a user click-and-dragging), you may not
- * want to respond to every event. For this purpose, the controller also emits a `selectionDebounced`
- * event. This will have the exact same object as an argument as a previous `selectionChanged'
- * event, but will only trigger after a short interval if this controller's selection isn't changed
- * during that interval.
- * 
- */
-class Controller extends EventEmitter {
-
-    constructor() { super(); }
-
-    /**
-     * Update this controller's selection, triggering a 'selectionChanged' event.
-     * @param {Selection|Promise<Selection>} selection - The new selection, or a promise
-     * that resolves to it.
-     * @param {*} source - The object that's calling this
-     * @param {*} decoration - Anything else you might want the other components to know about.
-     * This is passed along with the triggered event.
-     */
-    updateSelection(selection, source, decoration) {
-        if (selection instanceof Promise) {
-            // If selection is actually a promise, wait for it to resolve before
-            // emitting event
-            selection.then( (sel) => {
-                const event = { selection: sel, source, decoration, type: 'selectionChanged' };
-                this.emit('selectionChanged', event);
-                this.sendDebounced(event);
-            });
-        }
-        else {
-            // Otherwise, be normal
-            const event = { selection, source, decoration, type: 'selectionChanged' };
-            this.emit('selectionChanged', event);
-            this.sendDebounced(event);
-        }
-    }
-
-    sendDebounced = debounce( (event) => this.emit('selectionDebounced', event), 500 );
-                                                                              // ^^^- milliseconds
-}
-
-module.exports = { Selection, Controller, UNIT };
+module.exports = { Selection, UNIT };

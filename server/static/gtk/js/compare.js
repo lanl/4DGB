@@ -42,13 +42,6 @@ function renderAllPanels () {
     }
 }
 
-function updateBackgroundColor () {
-    for (let i = 0; i < TheNumPanels; i++) {
-        ThePanels[i].geometrycanvas.setBackgroundColor(TheControls.getBackgroundColor());
-        ThePanels[i].geometrycanvas.render();
-    }
-}
-
 function addTrackCallback() {
     // alert("track clicked")
 }
@@ -113,29 +106,6 @@ function linkCameras(a, b) {
     });
 }
 
-function setVariable( id ) {
-    GTK.Client.TheClient.get_array( (response) => {
-            ThePanels[0].geometrycanvas.setLUTParameters( TheControls.getCurrentVariableName(), response['data']['min'], response['data']['max'] ); 
-            ThePanels[0].geometrycanvas.geometry.colorBy( response['data']['values']);
-            ThePanels[0].geometrycanvas.render();
-        }, id, 0); 
-    GTK.Client.TheClient.get_array( (response) => {
-            ThePanels[1].geometrycanvas.setLUTParameters( TheControls.getCurrentVariableName(), response['data']['min'], response['data']['max'] ); 
-            ThePanels[1].geometrycanvas.geometry.colorBy( response['data']['values']);
-            ThePanels[1].geometrycanvas.render();
-        }, id, 1); 
-}
-
-function variableChanged(e) {
-    setVariable(e);
-}
-
-function colormapChanged(e) {
-    ThePanels[0].geometrycanvas.setLUT(e);
-    ThePanels[1].geometrycanvas.setLUT(e);
-    setVariable(TheControls.getCurrentVariableID());
-}
-
 function main( project ) {
 
     var dset = project.getDatasets(); 
@@ -185,12 +155,9 @@ function main( project ) {
     ThePanels[0].setController(TheController);
     ThePanels[1].setController(TheController);
         // events
-    TheControls.addListener( "variableChanged",        variableChanged );
-    TheControls.addListener( "colormapChanged",        colormapChanged );
     TheControls.addListener( "createTrack",            createTrack );
     TheControls.addListener( "clearTracks",            clearTracks );
     TheControls.addListener( "render",                 renderAllPanels );
-    TheControls.addListener( "backgroundColorChanged", updateBackgroundColor );
 
     // Load a selection from the query parameters if there is one
     const params = new URLSearchParams(window.location.search);
@@ -198,16 +165,25 @@ function main( project ) {
         const selection = GTK.Selections.Selection.deserialize( params.get('selection') );
         TheController.updateSelection(selection);
     }
+
+    /*TheController.on('anyChanged', (value, options) => {
+        console.log(`Event!    ${options.type}: ${value}`);
+    });*/
 }
 
 //
 // create the project object and load data 
 //
 var view;
-const TheController   = new GTK.Selections.Controller();
+var TheController;
 
 GTK.Client.TheClient  = new GTK.Client();
 GTK.Project.getProject().then( (project) => {
+
     GTK.Project.TheProject = project;
+    TheProject = project;
+
+    TheController = new GTK.Controller(project);
+
     main(project);
 });
