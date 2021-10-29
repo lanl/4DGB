@@ -130,7 +130,10 @@ class GeometryCanvas extends Component {
         this.controls = new THREE.OrbitControls(this.camera, this.canvas);
         this.controls.target.set(cam["center"][0], cam["center"][1], cam["center"][2]);
         this.controls.update();
-        this.controls.addEventListener('change', this.requestRenderIfNotRequested);
+        this.controls.addEventListener('change', () => {
+            this.controller.updateCameraPosition( this.camera.position.toArray() );
+            this.requestRenderIfNotRequested();
+        });
         window.addEventListener('resize', this.requestRenderIfNotRequested);
 
         // new scene
@@ -216,7 +219,16 @@ class GeometryCanvas extends Component {
         this.render();
     }
 
-    
+    onCameraPositionChanged(value, options) {
+        // Ignore this if it's coming from this very same Geometry Canvas
+        if (options.source === this) return;
+        this.camera.position.fromArray(value);
+        this.camera.lookAt(this.controls.target);
+        this.camera.updateProjectionMatrix();
+        this.render();
+    }
+
+
     showAxes( state ) {
         this.showAxes.visible = state;
     }

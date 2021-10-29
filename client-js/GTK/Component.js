@@ -92,6 +92,13 @@ class Component extends EventEmitter {
      */
      onBackgroundColorChanged(value, options) {}
 
+     /**
+      * Called in response to a cameraPositionChanged event in the Controller
+      * @param {CameraSetting} value 
+      * @param {EventOptions} options 
+      */
+     onCameraPositionChanged(value, options) {}
+
 }
 
 module.exports = Component;

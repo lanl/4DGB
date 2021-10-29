@@ -92,20 +92,6 @@ function clearTracks ( ) {
     TheTrackPanel.clear();
 }
 
-function linkCameras(a, b) {
-    // link the cameras
-    a.controls.addEventListener( 'change', () => {
-        b.camera.copy( a.camera, true );
-        b.controls.target = a.controls.target;
-        b.render();
-    });
-    b.controls.addEventListener( 'change', () => {
-        a.camera.copy( b.camera, true );
-        a.controls.target = b.controls.target;
-        a.render();
-    });
-}
-
 function main( project ) {
 
     var dset = project.getDatasets(); 
@@ -142,14 +128,6 @@ function main( project ) {
     TheTrackPanel = new GTK.TrackPanel( "trackpanel" );
     TheTrackPanel.setTrackTitles( dset[0]["name"], dset[1]["name"] );
 
-
-    // connections
-        // camera
-    linkCameras(ThePanels[0].geometrycanvas, ThePanels[1].geometrycanvas);
-        // contact maps
-    //linkContactMaps(ThePanels[0], ThePanels[1]);
-    //linkContactMapControls(TheControls, ThePanels[0].contactmapcanvas);
-    //linkContactMapControls(TheControls, ThePanels[1].contactmapcanvas);
         // selection controller
     TheControls.setController(TheController);
     ThePanels[0].setController(TheController);
