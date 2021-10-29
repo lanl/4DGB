@@ -39,7 +39,7 @@ const { Selection } = require('./selections');
  * triggered again but with the `debounced` option set to true. Some Components may change settings
  * very rapidly (like when click-and-dragging on a ContactMap), while some Components may have
  * expensive responses to events (like needing to fetch from the server). In these cases, Components
- * can just respond to the debounced events.
+ * can just respond to the debounced events by checking the `debounced` field of the options object.
  * 
  * The Controller will also emit an event, 'anyChanged', which will fire when any setting or
  * the selection is changed, with the same value and options as the regular event.
@@ -62,7 +62,9 @@ class Controller extends EventEmitter {
      * @typedef {Boolean} UnmappedSetting Whether or not to display unmapped segments in the geometry view
      * 
      * @typedef {String} BackgroundSetting Background color for the geometry view. A string in `#FFFFFF' format
-     */
+     * 
+     * @typedef {Number[]} CameraSetting Array of [x,y,z] values for camera position
+    **/
 
     /**********************
      * CONSTRUCTOR
@@ -106,8 +108,9 @@ class Controller extends EventEmitter {
             /** @type {UnmappedSetting} */
             showUnmappedSegments: false,
             /** @type {BackgroundSetting} */
-            backgroundColor: '#FFFFFF'
-
+            backgroundColor: '#FFFFFF',
+            /** @type {CameraSetting} */
+            cameraPos: this.project.getApplicationData('gtk')['geometrycanvas']['scene']['camera']['position']
         }
     }
 
@@ -177,6 +180,18 @@ class Controller extends EventEmitter {
      updateBackgroundColor = (value, source, decoration) => {
         this.settings.backgroundColor = value;
         this._triggerEvent('backgroundColorChanged', 'onBackgroundColorChanged', false, value, {decoration, source});
+     }
+
+     /**
+     * Trigger an update to the `cameraPosition` setting on this Controller and Components connected to it.
+     * @param {CameraSetting} value The new setting value
+     * @param {Component} source The component initiating the change. (If you're calling this method
+     * from a Component, then make this `this`). 
+     * @param {*} decoration Any additional data to pass along to other Components
+     */
+      updateCameraPosition = (value, source, decoration) => {
+        this.settings.cameraPos = value;
+        this._triggerEvent('cameraPositionChanged', 'onCameraPositionChanged', false, value, {decoration, source});
      }
 
     /**********************
