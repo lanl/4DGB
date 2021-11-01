@@ -141,10 +141,10 @@ class Controller extends EventEmitter {
      * from a Component, then make this `this`). 
      * @param {*} decoration Any additional data to pass along to other Components
      */
-     updateVariable = (value, source, decoration) => {
+    updateVariable = (value, source, decoration) => {
         this.settings.variable = value;
         this._triggerEvent('variableChanged', 'onVariableChanged', false, value, {decoration, source});
-     }
+    }
 
     /**
      * Trigger an update to the `colormap` setting on this Controller and Components connected to it.
@@ -153,10 +153,10 @@ class Controller extends EventEmitter {
      * from a Component, then make this `this`). 
      * @param {*} decoration Any additional data to pass along to other Components
      */
-     updateColormap = (value, source, decoration) => {
+    updateColormap = (value, source, decoration) => {
         this.settings.colormap = value;
         this._triggerEvent('colormapChanged', 'onColormapChanged', false, value, {decoration, source});
-     }
+    }
 
     /**
      * Trigger an update to the `showUnmappedSegments` setting on this Controller and Components connected to it.
@@ -165,10 +165,10 @@ class Controller extends EventEmitter {
      * from a Component, then make this `this`). 
      * @param {*} decoration Any additional data to pass along to other Components
      */
-     updateShowUnmappedSegments = (value, source, decoration) => {
+    updateShowUnmappedSegments = (value, source, decoration) => {
         this.settings.showUnmappedSegments = value;
         this._triggerEvent('showUnmappedSegmentsChanged', 'onShowUnmappedSegmentsChanged', false, value, {decoration, source});
-     }
+    }
 
     /**
      * Trigger an update to the `backgroundColor` setting on this Controller and Components connected to it.
@@ -177,10 +177,10 @@ class Controller extends EventEmitter {
      * from a Component, then make this `this`). 
      * @param {*} decoration Any additional data to pass along to other Components
      */
-     updateBackgroundColor = (value, source, decoration) => {
+    updateBackgroundColor = (value, source, decoration) => {
         this.settings.backgroundColor = value;
         this._triggerEvent('backgroundColorChanged', 'onBackgroundColorChanged', false, value, {decoration, source});
-     }
+    }
 
      /**
      * Trigger an update to the `cameraPosition` setting on this Controller and Components connected to it.
@@ -189,10 +189,10 @@ class Controller extends EventEmitter {
      * from a Component, then make this `this`). 
      * @param {*} decoration Any additional data to pass along to other Components
      */
-      updateCameraPosition = (value, source, decoration) => {
+    updateCameraPosition = (value, source, decoration) => {
         this.settings.cameraPos = value;
         this._triggerEvent('cameraPositionChanged', 'onCameraPositionChanged', false, value, {decoration, source});
-     }
+    }
 
     /**********************
      * "PRIVATE" METHODS
