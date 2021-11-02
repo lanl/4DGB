@@ -173,13 +173,6 @@ class ControlPanel extends Component {
         cell.appendChild(this.select);
         this.select.onclick = (function (e) { this.triggerSelection(e, this.lastUpdated) }).bind(this);
 
-            // selection permalink button
-        cell = row.insertCell(2);
-        this.permalinkButton = document.createElement("button");
-        this.permalinkButton.innerText = "Permalink";
-        cell.appendChild(this.permalinkButton);
-        this.permalinkButton.onclick = (e) => { this.createPermalink() };
-
             // title
         var row = this.controls.insertRow(cur_row); 
         cur_row += 1;
@@ -200,10 +193,11 @@ class ControlPanel extends Component {
         this.variablechoice.setAttribute("type", "text");
         // this.variablechoice.className = "gtkcontrolpanelselect";
         cell.appendChild(this.variablechoice);
+        this.updateArrayNames(project);
+        this.variablechoice.value = this.controller.settings.variable;
         this.variablechoice.addEventListener('change', (e) => {
             this.controller.updateVariable(this.variablechoice.value, this);
         });
-        this.updateArrayNames(project);
 
             // colormap
         var row = this.controls.insertRow(cur_row); 
@@ -215,10 +209,11 @@ class ControlPanel extends Component {
         this.colormapchoice = document.createElement("select");
         this.colormapchoice.setAttribute("type", "text");
         cell.appendChild(this.colormapchoice);
+        this.updateColormapNames();
+        this.colormapchoice.value = this.controller.settings.colormap;
         this.colormapchoice.addEventListener('change', (e) => {
             this.controller.updateColormap(this.colormapchoice.value, this);
         });
-        this.updateColormapNames();
 
             // title
         if (false) {
@@ -272,13 +267,13 @@ class ControlPanel extends Component {
         cell.innerHTML = "Show Unmapped Segments";
 
         cell = row.insertCell(1);
-        var checkbox = document.createElement("input");
-        checkbox.setAttribute("type", "checkbox");
-        checkbox.checked = ControlPanel.HACK_state; 
-        checkbox.addEventListener('change', (e) => {
-            this.controller.updateShowUnmappedSegments(checkbox.checked, this);
+        this.unmappedCheckbox = document.createElement("input");
+        this.unmappedCheckbox.setAttribute("type", "checkbox");
+        this.unmappedCheckbox.checked = this.controller.settings.showUnmappedSegments; 
+        this.unmappedCheckbox.addEventListener('change', (e) => {
+            this.controller.updateShowUnmappedSegments(this.unmappedCheckbox.checked, this);
         });
-        cell.appendChild(checkbox);
+        cell.appendChild(this.unmappedCheckbox);
 
         // background
         var row = cur_panel.insertRow(cur_row); 
@@ -288,16 +283,14 @@ class ControlPanel extends Component {
         cell.innerHTML = "Background";
 
         cell = row.insertCell(1);
-        var color = document.createElement("input");
-        color.id = "controlpanel-settings-background";
-        color.setAttribute("type", "color");
-        color.setAttribute("value", ControlPanel.HACK_color);
-            // TODO: clean up event notification (no need for second functions -
-            // instead do it like this
-        color.addEventListener('change', (e) => {
-            this.controller.updateBackgroundColor(color.value, this);
+        this.bgColorInput = document.createElement("input");
+        this.bgColorInput.id = "controlpanel-settings-background";
+        this.bgColorInput.setAttribute("type", "color");
+        this.bgColorInput.value = this.controller.settings.backgroundColor;
+        this.bgColorInput.addEventListener('change', (e) => {
+            this.controller.updateBackgroundColor(this.bgColorInput.value, this);
         });
-        cell.appendChild(color);
+        cell.appendChild(this.bgColorInput);
 
         // create the links section
             // title
@@ -484,23 +477,24 @@ class ControlPanel extends Component {
         }
     }
 
-    /**
-     * Create a URL that contains the current selection as a query parameter
-     * and copy it to the sytstem clipboard
-     */
-    createPermalink() {
-        if (this.controller.selection === undefined) return;
+    onVariableChanged(value, options) {
+        if (options.source === this) return; // ignore an event that came from this Control Panel
+        this.variablechoice.value = value;
+    }
 
-        const serialized = this.controller.selection.serialize();
+    onColormapChanged(value, options) {
+        if (options.source === this) return; // ignore an event that came from this Control Panel
+        this.colormapchoice.value = value;
+    }
 
-        const permalink = new URL(window.location.href);
-        permalink.searchParams.set('selection', serialized);
+    onShowUnmappedSegmentsChanged(value, options) {
+        if (options.source === this) return; // ignore an event that came from this Control Panel
+        this.unmappedCheckbox.checked = value;
+    }
 
-        window.alert(
-        `Use this URL to share your current selection:
-        
-        ${permalink.toString()}
-        `);
+    onBackgroundColorChanged(value, options) {
+        if (options.source === this) return; // ignore an event that came from this Control Panel
+        this.bgColorInput.value = value;
     }
 
     /**
