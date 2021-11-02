@@ -31,10 +31,6 @@
  *  
  */
 
-const EventEmitter = require('events');
-
-const debounce = require('debounce');
-
 const Project = require('./Project');
 const Client  = require('./Client');
 const Util    = require('./Util');
@@ -250,37 +246,41 @@ class Selection {
     }
 
     /**
-     * Save this selection to a base64url-encoded JSON string
-     * A selection can be re-created from that string with the static
-     * deserialize method.
-     * @returns {String}
+     * @typedef {Object} SelectionAsObject Plain-object representation of a Selection. Used for serialization.
+     * @property {UNIT} unit The unit to construct the selection from
+     * @property {String[]|Number[][]} value The value of the selection, depends on the unit.
      */
-    serialize() {
+
+    /**
+     * Get an object specifying the unit and value for this selection. This object can be
+     * used to save or restore a selection. Give this object to the static `fromPlainObject`
+     * method to create a copy of the selection.
+     * @returns {SelectionAsObject}
+     */
+    asPlainObject() {
         const unit = this._constructedFrom;
         const value = unit === UNIT.LOCATION ? this._locationRanges
                     : unit === UNIT.SEGMENT  ? this._segmentRanges
                     : this._genes;
 
-        return Util.objToBase64url( {unit, value} );
+        return { unit, value };
     }
 
     /**
-     * Create a selection from a base64url-encoded JSON string such
-     * as one returned by the serialize method.
+     * Create a new selection from an object specifying the unit and value, as returned by
+     * the `asPlainObject` method.
      * 
-     * If the serialized selection indicates that it was constructed based off
-     * a list of genes, the returned selection will _actually_ be a Promise that
-     * resolves into the selection.
-     * @param {String} str
-     * @returns {Selection|Promise<Selection}
+     * If the object indicates that the selection was based off a list of genes, the returned
+     * selection will _actually_ be a Promise that resolves into the selection
+     * @param {SelectionAsObject} obj The selection object
+     * @returns {Selection|Promise<Selection>}
      */
-    static deserialize(str) {
-        const {unit, value} = Util.base64urlToObj(str);
-
+    static fromPlainObject(obj) {
+        const {unit, value} = obj;
         const selection = new Selection(CONSTRUCTOR_PASS, unit, value);
 
         if (unit === UNIT.GENE) {
-            return selection._fetchLocationData().then( () => { return selection } );
+            return selection._fetchLocationData().then( () => selection );
         }
         else {
             return selection;

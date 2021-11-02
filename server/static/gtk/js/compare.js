@@ -32,7 +32,6 @@ var ThePanels = [];
 var TheNumPanels = 2;
 var TheControls;
 var TheTrackPanel;
-var TheInterval;
 
 // general function for updating
 // TODO: refine granularity of updates, etc.
@@ -94,25 +93,7 @@ function clearTracks ( ) {
 
 function main( project ) {
 
-    var dset = project.getDatasets(); 
-    TheInterval = project.getInterval();
-
-    // testing the range function
-    if (false) {
-        var segs = [];
-            // [1]
-        segs.push(getSegmentsForLocationRange( [1, TheInterval] ));
-            // [1,2]
-        segs.push(getSegmentsForLocationRange( [1, TheInterval + 100] ));
-            // [1]
-        segs.push(getSegmentsForLocationRange( [TheInterval, TheInterval] ));
-            // [1,2]
-        segs.push(getSegmentsForLocationRange( [TheInterval, 2*TheInterval] ));
-            // [1,2]
-        segs.push(getSegmentsForLocationRange( [100, 2*TheInterval] ));
-            // [1,2,3]
-        segs.push(getSegmentsForLocationRange( [100, 2*TheInterval + 100] ));
-    }
+    var dset = project.getDatasets();
 
     // control panel
     TheControls = new GTK.ControlPanel( project, "controlpanel" );
@@ -137,16 +118,27 @@ function main( project ) {
     TheControls.addListener( "clearTracks",            clearTracks );
     TheControls.addListener( "render",                 renderAllPanels );
 
-    // Load a selection from the query parameters if there is one
+    // If a 'gtkproject' is specified in the URL parameters, then
+    // we can enable saving/restoring state
     const params = new URLSearchParams(window.location.search);
-    if (params.has('selection')) {
-        const selection = GTK.Selections.Selection.deserialize( params.get('selection') );
-        TheController.updateSelection(selection);
+    if (params.has('gtkproject')) {
+        const store = window.localStorage;
+        const key = `settings_${params.get('gtkproject')}`;
+
+        // Restore state if one is saved
+        if (store.getItem(key)) {
+            TheController.deserialize( store.getItem(key) );
+        }
+    
+        // Save state after any change
+        TheController.on('anyChanged', (value, options) => {
+            if (options.debounced) {
+                const str = TheController.serialize();
+                store.setItem(key, str);
+            }
+        });
     }
 
-    /*TheController.on('anyChanged', (value, options) => {
-        console.log(`Event!    ${options.type}: ${value}`);
-    });*/
 }
 
 //

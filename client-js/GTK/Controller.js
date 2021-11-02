@@ -5,6 +5,7 @@ const debounce = require('debounce');
 const Project = require('./Project');
 const Component = require('./Component');
 const { Selection } = require('./selections');
+const UTIL = require('./Util');
 
 /**
  * A Controller maintains settings and state between one or more Components (that is, instances
@@ -99,8 +100,6 @@ class Controller extends EventEmitter {
 
         /** Current settings */
         this.settings = {
-            /** @type {Selection?} Current selection */
-            selection: null,
             /** @type {VariableSetting} */
             variable: (arrays.length ? arrays[0].id : null),
             /** @type {ColormapSetting} */
@@ -194,8 +193,44 @@ class Controller extends EventEmitter {
         this._triggerEvent('cameraPositionChanged', 'onCameraPositionChanged', false, value, {decoration, source});
     }
 
+    /**
+     * Serialize this Controller's settings to a base64url-encoded JSON string. You can restore these
+     * settings into a new Controller with the `deserialize` method.
+     * @returns 
+     */
+    serialize() {
+        const s = this.settings;
+        return UTIL.objToBase64url({
+            selection: this.selection === null ? null : this.selection.asPlainObject(),
+            variable:  s.variable,
+            colormap:  s.colormap,
+            cameraPos: s.cameraPos,
+            showUnmappedSegments: s.showUnmappedSegments,
+            backgroundColor:      s.backgroundColor,
+        });
+    }
+
+    /**
+     * Restore settings from a base64url-encoded JSON string, as returned by the `serialize` method.
+     * This will set all of the settings and the selection to that of the previously-serialized
+     * Controller, triggering events and hdndlers for each one.
+     * @param {String} str 
+     */
+    deserialize(str) {
+        const from = UTIL.base64urlToObj(str);
+
+        if (from.selection) 
+            this.updateSelection( Selection.fromPlainObject(from.selection) );
+        
+        this.updateVariable(from.variable);
+        this.updateColormap(from.colormap);
+        this.updateCameraPosition(from.cameraPos);
+        this.updateShowUnmappedSegments(from.showUnmappedSegments);
+        this.updateBackgroundColor(from.backgroundColor);
+    }
+
     /**********************
-     * "PRIVATE" METHODS
+     * PRIVATE METHODS
     ***********************/
 
     /**
@@ -233,17 +268,17 @@ class Controller extends EventEmitter {
      */
     _triggerEvent(name, handlerName, debounced, value, options) {
         // Add name to options
-        options.type = name;
+        const opts = { ...options, type: name, debounced }
 
         // Emit event
-        this.emit(name, value, options);
-        this.emit('anyChanged', value, options);
+        this.emit(name, value, opts);
+        this.emit('anyChanged', value, opts);
 
         // Call handler for every component that has a handler method
         this.components
             .filter ( (c) => typeof c[handlerName] === 'function' )
             .forEach( (c) => {
-                c[handlerName](value, {...options, debounced }); 
+                c[handlerName](value, opts); 
             });
 
         // If this isn't from a debounced event, then start a debouncer for this event
