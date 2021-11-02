@@ -11,6 +11,7 @@ projects/test.01/source/*/*Binned*.csv
 projects/test.00/generated/
 projects/release.2021-09-15
 projects/release.2021-09-15.05-19
+projects/release.v1.1.0
 server/static/*.pdf
 __pycache__/
 venv/
