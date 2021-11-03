@@ -30,6 +30,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require('three/examples/js/controls/OrbitControls')
 
+const Client = require('./Client');
 const Project = require('./Project');
 const Geometry = require('./Geometry');
 const AxesCanvas = require('./AxesCanvas');
@@ -189,8 +190,10 @@ class GeometryCanvas {
         this.axesCanvas = new AxesCanvas(contdiv, this.camera);
 
         // load data
-        this.geometry = new Geometry(gdata["geometry"]);
-        this.geometry.load( this.dataset.id, this.scene, this );
+        this.geometry = new Geometry(this.dataset.id, gdata["geometry"]);
+        this.geometry.addListener('loaded', this.postLoad.bind(this));
+        Client.TheClient.get_structure(this.geometry.load.bind(this.geometry), this.dataset.id);
+        // this.geometry.load( this.dataset.id, this );
 
         // scalar bar
         this.scalarBarCanvas = new ScalarBarCanvas(contdiv);
@@ -249,15 +252,18 @@ class GeometryCanvas {
     }
 
     // update after data loaded
-    postLoad(instance) {
+    postLoad() {
+        // add the loaded geometry to the scene
+        this.geometry.addToScene(this.scene);
+
         // set the centroid
-        instance.setRotationCenter( instance.geometry.centroid );
+        this.setRotationCenter( this.geometry.centroid );
 
         // set the colors
         // instance.paintByVariable();
          
         // turn off the unmapped ones
-        instance.showUnmappedSegments( instance.ShowUnmappedSegments );
+        this.showUnmappedSegments( this.ShowUnmappedSegments );
         // instance.geometry.setSegmentVisible(instance.unmapped, false);
 
         this.loaded = true;

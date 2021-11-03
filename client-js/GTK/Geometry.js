@@ -31,11 +31,11 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require('three/examples/js/math/Lut');
 
+const EventEmitter = require('events');
 const ArrowSegment = require('./ArrowSegment');
 const CurveSegment = require('./CurveSegment');
-const Client = require('./Client');
 
-class Geometry {
+class Geometry extends EventEmitter {
     /**
      * Class Geometry
      *
@@ -50,14 +50,13 @@ class Geometry {
      *
      * @param {dictionary} s This is a dictionary of values used to construct the Geometry
      */
-    constructor( g ) {
-        // scene
-        this.scene;
+    constructor( geometryid, g ) {
+        super();
 
         // geometry
         this.root       = new THREE.Group();
         this.centroid   = new THREE.Vector3(0.0, 0.0, 0.0);
-        this.geometry   = "";
+        this.geometryid = geometryid;
 
         // other
             // this.segments is a dictionary because:
@@ -114,93 +113,90 @@ class Geometry {
         return this.segments[id];
     }
 
-    // loads the geometry into the scene provided
-    load(geometry, scene, caller) { 
-        this.scene = scene;
-        this.scene.add(this.root);
-        this.geometry = geometry;
-
+    // loads the geometry
+    load(data) { 
         // used to compute the centroid
         var center = new THREE.Vector3(0.0, 0.0, 0.0);
 
-        Client.TheClient.get_structure( (response) => {
-            if (this.segmentType == "arrow") {
-                for (var s of response["segments"]) {
+        if (this.segmentType == "arrow") {
+            for (var s of data["segments"]) {
 
-                    let points = {
-                        'start': new THREE.Vector3(s['start'][0], s['start'][1], s['start'][2]),
-                        'end'  : new THREE.Vector3(s['end'][0], s['end'][1], s['end'][2])
-                    }
-                    center.add(points['end']);
-                    var radius = {
-                        'start': ArrowSegment.RadiusBegin, 
-                        'end'  : ArrowSegment.RadiusEnd 
-                    }
-                    const newSeg = new ArrowSegment(s['segid'], points, radius); 
-                    newSeg.addToParent(this.root);
-                    this.segments[s['segid']] = newSeg;
+                let points = {
+                    'start': new THREE.Vector3(s['start'][0], s['start'][1], s['start'][2]),
+                    'end'  : new THREE.Vector3(s['end'][0], s['end'][1], s['end'][2])
                 }
-            } else if (this.segmentType == "curve") {
-                var segArray = {};
-                // HACK: for now, make a new data structure that can be accessed with IDs
-                for (var s of response["segments"]) {
-                    segArray[s["segid"]] = s;
+                center.add(points['end']);
+                var radius = {
+                    'start': ArrowSegment.RadiusBegin, 
+                    'end'  : ArrowSegment.RadiusEnd 
                 }
-
-                let defPoint = {
-                    'start' : [0.0, 0.0, 0.0], 
-                    'end'   : [0.0, 0.0, 0.0] 
-                }
-                let numSegs = Object.keys(segArray).length;
-                for (var i=1;i<=numSegs;i++) {
-                    let pSeg = defPoint; 
-                    let cSeg = segArray[i];
-                    let nSeg = defPoint; 
-                    if ( i == 1 ) {
-                        nSeg = segArray[i+1];
-                    } else if (i == numSegs) { 
-                        pSeg = segArray[i-1];
-                        nSeg = defPoint; 
-                    } else {
-                        pSeg = segArray[i-1];
-                        nSeg = segArray[i+1];
-                    }
-
-                    // gather the four points required by the C/R object
-                    let points = {
-                        '0' : new THREE.Vector3(pSeg['start'][0], pSeg['start'][1], pSeg['start'][2]),
-                        '1' : new THREE.Vector3(cSeg['start'][0], cSeg['start'][1], cSeg['start'][2]),
-                        '2' : new THREE.Vector3(cSeg['end'][0],   cSeg['end'][1],   cSeg['end'][2]),
-                        '3' : new THREE.Vector3(nSeg['end'][0],   nSeg['end'][1],   nSeg['end'][2]),
-                    }
-
-                    center.add(points['1'])
-                    const newSeg = new CurveSegment(i, points, CurveSegment.SegmentRadius); 
-                    newSeg.addToParent(this.root);
-                    this.segments[i] = newSeg;
-                }
-            } else {
-                // TODO: report error
+                const newSeg = new ArrowSegment(s['segid'], points, radius); 
+                newSeg.addToParent(this.root);
+                this.segments[s['segid']] = newSeg;
+            }
+        } else if (this.segmentType == "curve") {
+            var segArray = {};
+            // HACK: for now, make a new data structure that can be accessed with IDs
+            for (var s of data["segments"]) {
+                segArray[s["segid"]] = s;
             }
 
-            // centroid
-            var numSegs = this.getNumSegments(); 
-            this.centroid = center.divideScalar(numSegs);
-
-            // create geometry for the centroid
-            var cGeom = new THREE.SphereBufferGeometry( 0.5, 8, 8, );
-            var cMaterial = new THREE.MeshPhongMaterial();
-            this.centroidMarker = new THREE.Mesh(cGeom, cMaterial);
-            this.centroidMarker.position.x = this.centroid.x;
-            this.centroidMarker.position.y = this.centroid.y;
-            this.centroidMarker.position.z = this.centroid.z;
-            this.centroidMarker.visible = true;
-            this.scene.add(this.centroidMarker);
-            
-            if (caller != "None") {
-                caller.postLoad(caller);
+            let defPoint = {
+                'start' : [0.0, 0.0, 0.0], 
+                'end'   : [0.0, 0.0, 0.0] 
             }
-        }, this.geometry );
+            let numSegs = Object.keys(segArray).length;
+            for (var i=1;i<=numSegs;i++) {
+                let pSeg = defPoint; 
+                let cSeg = segArray[i];
+                let nSeg = defPoint; 
+                if ( i == 1 ) {
+                    nSeg = segArray[i+1];
+                } else if (i == numSegs) { 
+                    pSeg = segArray[i-1];
+                    nSeg = defPoint; 
+                } else {
+                    pSeg = segArray[i-1];
+                    nSeg = segArray[i+1];
+                }
+
+                // gather the four points required by the C/R object
+                let points = {
+                    '0' : new THREE.Vector3(pSeg['start'][0], pSeg['start'][1], pSeg['start'][2]),
+                    '1' : new THREE.Vector3(cSeg['start'][0], cSeg['start'][1], cSeg['start'][2]),
+                    '2' : new THREE.Vector3(cSeg['end'][0],   cSeg['end'][1],   cSeg['end'][2]),
+                    '3' : new THREE.Vector3(nSeg['end'][0],   nSeg['end'][1],   nSeg['end'][2]),
+                }
+
+                center.add(points['1'])
+                const newSeg = new CurveSegment(i, points, CurveSegment.SegmentRadius); 
+                newSeg.addToParent(this.root);
+                this.segments[i] = newSeg;
+            }
+        } else {
+            // TODO: report error
+        }
+
+        // centroid
+        var numSegs = this.getNumSegments(); 
+        this.centroid = center.divideScalar(numSegs);
+
+        // create geometry for the centroid
+        var cGeom = new THREE.SphereBufferGeometry( 0.5, 8, 8, );
+        var cMaterial = new THREE.MeshPhongMaterial();
+        this.centroidMarker = new THREE.Mesh(cGeom, cMaterial);
+        this.centroidMarker.position.x = this.centroid.x;
+        this.centroidMarker.position.y = this.centroid.y;
+        this.centroidMarker.position.z = this.centroid.z;
+        this.centroidMarker.visible = true;
+
+        // broadcast load is done
+        super.emit("loaded");
+    }
+
+    addToScene(scene) {
+        scene.add(this.root);
+        scene.add(this.centroidMarker);
     }
 
     showCentroid(state) {
