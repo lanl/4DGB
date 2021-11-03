@@ -196,6 +196,7 @@ class Geometry {
             this.centroidMarker.position.z = this.centroid.z;
             this.centroidMarker.visible = true;
             this.scene.add(this.centroidMarker);
+            this.showCentroid(false);
             
             if (caller != "None") {
                 caller.postLoad(caller);
