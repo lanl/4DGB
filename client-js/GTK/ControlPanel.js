@@ -234,7 +234,7 @@ class ControlPanel extends Component {
         this.createTrack = document.createElement("button");
         this.createTrack.innerHTML = "Create Data Tracks";
         cell.appendChild(this.createTrack);
-        this.createTrack.onclick = (function (e) { this.onCreateTrack(e) }).bind(this);
+        this.createTrack.onclick = () => { this.controller.addNewTrack() }
 
         // track clear button 
         var row = this.controls.insertRow(cur_row); 
@@ -246,7 +246,7 @@ class ControlPanel extends Component {
         this.clearTracks = document.createElement("button");
         this.clearTracks.innerHTML = "Clear All Tracks";
         cell.appendChild(this.clearTracks);
-        this.clearTracks.onclick = (function (e) { this.onClearTracks(e) }).bind(this);
+        this.clearTracks.onclick = () => { this.controller.clearTracks() }
 
 
         // global settings (moved to front tab for simplicity)

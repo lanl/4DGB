@@ -4,7 +4,7 @@ const debounce = require('debounce');
 
 const Project = require('./Project');
 const Component = require('./Component');
-const { Selection } = require('./selections');
+const { Selection, UNIT } = require('./selections');
 const UTIL = require('./Util');
 
 /**
@@ -14,20 +14,20 @@ const UTIL = require('./Util');
  * Controller instance and register multiple Components to it, which will allow the Components to
  * keep their settings and state synced.
  * 
- * In addition to settings (color map, camera position, etc.), the controller maintains a common
- * Selection between components, so selecting a part of the genome in one component will update
- * the display in another. For example, the GeometryCanvas, ContactMapCanvas and ControlPanel are
- * all Components. When they are registered to the same Controller, then click-and-dragging a
- * selection in the Contact Map will update the displayed segments in the Geometry view and the
- * selection read-out in the ControlPanel. Changing display settings in the ControlPanel will cause
- * the associated Geometry views to update.
+ * In addition to settings (color map, camera position, displayed tracks, etc.), the controller
+ * maintains a common Selection between components, so selecting a part of the genome in one
+ * component will update the display in another. For example, the GeometryCanvas, ContactMapCanvas
+ * and ControlPanel are all Components. When they are registered to the same Controller, then
+ * click-and-dragging a selection in the Contact Map will update the displayed segments in the
+ * Geometry view and the selection read-out in the ControlPanel. Changing display settings in the
+ * ControlPanel will cause the associated Geometry views to update.
  * 
  * The Controller has methods to set each of the individual settings or the selection. When one of
  * these is called, the Controller will update its internal state and then call associated handlers
  * in each of the registered Components. It will also emit events for each change, although code
  * within Components should rely on the handler methods, instead of listening for the events.
  * 
- * In addition to the value for the new setting or selection, events or handler calls are called
+ * In addition to the value for the new setting, events or handler calls are called
  * with an additional `options` object with extra information in the following fields:
  * 
  * - `source`: The Component instance that triggered the change
@@ -42,10 +42,9 @@ const UTIL = require('./Util');
  * expensive responses to events (like needing to fetch from the server). In these cases, Components
  * can just respond to the debounced events by checking the `debounced` field of the options object.
  * 
- * The Controller will also emit an event, 'anyChanged', which will fire when any setting or
- * the selection is changed, with the same value and options as the regular event.
- * 
- * TODO: Add settings for the state of the TrackPanel and make TrackPanel into a Component.
+ * The Controller will also emit an event, 'anyChanged', which will fire when any setting is 
+ * changed, with the same value and options as the regular event.
+ *
  */
 class Controller extends EventEmitter {
 
@@ -66,6 +65,12 @@ class Controller extends EventEmitter {
      * 
      * @typedef {Number[]} CameraSetting Array of [x,y,z] values for camera position
     **/
+
+    /**
+     * @typedef {Object} TrackSpec Specification for a data track chart
+     * @property {VariableSetting} variable Variable ID
+     * @property {Number[]} locationRange Range of locations like: [ start, end ]
+     */
 
     /**********************
      * CONSTRUCTOR
@@ -88,7 +93,10 @@ class Controller extends EventEmitter {
         /** @type {Selection} the current selection */
         this.selection = null;
 
-        /** @type {Component[]}  */
+        /** @type {TrackSpec[]} Currently displayed tracks */
+        this.tracks = [];
+
+        /** @type {Component[]} Registered Components*/
         this.components = [];
 
         /** Mapping of event names to debounced functions for each one */
@@ -194,6 +202,41 @@ class Controller extends EventEmitter {
     }
 
     /**
+     * Add a new track based on the current selection and variable. Will trigger the tracksChanged
+     * event / handlers
+     * @param {Component} source The component initiating the change. (If you're calling this method
+     * from a Component, then make this `this`). 
+     * @param {*} decoration Any additional data to pass along to other Components
+     */
+    async addNewTrack(source, decoration) {
+        const locRanges = this.selection.asLocations();
+        
+        // Add a track for every range
+        for (let range of locRanges) {
+            // Skip a range of just one value
+            if (range[0] === range[1]) continue;
+
+            this.tracks.push({
+                locationRange: range,
+                variable:     this.settings.variable
+            });
+        }
+
+        this._triggerEvent('tracksChanged', 'onTracksChanged', false, this.tracks, {decoration, source});
+    }
+
+    /**
+     * Clear all of the variable tracks
+     * @param {Component} source The component initiating the change. (If you're calling this method
+     * from a Component, then make this `this`). 
+     * @param {*} decoration Any additional data to pass along to other Components
+     */
+    clearTracks(source, decoration) {
+        this.tracks = [];
+        this._triggerEvent('tracksChanged', 'onTracksChanged', false, this.tracks, {decoration, source});
+    }
+
+    /**
      * Serialize this Controller's settings to a base64url-encoded JSON string. You can restore these
      * settings into a new Controller with the `deserialize` method.
      * @returns 
@@ -202,11 +245,12 @@ class Controller extends EventEmitter {
         const s = this.settings;
         return UTIL.objToBase64url({
             selection: this.selection === null ? null : this.selection.asPlainObject(),
+            tracks:    this.tracks,
             variable:  s.variable,
             colormap:  s.colormap,
             cameraPos: s.cameraPos,
             showUnmappedSegments: s.showUnmappedSegments,
-            backgroundColor:      s.backgroundColor,
+            backgroundColor:      s.backgroundColor
         });
     }
 
@@ -227,6 +271,10 @@ class Controller extends EventEmitter {
         this.updateCameraPosition(from.cameraPos);
         this.updateShowUnmappedSegments(from.showUnmappedSegments);
         this.updateBackgroundColor(from.backgroundColor);
+
+        // Update tracks
+        this.tracks = from.tracks;
+        this._triggerEvent('tracksChanged', 'onTracksChanged', false, this.tracks, {});
     }
 
     /**********************

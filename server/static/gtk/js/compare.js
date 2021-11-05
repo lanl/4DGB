@@ -99,23 +99,23 @@ function main( project ) {
     TheControls = new GTK.ControlPanel( project, "controlpanel" );
 
     // views
-    var dataset = new GTK.Dataset(dset[0]);
-    ThePanels.push(new GTK.ViewerPanel( project, dataset, "leftpanel" ));
+    const dataset1 = new GTK.Dataset(dset[0]);
+    ThePanels.push(new GTK.ViewerPanel( project, dataset1, "leftpanel" ));
 
-    var dataset = new GTK.Dataset(dset[1]);
-    ThePanels.push(new GTK.ViewerPanel( project, dataset, "rightpanel" ));
+    const dataset2 = new GTK.Dataset(dset[1]);
+    ThePanels.push(new GTK.ViewerPanel( project, dataset2, "rightpanel" ));
 
     // attribute charts
-    TheTrackPanel = new GTK.TrackPanel( "trackpanel" );
-    TheTrackPanel.setTrackTitles( dset[0]["name"], dset[1]["name"] );
+    TheTrackPanel = new GTK.TrackPanel( "trackpanel", dataset1, dataset2 );
 
         // selection controller
     TheControls.setController(TheController);
     ThePanels[0].setController(TheController);
     ThePanels[1].setController(TheController);
+    TheTrackPanel.setController(TheController);
         // events
-    TheControls.addListener( "createTrack",            createTrack );
-    TheControls.addListener( "clearTracks",            clearTracks );
+    //TheControls.addListener( "createTrack",            createTrack );
+    //TheControls.addListener( "clearTracks",            clearTracks );
     TheControls.addListener( "render",                 renderAllPanels );
 
     // If a 'gtkproject' is specified in the URL parameters, then
