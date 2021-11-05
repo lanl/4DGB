@@ -33,64 +33,6 @@ var TheNumPanels = 2;
 var TheControls;
 var TheTrackPanel;
 
-// general function for updating
-// TODO: refine granularity of updates, etc.
-function renderAllPanels () {
-    for (let i = 0; i < TheNumPanels; i++) {
-        ThePanels[i].geometrycanvas.render();
-    }
-}
-
-function addTrackCallback() {
-    // alert("track clicked")
-}
-
-//
-// generate the labels for track data
-//
-function generateTrackLabels (start, end, numbins) {
-    var labels = [];
-    var incr   = Math.trunc((end-start)/numbins);
-    for (var i = 0; i < numbins; i++) { 
-        labels.push(start + i*incr); 
-    }
-    return labels;
-}
-
-//
-// create a track using the data provided
-//
-function createTrack ( data ) {
-
-    // for (var i = 0; i < data.locations.length; i++) {
-    // HACK currently create tracks for the first range only
-    for (var i = 0; i < 1; i++) {
-        var lrange = data.locations[i].split("-").map(Number);
-
-        // create a title for the track
-        var title =  "Var: " + data.varname + " Range: (" + lrange[0] + ", " + lrange[1] + ")"
-        TheTrackPanel.pushContainer( title, addTrackCallback );
-
-        var title = [TheTrackPanel.topTitle, TheTrackPanel.bottomTitle]
-        var position = [0, 1]
-        for (let i = 0; i < TheNumPanels; i++) {
-            GTK.Client.TheClient.get_sampled_array( (response) => {
-                    var numlabels = response["data"].length;
-                    var labels = generateTrackLabels( lrange[0], lrange[1], numlabels); 
-                    TheTrackPanel.addTrackToCurrentContainer( labels, response["data"], title[i], position[i]);
-                    var data = response["data"];
-                }, data.varid, i, lrange[0], lrange[1], data.numbins); 
-        }
-    }
-}
-
-//
-// clear all the data tracks 
-//
-function clearTracks ( ) {
-    TheTrackPanel.clear();
-}
-
 function main( project ) {
 
     var dset = project.getDatasets();
@@ -113,10 +55,6 @@ function main( project ) {
     ThePanels[0].setController(TheController);
     ThePanels[1].setController(TheController);
     TheTrackPanel.setController(TheController);
-        // events
-    //TheControls.addListener( "createTrack",            createTrack );
-    //TheControls.addListener( "clearTracks",            clearTracks );
-    TheControls.addListener( "render",                 renderAllPanels );
 
     // If a 'gtkproject' is specified in the URL parameters, then
     // we can enable saving/restoring state
