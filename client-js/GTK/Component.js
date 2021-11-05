@@ -65,6 +65,13 @@ class Component extends EventEmitter {
     onSelectionChanged(selection, options) {}
 
     /**
+     * Called in response to a tracksChanged event in the Controller
+     * @param {TrackSpec[]} tracks 
+     * @param {EventOptions} options 
+     */
+    onTracksChanged(tracks, options) {}
+
+    /**
      * Called in response to a variableChanged event in the Controller
      * @param {VariableSetting} value
      * @param {EventOptions} options 

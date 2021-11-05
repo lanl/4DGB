@@ -30,23 +30,31 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 const TrackChart = require('./TrackChart');
+const Component  = require('./Component');
+const Project    = require('./Project');
+const Client     = require('./Client');
 
-class TrackPanel {
+class TrackPanel extends Component {
 
     static CurID = 0;
 
-    constructor(parentID) {
+    constructor(parentID, topDataset, bottomDataset) {
+        super();
         // container
         this.container = document.createElement("div"); 
         this.container.className = "gtktrackpanel";
+
+        this.topDataset = topDataset;
+        this.bottomDataset = bottomDataset;
 
         // title
         this.title = document.createElement("div");
         this.title.className = "gtktrackpaneltitle";
         this.container.appendChild(this.title);
         this.setTitle("Tracks")
-        this.topTitle = "";
-        this.bottomTitle = "";
+        this.topTitle = this.topDataset.name;
+        this.bottomTitle = this.bottomDataset.name;
+        this.titles = [this.topTitle, this.bottomTitle];
 
         // charts
         this.charts = document.createElement("div");
@@ -62,12 +70,6 @@ class TrackPanel {
         this.bottomTitle = bottom;
     }
 
-    clear() {
-        while (this.charts.firstChild) {
-            this.charts.removeChild(this.charts.firstChild);
-        }
-    }
-
     setTitle(title) {
         this.title.innerHTML = title;
     }
@@ -75,6 +77,54 @@ class TrackPanel {
     setDims(w, h) {
         this.container.style.width = w;
         this.container.style.height = h;
+    }
+
+    onTracksChanged(tracks, options) {
+        if (!options.debounced) return;
+
+        // Clear current tracks
+        while (this.charts.firstChild) {
+            this.charts.removeChild(this.charts.firstChild);
+        }
+
+        // Populate tracks
+        for (let track of tracks) {
+            const {variable, locationRange} = track;
+            const [start, end] = locationRange;
+            const varname = Project.TheProject.getVariableByID(variable).name;
+            const title = `${varname}: (${start} - ${end})`;
+
+            // Create container for chart pair
+            const cont = document.createElement('div');
+            cont.className = 'gtktrackpanelpaircontainer';
+            cont.innerText = title;
+            this.charts.insertBefore(cont, this.charts.firstChild);
+
+            // Function to fetch data and create chart
+            const make_chart = (index) => new Promise( (resolve, reject) => {
+                Client.TheClient.get_sampled_array( (response) => { try {
+                    const data = response['data'];
+    
+                    // Create chart labels
+                    const labels = [];
+                    const incr = Math.max( (end-start)/data.length, 1);
+                    for (let i = start; i < end; i += incr)
+                        labels.push[i];
+    
+                    // Build chart
+                    const chart = new TrackChart( this.titles[index] );
+                    cont.appendChild(chart.element);
+                    chart.make(labels, data);
+
+                    resolve();
+
+                } catch (e) { reject(e); }
+                }, variable, index, locationRange[0], locationRange[1], 200);
+            });
+
+            // Create charts
+            make_chart(0).then( () => make_chart(1) );
+        }
     }
 
     //
