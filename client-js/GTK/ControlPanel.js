@@ -28,21 +28,11 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const EventEmitter      = require('events');
-
 const Component         = require('./Component');
-const GeometryCanvas    = require('./GeometryCanvas');
 const Util              = require('./Util');
 
 const { Selection, UNIT } = require('./selections');
-
-var HACK_numbins = 200;
-
 class ControlPanel extends Component {
-
-    // TODO: need to update states consistently across app
-    static HACK_state = false;
-    static HACK_color = "#FFFFFF"; 
 
     constructor(project, parent) {
         super();
@@ -396,27 +386,6 @@ class ControlPanel extends Component {
             option.value = f;
             option.innerHTML = f;
             this.locationchoice.appendChild(option)
-        }
-    }
-
-//  onLocationSelect(e) {
-//      super.emit("locationChanged", e.target.value);
-//  }
-
-//  onGeneSelect(e) {
-//      super.emit("geneChanged", e.target.value);
-//  }
-
-    onCreateTrack(e) {
-        super.emit("createTrack", { varname:    this.getCurrentVariableName(), 
-                                    varid:      this.getCurrentVariableID(),
-                                    numbins:    HACK_numbins, 
-                                    locations:  this.getSelectedLocationsList()})
-    }
-
-    onClearTracks(e) {
-        if (confirm("Are you sure you want to clear the data tracks?")) {
-            super.emit("clearTracks")
         }
     }
 

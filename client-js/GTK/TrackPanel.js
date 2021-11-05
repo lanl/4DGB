@@ -50,8 +50,8 @@ class TrackPanel extends Component {
         // title
         this.title = document.createElement("div");
         this.title.className = "gtktrackpaneltitle";
+        this.title.innerText = "Tracks";
         this.container.appendChild(this.title);
-        this.setTitle("Tracks")
         this.topTitle = this.topDataset.name;
         this.bottomTitle = this.bottomDataset.name;
         this.titles = [this.topTitle, this.bottomTitle];
@@ -63,20 +63,6 @@ class TrackPanel extends Component {
 
         var parent = document.getElementById(parentID);
         parent.appendChild(this.container);
-    }
-
-    setTrackTitles( top, bottom ) {
-        this.topTitle = top;
-        this.bottomTitle = bottom;
-    }
-
-    setTitle(title) {
-        this.title.innerHTML = title;
-    }
-
-    setDims(w, h) {
-        this.container.style.width = w;
-        this.container.style.height = h;
     }
 
     onTracksChanged(tracks, options) {
@@ -127,44 +113,6 @@ class TrackPanel extends Component {
         }
     }
 
-    //
-    // generate a unique ID name
-    //
-    generateCurIDName () {
-        TrackPanel.CurID += 1;
-        return "gtktrackpanelpaircontainer_" + TrackPanel.CurID;
-    }
-
-    //
-    // push a new container on the top of the stack
-    //
-    pushContainer(label, callback) {
-        var pair = document.createElement("div");
-        pair.className = "gtktrackpanelpaircontainer";
-        pair.id = this.generateCurIDName(); 
-        pair.innerHTML = label; 
-        pair.addEventListener("click", function(){callback(this);} );
-        pair.addEventListener("contextmenu", function(ev) { ev.preventDefault(); alert('success!'); return false; }, false);
-
-        this.charts.insertBefore(pair, this.charts.firstChild);
-    }
-
-    //
-    // add track data to the current container
-    //
-    addTrackToCurrentContainer(labels, values, title, position) { 
-        var track = new TrackChart(title);
-        if ((this.charts.firstChild.childElementCount > 0) && (position == 0)) {
-            // insert before
-            this.charts.firstChild.insertBefore(track.element, this.charts.firstChild.lastChild)
-        } else {
-            // append the item
-            this.charts.firstChild.appendChild(track.element)
-        }
-
-        // charts[i].setYValLimits( min, max );
-        track.make( labels, values );
-    }
 }
 
 module.exports = TrackPanel;

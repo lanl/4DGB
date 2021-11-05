@@ -42,9 +42,6 @@ const { Selection } = require('./selections');
 
 class GeometryCanvas extends Component {
 
-    // class global settings
-    static ShowUnmappedSegments = false;
-
     constructor(project, dataset, rootElemID) {
         super();
 
@@ -61,13 +58,6 @@ class GeometryCanvas extends Component {
 
         // bind this pointer to appropriate class methods
         this.postLoad = this.postLoad.bind(this);
-
-        /**
-         * If onSelectionChanged is triggered before this has finished loading the contact map,
-         * then this will get set to the arguments for that call. It will be triggered again as
-         * soon as loading has finished. 
-         */
-         this.pendingSelection = null;
 
         this.render = (function() {
             this.renderRequested = undefined;
@@ -212,15 +202,12 @@ class GeometryCanvas extends Component {
      * Called in response to 'selectionChanged' events. Sets the visibility of segments
      */
     onSelectionChanged(selection, options) {
-        // If we haven't finished loading, put this selection event on hold
-        // (It'll be triggered again as soon as loading has finished)
-        if (!this.loaded) {
-            this.pendingSelection = { selection, options };
-            return;
-        }
+        // If we haven't finished loading, ignore this (we'll set the selection ourselves
+        // when we're done loading)
+        if (!this.loaded) return
 
         const segmentIDs = Util.rangesToValues( selection.asSegments() );
-        this.setSegmentStates(segmentIDs, Segment.State.LIVE, Segment.State.GHOST);
+        this.geometry.setSegmentStates(segmentIDs, Segment.State.LIVE, Segment.State.GHOST);
         this.render();
     }
 
@@ -233,7 +220,6 @@ class GeometryCanvas extends Component {
         this.render();
     }
 
-
     showAxes( state ) {
         this.showAxes.visible = state;
     }
@@ -242,49 +228,42 @@ class GeometryCanvas extends Component {
         this.geometry.showCentroid(state);
     }
     
-    // color must be of the form #000000
-    setBackgroundColor( color ) {
+    onBackgroundColorChanged( color ) {
         this.scene.background.set(color);
         this.render();
     }
-    onBackgroundColorChanged = this.setBackgroundColor;
 
-    showUnmappedSegments( state ) {
-        this.geometry.setSegmentVisible(this.unmapped, state);
+    onShowUnmappedSegmentsChanged( value ) {
+        this.geometry.setSegmentVisible(this.unmapped, value);
+        // refresh selection
+        if (this.controller.selection) {
+            this.onSelectionChanged(this.controller.selection)
+        }
         this.render();
-    }
-    onShowUnmappedSegmentsChanged = this.showUnmappedSegments
-
-    setVariable(id) {
-        const v = this.project.getVariableByID(id);
-            this.setLUTParameters( v.name, v.min, v.max );
-            Client.TheClient.get_array( (response) => {
-                this.geometry.colorBy( response['data']['values'] );
-                this.render();
-        }, v.id, this.dataset.id)
     }
 
     onVariableChanged(id, options) {
         // This requires a fetch, so we only respond on
         // the debounced event
-        if (options.debounced) this.setVariable(id);
-    } 
-
-    setColormap(colormap) {
-        this.setLUT(colormap);
-        // Refresh the currently selected variable
-        this.setVariable( this.controller.settings.variable );
+        if (options.debounced) {
+            const v = this.project.getVariableByID(id);
+            this.geometry.setLUTParameters(v.min, v.max);
+            this.scalarBarCanvas.title = v.name;
+            Client.TheClient.get_array( (response) => {
+                this.geometry.colorBy( response['data']['values'] );
+                this.render();
+            }, v.id, this.dataset.id)
+        };
     }
 
     onColormapChanged(colormap, options) {
         // setVariable requires a fetch, so we only respond
         // on the the debounced event
-        if (options.debounced) this.setColormap(colormap);
-    }
-
-
-    setSegmentStates( segments, setState, unsetState ) {
-        this.geometry.setSegmentStates(segments, setState, unsetState);
+        if (options.debounced) {
+            this.geometry.setLUT(colormap);;
+            // Refresh the currently selected variable
+            this.onVariableChanged(this.controller.settings.variable, options)
+        };
     }
 
     // update after data loaded
@@ -294,21 +273,15 @@ class GeometryCanvas extends Component {
 
         // set the centroid
         this.setRotationCenter( this.geometry.centroid );
-
-        // set the colors
-        // instance.paintByVariable();
          
         // turn off the unmapped ones
-        this.showUnmappedSegments( false );
-        // instance.geometry.setSegmentVisible(instance.unmapped, false);
+        this.onShowUnmappedSegmentsChanged( false );
 
         this.loaded = true;
-        // If a selection was set while we were loading, apply it now
-        if (this.pendingSelection) {
-            this.onSelectionChanged(
-                this.pendingSelection.selection,
-                this.pendingSelection.options
-            );
+
+        // If our controller has a selection made on it, apply it now
+        if (this.controller.selection) {
+            this.onSelectionChanged(this.controller.selection, {})
         }
     }
 
@@ -342,26 +315,12 @@ class GeometryCanvas extends Component {
         }
     }
 
-    reset() {
-        // no-op for now
-    }
-
     setDataset(d) {
-        this.reset();
         this.dataset = d;
         this.initializeUnmappedSegments();
         if (this.loaded) {
             this.showUnmappedSegments(false);
         }
-    }
-
-    setLUT (lut) {
-        this.geometry.setLUT(lut);
-    }
-
-    setLUTParameters (varname, min, max) {
-        this.geometry.setLUTParameters(min, max);
-        this.scalarBarCanvas.title = varname;
     }
 
 }
