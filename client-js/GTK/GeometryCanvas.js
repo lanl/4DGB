@@ -55,6 +55,9 @@ class GeometryCanvas {
         this.loaded = false;
         this.setDataset(dataset);
 
+        // bind this pointer to appropriate class methods
+        this.postLoad = this.postLoad.bind(this);
+
         /**
          * @type {Controller} Selection controller used to sync selections with other components.
          */
@@ -190,9 +193,9 @@ class GeometryCanvas {
         this.axesCanvas = new AxesCanvas(contdiv, this.camera);
 
         // load data
-        this.geometry = new Geometry(this.dataset.id, gdata["geometry"]);
-        this.geometry.addListener('loaded', this.postLoad.bind(this));
-        Client.TheClient.get_structure(this.geometry.load.bind(this.geometry), this.dataset.id);
+        this.geometry = new Geometry(this.dataset.structure, gdata["geometry"]);
+        this.geometry.addListener('loaded', this.postLoad);
+        Client.TheClient.get_structure(this.geometry.load, this.geometry.id);
         // this.geometry.load( this.dataset.id, this );
 
         // scalar bar

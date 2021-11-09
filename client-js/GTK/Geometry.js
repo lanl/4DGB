@@ -56,7 +56,7 @@ class Geometry extends EventEmitter {
         // geometry
         this.root       = new THREE.Group();
         this.centroid   = new THREE.Vector3(0.0, 0.0, 0.0);
-        this.geometryid = geometryid;
+        this.id = geometryid;
 
         // other
             // this.segments is a dictionary because:
@@ -66,6 +66,17 @@ class Geometry extends EventEmitter {
         this.segments = {};
         this.LUT = new THREE.Lut( g["colormap"]["name"], g["colormap"]["divs"] );
         this.opacityClamp = g["colormap"]["opacity-clamp"]
+
+        // bind this pointer to appropriate methods
+        this.load = this.load.bind(this);
+    }
+
+    get id() {
+        return this._id;
+    }
+
+    set id(id) {
+        this._id = id;
     }
 
     // sets the state of a list of segments. Two values are needed:
@@ -188,7 +199,7 @@ class Geometry extends EventEmitter {
         this.centroidMarker.position.x = this.centroid.x;
         this.centroidMarker.position.y = this.centroid.y;
         this.centroidMarker.position.z = this.centroid.z;
-        this.centroidMarker.visible = true;
+        this.centroidMarker.visible = false;
 
         // broadcast load is done
         super.emit("loaded");
