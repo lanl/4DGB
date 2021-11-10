@@ -35,11 +35,11 @@ const EventEmitter = require('events');
 const ArrowSegment = require('./ArrowSegment');
 const CurveSegment = require('./CurveSegment');
 
-class Geometry extends EventEmitter {
+class Structure extends EventEmitter {
     /**
-     * Class Geometry
+     * Class Structure
      *
-     * Geometry is a representation of the geometry for a set of segments
+     * Structure is a representation of the geometry for a set of segments
      * The specific representation of a segment is controlled in the representation
      * object for the segments.
      *
@@ -48,7 +48,7 @@ class Geometry extends EventEmitter {
     /*
      * constructs an instance, give input parameters
      *
-     * @param {dictionary} s This is a dictionary of values used to construct the Geometry
+     * @param {dictionary} s This is a dictionary of values used to construct the Structure
      */
     constructor( geometryid, g ) {
         super();
@@ -244,4 +244,4 @@ class Geometry extends EventEmitter {
     }
 }
 
-module.exports = Geometry;
+module.exports = Structure;

@@ -10,12 +10,12 @@ module.exports = {
     ContactMap:         require('./GTK/ContactMap'),
     ContactMapCanvas:   require('./GTK/ContactMapCanvas'),
     Dataset:            require('./GTK/Dataset'),
-    Geometry:           require('./GTK/Geometry'),
     GeometryCanvas:     require('./GTK/GeometryCanvas'),
     Project:            require('./GTK/Project'),
     ScalarBarCanvas:    require('./GTK/ScalarBarCanvas'),
     Segment:            require('./GTK/Segment'),
     Selections:         require('./GTK/selections'),
+    Structure:          require('./GTK/Structure'),
     ViewerPanel:        require('./GTK/ViewerPanel'),
     Util:               require('./GTK/Util')
 }

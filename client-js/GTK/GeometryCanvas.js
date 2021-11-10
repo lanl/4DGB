@@ -32,7 +32,7 @@ require('three/examples/js/controls/OrbitControls')
 
 const Client = require('./Client');
 const Project = require('./Project');
-const Geometry = require('./Geometry');
+const Structure = require('./Structure');
 const AxesCanvas = require('./AxesCanvas');
 const ScalarBarCanvas = require('./ScalarBarCanvas');
 const Segment = require('./Segment');
@@ -64,7 +64,7 @@ class GeometryCanvas {
         this.controller;
 
         /**
-         * If a 'selectionChanged' event is triggered before the Geometry has finished
+         * If a 'selectionChanged' event is triggered before the Structure has finished
          * loading, this will get set to that selection event's object. It will be applied
          * as soon as loading has finished.
          */
@@ -193,7 +193,7 @@ class GeometryCanvas {
         this.axesCanvas = new AxesCanvas(contdiv, this.camera);
 
         // load data
-        this.geometry = new Geometry(this.dataset.structure, gdata["geometry"]);
+        this.geometry = new Structure(this.dataset.structure, gdata["geometry"]);
         this.geometry.addListener('loaded', this.postLoad);
         Client.TheClient.get_structure(this.geometry.load, this.geometry.id);
         // this.geometry.load( this.dataset.id, this );
