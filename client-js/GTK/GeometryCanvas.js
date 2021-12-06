@@ -133,6 +133,10 @@ class GeometryCanvas extends Component {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(parseInt(gdata["scene"]["background"])); 
 
+        // raycaster
+        this.raycaster = new THREE.Raycaster();
+        this.canvas.onclick = (e) => this.onMouseClick(e);
+
         // axes
         if (false) {
             this.axes = new THREE.AxesHelper( 1 );
@@ -264,6 +268,36 @@ class GeometryCanvas extends Component {
             // Refresh the currently selected variable
             this.onVariableChanged(this.controller.settings.variable, options)
         };
+    }
+
+    /**
+     * Respond to a mouse click on the canvas. If a segment is clicked on,
+     * sets a new center of rotation.
+     * @param {MouseEvent} event 
+     */
+    onMouseClick(event) {
+        // If we haven't loaded yet, it doesn't matter
+        if (!this.loaded) return;
+
+        
+        // Coordinates of the mouse click, THREE.js wants this to
+        // be normalized with the origin in the center of the viewport/canvas
+        const bounds = this.canvas.getBoundingClientRect();
+        const mousePoint = new THREE.Vector2(
+            ( (event.clientX-bounds.left) / bounds.width  ) * 2 - 1,
+            - ( (event.clientY-bounds.top ) / bounds.height ) * 2 + 1
+        );
+
+        this.raycaster.setFromCamera(mousePoint, this.camera);
+        const objects = this.geometry.segmentMeshes;
+        const intersections = this.raycaster.intersectObjects(objects);
+
+        if (intersections.length > 0) {
+            const i = intersections[0];
+            const seg = this.geometry.meshesToSegments[i.object.uuid];
+            const selection = Selection.fromSegments( Util.valuesToRanges([seg]) );
+            this.controller.updateSelection(selection, this);
+        }
     }
 
     // update after data loaded

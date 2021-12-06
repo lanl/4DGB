@@ -67,6 +67,20 @@ class Structure extends EventEmitter {
         this.LUT = new THREE.Lut( g["colormap"]["name"], g["colormap"]["divs"] );
         this.opacityClamp = g["colormap"]["opacity-clamp"]
 
+        /**
+         * Mapping of THREE.js mesh UUIDs for the segment geometry
+         * to segment IDs. (Initialized after loading)
+         * It's kinda like the inverse of this.segments, which we
+         * can use to resolve raycasts
+         */
+        this.meshesToSegments = {};
+
+        /**
+         * @type {THREE.Mesh[]} Array of the meshes for segments
+         * (Initialized after loading)
+         */
+        this.segmentMeshes = [];
+
         // bind this pointer to appropriate methods
         this.load = this.load.bind(this);
     }
@@ -200,6 +214,15 @@ class Structure extends EventEmitter {
         this.centroidMarker.position.y = this.centroid.y;
         this.centroidMarker.position.z = this.centroid.z;
         this.centroidMarker.visible = false;
+
+        // init meshesToSegments map
+        for (let segid in this.segments) {
+            const seg = this.segments[segid];
+            this.meshesToSegments[seg.spanMesh.uuid] = segid;
+        }
+
+        // init segmentMeshes
+        this.segmentMeshes = Object.values(this.segments).map( (s) => s.spanMesh );
 
         // broadcast load is done
         super.emit("loaded");
