@@ -67,6 +67,10 @@ function main( project ) {
         if (store.getItem(key)) {
             TheController.deserialize( store.getItem(key) );
         }
+        else {
+            // Init with default settings
+            TheController.triggerAll();
+        }
     
         // Save state after any change
         TheController.on('anyChanged', (value, options) => {
@@ -75,6 +79,10 @@ function main( project ) {
                 store.setItem(key, str);
             }
         });
+    }
+    else {
+        // Set all components to default settings
+        TheController.triggerAll();
     }
 
 }

@@ -119,7 +119,6 @@ class GeometryCanvas extends Component {
         this.camera.updateProjectionMatrix();
 
         // controls
-        // this.controls = new THREE.TrackballControls(this.camera, this.canvas);
         this.controls = new THREE.OrbitControls(this.camera, this.canvas);
         this.controls.target.set(cam["center"][0], cam["center"][1], cam["center"][2]);
         this.controls.update();
@@ -197,11 +196,6 @@ class GeometryCanvas extends Component {
         this.scalarBarCanvas.setLUT(this.geometry.LUT);
     }
 
-    setRotationCenter( center ) {
-        this.controls.target.set(center.x, center.y, center.z);
-        this.controls.update();
-    }
-
     /**
      * Called in response to 'selectionChanged' events. Sets the visibility of segments
      */
@@ -222,6 +216,22 @@ class GeometryCanvas extends Component {
         this.camera.lookAt(this.controls.target);
         this.camera.updateProjectionMatrix();
         this.render();
+    }
+
+    onCenterPositionChanged(value, options) {
+        // Ignore this if it's coming from this very same Geometry Canvas
+        if (options && options.source === this) return;
+
+        if (value == null) {
+            if (!this.loaded) return;
+            // A null center-of-rotation means to use the structure's centroid
+            this.controls.target.copy( this.geometry.centroid );
+        }
+        else {
+            this.controls.target.fromArray(value);
+        }
+
+        this.controls.update();
     }
 
     showAxes( state ) {
@@ -294,9 +304,13 @@ class GeometryCanvas extends Component {
 
         if (intersections.length > 0) {
             const i = intersections[0];
+            // Uncomment to set selection to clicked segment
+            /*
             const seg = this.geometry.meshesToSegments[i.object.uuid];
             const selection = Selection.fromSegments( Util.valuesToRanges([seg]) );
             this.controller.updateSelection(selection, this);
+            */
+            this.controller.updateCenterPosition( i.point.toArray() );
         }
     }
 
@@ -306,7 +320,7 @@ class GeometryCanvas extends Component {
         this.geometry.addToScene(this.scene);
 
         // set the centroid
-        this.setRotationCenter( this.geometry.centroid );
+        this.onCenterPositionChanged( this.controller.settings.centerPos );
          
         // turn off the unmapped ones
         this.onShowUnmappedSegmentsChanged( false );
