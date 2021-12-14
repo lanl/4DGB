@@ -30,21 +30,22 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require('three/examples/js/controls/OrbitControls')
 
-const Client = require('./Client');
+const Component = require('./Component');
 const Project = require('./Project');
+const Client = require('./Client');
 const Structure = require('./Structure');
 const AxesCanvas = require('./AxesCanvas');
 const ScalarBarCanvas = require('./ScalarBarCanvas');
 const Segment = require('./Segment');
 const Util = require('./Util');
-const { Selection, Controller } = require('./selections');
+const { Selection } = require('./selections');
 
-class GeometryCanvas {
-
-    // class global settings
-    static ShowUnmappedSegments = false;
+class GeometryCanvas extends Component {
 
     constructor(project, dataset, rootElemID) {
+        super();
+
+        this.project = project;
         this.renderRequested = false;
         this.camera;
         this.canvas;
@@ -58,23 +59,8 @@ class GeometryCanvas {
         // bind this pointer to appropriate class methods
         this.postLoad = this.postLoad.bind(this);
 
-        /**
-         * @type {Controller} Selection controller used to sync selections with other components.
-         */
-        this.controller;
-
-        /**
-         * If a 'selectionChanged' event is triggered before the Structure has finished
-         * loading, this will get set to that selection event's object. It will be applied
-         * as soon as loading has finished.
-         */
-        this.pendingSelection = null;
-
         this.render = (function() {
             this.renderRequested = undefined;
-
-            // TODO: improve granularity of control for this
-            this.showUnmappedSegments( GeometryCanvas.ShowUnmappedSegments );
 
             if (this.resizeRendererToDisplaySize(this.renderer)) {
                 const canvas = this.renderer.domElement;
@@ -137,12 +123,19 @@ class GeometryCanvas {
         this.controls = new THREE.OrbitControls(this.camera, this.canvas);
         this.controls.target.set(cam["center"][0], cam["center"][1], cam["center"][2]);
         this.controls.update();
-        this.controls.addEventListener('change', this.requestRenderIfNotRequested);
+        this.controls.addEventListener('change', () => {
+            this.controller.updateCameraPosition( this.camera.position.toArray() );
+            this.requestRenderIfNotRequested();
+        });
         window.addEventListener('resize', this.requestRenderIfNotRequested);
 
         // new scene
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(parseInt(gdata["scene"]["background"])); 
+
+        // raycaster
+        this.raycaster = new THREE.Raycaster();
+        this.canvas.onclick = (e) => this.onMouseClick(e);
 
         // axes
         if (false) {
@@ -204,17 +197,6 @@ class GeometryCanvas {
         this.scalarBarCanvas.setLUT(this.geometry.LUT);
     }
 
-    /**
-     * Set a new selection controller for the Geometry Canvas.
-     * This will cause the displayed segments to react to 'selectionChanged' events
-     * from the controller.
-     * @param {Controller} controller 
-     */
-    setController(controller) {
-        this.controller = controller;
-        this.controller.addListener('selectionChanged', (e) => this.onSelectionChanged(e) );
-    }
-
     setRotationCenter( center ) {
         this.controls.target.set(center.x, center.y, center.z);
         this.controls.update();
@@ -223,35 +205,99 @@ class GeometryCanvas {
     /**
      * Called in response to 'selectionChanged' events. Sets the visibility of segments
      */
-    onSelectionChanged(selectionEvent) {
-        // If we haven't finished loading, put this selection event on hold
-        // (It'll be triggered again as soon as loading has finished)
-        if (!this.loaded) {
-            this.pendingSelection = selectionEvent;
-            return;
-        }
+    onSelectionChanged(selection, options) {
+        // If we haven't finished loading, ignore this (we'll set the selection ourselves
+        // when we're done loading)
+        if (!this.loaded) return
 
-        const {selection} = selectionEvent;
         const segmentIDs = Util.rangesToValues( selection.asSegments() );
-        this.setSegmentStates(segmentIDs, Segment.State.LIVE, Segment.State.GHOST);
+        this.geometry.setSegmentStates(segmentIDs, Segment.State.LIVE, Segment.State.GHOST);
+        this.render();
+    }
+
+    onCameraPositionChanged(value, options) {
+        // Ignore this if it's coming from this very same Geometry Canvas
+        if (options.source === this) return;
+        this.camera.position.fromArray(value);
+        this.camera.lookAt(this.controls.target);
+        this.camera.updateProjectionMatrix();
         this.render();
     }
 
     showAxes( state ) {
         this.showAxes.visible = state;
     }
-
+    
     showCentroid( state ) {
         this.geometry.showCentroid(state);
     }
-
-    // color must be of the form #000000
-    setBackgroundColor( color ) {
-        this.scene.background.set(color)
+    
+    onBackgroundColorChanged( color ) {
+        this.scene.background.set(color);
+        this.render();
     }
 
-    setSegmentStates( segments, setState, unsetState ) {
-        this.geometry.setSegmentStates(segments, setState, unsetState);
+    onShowUnmappedSegmentsChanged( value ) {
+        this.geometry.setSegmentVisible(this.unmapped, value);
+        // refresh selection
+        if (this.controller.selection) {
+            this.onSelectionChanged(this.controller.selection)
+        }
+        this.render();
+    }
+
+    onVariableChanged(id, options) {
+        // This requires a fetch, so we only respond on
+        // the debounced event
+        if (options.debounced) {
+            const v = this.project.getVariableByID(id);
+            this.geometry.setLUTParameters(v.min, v.max);
+            this.scalarBarCanvas.title = v.name;
+            Client.TheClient.get_array( (response) => {
+                this.geometry.colorBy( response['data']['values'] );
+                this.render();
+            }, v.id, this.dataset.id)
+        };
+    }
+
+    onColormapChanged(colormap, options) {
+        // setVariable requires a fetch, so we only respond
+        // on the the debounced event
+        if (options.debounced) {
+            this.geometry.setLUT(colormap);;
+            // Refresh the currently selected variable
+            this.onVariableChanged(this.controller.settings.variable, options)
+        };
+    }
+
+    /**
+     * Respond to a mouse click on the canvas. If a segment is clicked on,
+     * sets a new center of rotation.
+     * @param {MouseEvent} event 
+     */
+    onMouseClick(event) {
+        // If we haven't loaded yet, it doesn't matter
+        if (!this.loaded) return;
+
+        
+        // Coordinates of the mouse click, THREE.js wants this to
+        // be normalized with the origin in the center of the viewport/canvas
+        const bounds = this.canvas.getBoundingClientRect();
+        const mousePoint = new THREE.Vector2(
+            ( (event.clientX-bounds.left) / bounds.width  ) * 2 - 1,
+            - ( (event.clientY-bounds.top ) / bounds.height ) * 2 + 1
+        );
+
+        this.raycaster.setFromCamera(mousePoint, this.camera);
+        const objects = this.geometry.segmentMeshes;
+        const intersections = this.raycaster.intersectObjects(objects);
+
+        if (intersections.length > 0) {
+            const i = intersections[0];
+            const seg = this.geometry.meshesToSegments[i.object.uuid];
+            const selection = Selection.fromSegments( Util.valuesToRanges([seg]) );
+            this.controller.updateSelection(selection, this);
+        }
     }
 
     // update after data loaded
@@ -261,18 +307,15 @@ class GeometryCanvas {
 
         // set the centroid
         this.setRotationCenter( this.geometry.centroid );
-
-        // set the colors
-        // instance.paintByVariable();
          
         // turn off the unmapped ones
-        this.showUnmappedSegments( this.ShowUnmappedSegments );
-        // instance.geometry.setSegmentVisible(instance.unmapped, false);
+        this.onShowUnmappedSegmentsChanged( false );
 
         this.loaded = true;
-        // If a selection was set while we were loading, apply it now
-        if (this.pendingSelection) {
-            this.onSelectionChanged(this.pendingSelection);
+
+        // If our controller has a selection made on it, apply it now
+        if (this.controller.selection) {
+            this.onSelectionChanged(this.controller.selection, {})
         }
     }
 
@@ -306,30 +349,12 @@ class GeometryCanvas {
         }
     }
 
-    reset() {
-        // no-op for now
-    }
-
-    showUnmappedSegments( state ) {
-        this.geometry.setSegmentVisible(this.unmapped, state);
-    }
-
     setDataset(d) {
-        this.reset();
         this.dataset = d;
         this.initializeUnmappedSegments();
         if (this.loaded) {
-            this.showUnmappedSegments(this.ShowUnmappedSegments);
+            this.showUnmappedSegments(false);
         }
-    }
-
-    setLUT (lut) {
-        this.geometry.setLUT(lut);
-    }
-
-    setLUTParameters (varname, min, max) {
-        this.geometry.setLUTParameters(min, max);
-        this.scalarBarCanvas.title = varname;
     }
 
 }

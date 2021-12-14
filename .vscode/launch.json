@@ -21,7 +21,7 @@
             "type": "firefox",
             "request": "launch",
             "reAttach": true,
-            "url": "http://localhost:8000/",
+            "url": "http://localhost:8000/compare.html?gtkproject=test.01",
             "clearConsoleOnReload": true,
             "pathMappings": [
                 {

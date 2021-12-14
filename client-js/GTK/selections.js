@@ -28,17 +28,8 @@
  *      - Selection: An immutable object representing a selection. A selection can be constructed
  *                   by specifying any of the three units mentioned above. Once constructed, there
  *                   are methods to get the selection described in any of the three units.
- *
- *      - Controller: An event emitter/reciever which allows components to stay in sync with the
- *                    selections they make. For example, a Contact Map widget and Geometry widget
- *                    can both listen to the same instance of Controller so that a selection
- *                    being made on one will affect the other and vice-versa.
  *  
  */
-
-const EventEmitter = require('events');
-
-const debounce = require('debounce');
 
 const Project = require('./Project');
 const Client  = require('./Client');
@@ -255,37 +246,41 @@ class Selection {
     }
 
     /**
-     * Save this selection to a base64url-encoded JSON string
-     * A selection can be re-created from that string with the static
-     * deserialize method.
-     * @returns {String}
+     * @typedef {Object} SelectionAsObject Plain-object representation of a Selection. Used for serialization.
+     * @property {UNIT} unit The unit to construct the selection from
+     * @property {String[]|Number[][]} value The value of the selection, depends on the unit.
      */
-    serialize() {
+
+    /**
+     * Get an object specifying the unit and value for this selection. This object can be
+     * used to save or restore a selection. Give this object to the static `fromPlainObject`
+     * method to create a copy of the selection.
+     * @returns {SelectionAsObject}
+     */
+    asPlainObject() {
         const unit = this._constructedFrom;
         const value = unit === UNIT.LOCATION ? this._locationRanges
                     : unit === UNIT.SEGMENT  ? this._segmentRanges
                     : this._genes;
 
-        return Util.objToBase64url( {unit, value} );
+        return { unit, value };
     }
 
     /**
-     * Create a selection from a base64url-encoded JSON string such
-     * as one returned by the serialize method.
+     * Create a new selection from an object specifying the unit and value, as returned by
+     * the `asPlainObject` method.
      * 
-     * If the serialized selection indicates that it was constructed based off
-     * a list of genes, the returned selection will _actually_ be a Promise that
-     * resolves into the selection.
-     * @param {String} str
-     * @returns {Selection|Promise<Selection}
+     * If the object indicates that the selection was based off a list of genes, the returned
+     * selection will _actually_ be a Promise that resolves into the selection
+     * @param {SelectionAsObject} obj The selection object
+     * @returns {Selection|Promise<Selection>}
      */
-    static deserialize(str) {
-        const {unit, value} = Util.base64urlToObj(str);
-
+    static fromPlainObject(obj) {
+        const {unit, value} = obj;
         const selection = new Selection(CONSTRUCTOR_PASS, unit, value);
 
         if (unit === UNIT.GENE) {
-            return selection._fetchLocationData().then( () => { return selection } );
+            return selection._fetchLocationData().then( () => selection );
         }
         else {
             return selection;
@@ -417,62 +412,4 @@ class Selection {
 
 }
 
-/*####################################
-  #
-  #    CONTROLLER
-  #
-  ###################################*/
-
-/**
- * An EventEmitter used to control multiple components that wish to keep their selections in-sync
- * with one-another. This will emit the event 'selectionChanged', providing an object with the
- * following fields:
- *
- * - `selection`: The new Selection
- * - `source`: The Object that triggered the change. i.e. The object that calls `updateSelection`.
- * Typically, a listener will check to see if this is the same as itself and then ignore the event.
- * - `decoration`: Any other object that a caller chooses to attach when updating the selection.
- * - `type`: The string 'selectionChanged'
- * 
- * In cases where the selection will change rapidly (like a user click-and-dragging), you may not
- * want to respond to every event. For this purpose, the controller also emits a `selectionDebounced`
- * event. This will have the exact same object as an argument as a previous `selectionChanged'
- * event, but will only trigger after a short interval if this controller's selection isn't changed
- * during that interval.
- * 
- */
-class Controller extends EventEmitter {
-
-    constructor() { super(); }
-
-    /**
-     * Update this controller's selection, triggering a 'selectionChanged' event.
-     * @param {Selection|Promise<Selection>} selection - The new selection, or a promise
-     * that resolves to it.
-     * @param {*} source - The object that's calling this
-     * @param {*} decoration - Anything else you might want the other components to know about.
-     * This is passed along with the triggered event.
-     */
-    updateSelection(selection, source, decoration) {
-        if (selection instanceof Promise) {
-            // If selection is actually a promise, wait for it to resolve before
-            // emitting event
-            selection.then( (sel) => {
-                const event = { selection: sel, source, decoration, type: 'selectionChanged' };
-                this.emit('selectionChanged', event);
-                this.sendDebounced(event);
-            });
-        }
-        else {
-            // Otherwise, be normal
-            const event = { selection, source, decoration, type: 'selectionChanged' };
-            this.emit('selectionChanged', event);
-            this.sendDebounced(event);
-        }
-    }
-
-    sendDebounced = debounce( (event) => this.emit('selectionDebounced', event), 500 );
-                                                                              // ^^^- milliseconds
-}
-
-module.exports = { Selection, Controller, UNIT };
+module.exports = { Selection, UNIT };

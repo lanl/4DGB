@@ -30,23 +30,31 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 const TrackChart = require('./TrackChart');
+const Component  = require('./Component');
+const Project    = require('./Project');
+const Client     = require('./Client');
 
-class TrackPanel {
+class TrackPanel extends Component {
 
     static CurID = 0;
 
-    constructor(parentID) {
+    constructor(parentID, topDataset, bottomDataset) {
+        super();
         // container
         this.container = document.createElement("div"); 
         this.container.className = "gtktrackpanel";
 
+        this.topDataset = topDataset;
+        this.bottomDataset = bottomDataset;
+
         // title
         this.title = document.createElement("div");
         this.title.className = "gtktrackpaneltitle";
+        this.title.innerText = "Tracks";
         this.container.appendChild(this.title);
-        this.setTitle("Tracks")
-        this.topTitle = "";
-        this.bottomTitle = "";
+        this.topTitle = this.topDataset.name;
+        this.bottomTitle = this.bottomDataset.name;
+        this.titles = [this.topTitle, this.bottomTitle];
 
         // charts
         this.charts = document.createElement("div");
@@ -57,64 +65,54 @@ class TrackPanel {
         parent.appendChild(this.container);
     }
 
-    setTrackTitles( top, bottom ) {
-        this.topTitle = top;
-        this.bottomTitle = bottom;
-    }
+    onTracksChanged(tracks, options) {
+        if (!options.debounced) return;
 
-    clear() {
+        // Clear current tracks
         while (this.charts.firstChild) {
             this.charts.removeChild(this.charts.firstChild);
         }
-    }
 
-    setTitle(title) {
-        this.title.innerHTML = title;
-    }
+        // Populate tracks
+        for (let track of tracks) {
+            const {variable, locationRange} = track;
+            const [start, end] = locationRange;
+            const varname = Project.TheProject.getVariableByID(variable).name;
+            const title = `${varname}: (${start} - ${end})`;
 
-    setDims(w, h) {
-        this.container.style.width = w;
-        this.container.style.height = h;
-    }
+            // Create container for chart pair
+            const cont = document.createElement('div');
+            cont.className = 'gtktrackpanelpaircontainer';
+            cont.innerText = title;
+            this.charts.insertBefore(cont, this.charts.firstChild);
 
-    //
-    // generate a unique ID name
-    //
-    generateCurIDName () {
-        TrackPanel.CurID += 1;
-        return "gtktrackpanelpaircontainer_" + TrackPanel.CurID;
-    }
+            // Function to fetch data and create chart
+            const make_chart = (index) => new Promise( (resolve, reject) => {
+                Client.TheClient.get_sampled_array( (response) => { try {
+                    const data = response['data'];
+    
+                    // Create chart labels
+                    const labels = [];
+                    const incr = Math.max( (end-start)/data.length, 1);
+                    for (let i = start; i < end; i += incr)
+                        labels.push[i];
+    
+                    // Build chart
+                    const chart = new TrackChart( this.titles[index] );
+                    cont.appendChild(chart.element);
+                    chart.make(labels, data);
 
-    //
-    // push a new container on the top of the stack
-    //
-    pushContainer(label, callback) {
-        var pair = document.createElement("div");
-        pair.className = "gtktrackpanelpaircontainer";
-        pair.id = this.generateCurIDName(); 
-        pair.innerHTML = label; 
-        pair.addEventListener("click", function(){callback(this);} );
-        pair.addEventListener("contextmenu", function(ev) { ev.preventDefault(); alert('success!'); return false; }, false);
+                    resolve();
 
-        this.charts.insertBefore(pair, this.charts.firstChild);
-    }
+                } catch (e) { reject(e); }
+                }, variable, index, locationRange[0], locationRange[1], 200);
+            });
 
-    //
-    // add track data to the current container
-    //
-    addTrackToCurrentContainer(labels, values, title, position) { 
-        var track = new TrackChart(title);
-        if ((this.charts.firstChild.childElementCount > 0) && (position == 0)) {
-            // insert before
-            this.charts.firstChild.insertBefore(track.element, this.charts.firstChild.lastChild)
-        } else {
-            // append the item
-            this.charts.firstChild.appendChild(track.element)
+            // Create charts
+            make_chart(0).then( () => make_chart(1) );
         }
-
-        // charts[i].setYValLimits( min, max );
-        track.make( labels, values );
     }
+
 }
 
 module.exports = TrackPanel;
