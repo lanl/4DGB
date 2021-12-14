@@ -28,39 +28,14 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const EventEmitter      = require('events');
-
-const Client            = require('./Client');
-const GeometryCanvas    = require('./GeometryCanvas');
+const Component         = require('./Component');
 const Util              = require('./Util');
 
-const { Selection, Controller, UNIT } = require('./selections');
-
-var HACK_numbins = 200;
-
-class ControlPanel extends EventEmitter {
-
-    // TODO: need to update states consistently across app
-    static HACK_state = false;
-    static HACK_color = "#FFFFFF"; 
+const { Selection, UNIT } = require('./selections');
+class ControlPanel extends Component {
 
     constructor(project, parent) {
         super();
-
-        /** 
-         * @type {Controller} Selection controller used to sync selections
-         * with other components. By default, this constructs its own controller,
-         * (so that the text boxes still respond to each-other)
-         * although you'll probably want to override it with `setController`
-         **/
-        this.controller = new Controller();
-        this.controller.addListener('selectionChanged', (e) => this.onSelectionChanged(e) );
-        this.controller.addListener('selectionDebounced', (e) => this.onSelectionChanged(e) );
-
-        /**
-         * @type {Selection} Currently displayed selection
-         */
-        this.currentSelection;
 
         // build UI
         var root = document.getElementById(parent);
@@ -99,12 +74,6 @@ class ControlPanel extends EventEmitter {
          * edited. This used to pick which unit to use when the "Select" button is pressed.
          **/
         this.lastUpdated;
-
-        // info 
-        // this.initializeInfoTab(root, project);
-
-        // settings
-        // this.initializeSettingsTab(root, project);
 
             // global controls
         var cur_row = 0;
@@ -194,13 +163,6 @@ class ControlPanel extends EventEmitter {
         cell.appendChild(this.select);
         this.select.onclick = (function (e) { this.triggerSelection(e, this.lastUpdated) }).bind(this);
 
-            // selection permalink button
-        cell = row.insertCell(2);
-        this.permalinkButton = document.createElement("button");
-        this.permalinkButton.innerText = "Permalink";
-        cell.appendChild(this.permalinkButton);
-        this.permalinkButton.onclick = (e) => { this.createPermalink() };
-
             // title
         var row = this.controls.insertRow(cur_row); 
         cur_row += 1;
@@ -221,8 +183,11 @@ class ControlPanel extends EventEmitter {
         this.variablechoice.setAttribute("type", "text");
         // this.variablechoice.className = "gtkcontrolpanelselect";
         cell.appendChild(this.variablechoice);
-        this.variablechoice.addEventListener('change', (function (e) { this.onVariableSelect(e) }).bind(this));
-        this.updateArrayNames();
+        this.updateArrayNames(project);
+        this.variablechoice.value = this.controller.settings.variable;
+        this.variablechoice.addEventListener('change', (e) => {
+            this.controller.updateVariable(this.variablechoice.value, this);
+        });
 
             // colormap
         var row = this.controls.insertRow(cur_row); 
@@ -234,8 +199,11 @@ class ControlPanel extends EventEmitter {
         this.colormapchoice = document.createElement("select");
         this.colormapchoice.setAttribute("type", "text");
         cell.appendChild(this.colormapchoice);
-        this.colormapchoice.addEventListener('change', (function (e) { this.onColormapSelect(e) }).bind(this));
         this.updateColormapNames();
+        this.colormapchoice.value = this.controller.settings.colormap;
+        this.colormapchoice.addEventListener('change', (e) => {
+            this.controller.updateColormap(this.colormapchoice.value, this);
+        });
 
             // title
         if (false) {
@@ -256,7 +224,7 @@ class ControlPanel extends EventEmitter {
         this.createTrack = document.createElement("button");
         this.createTrack.innerHTML = "Create Data Tracks";
         cell.appendChild(this.createTrack);
-        this.createTrack.onclick = (function (e) { this.onCreateTrack(e) }).bind(this);
+        this.createTrack.onclick = () => { this.controller.addNewTrack() }
 
         // track clear button 
         var row = this.controls.insertRow(cur_row); 
@@ -268,7 +236,7 @@ class ControlPanel extends EventEmitter {
         this.clearTracks = document.createElement("button");
         this.clearTracks.innerHTML = "Clear All Tracks";
         cell.appendChild(this.clearTracks);
-        this.clearTracks.onclick = (function (e) { this.onClearTracks(e) }).bind(this);
+        this.clearTracks.onclick = () => { this.controller.clearTracks() }
 
 
         // global settings (moved to front tab for simplicity)
@@ -289,11 +257,13 @@ class ControlPanel extends EventEmitter {
         cell.innerHTML = "Show Unmapped Segments";
 
         cell = row.insertCell(1);
-        var checkbox = document.createElement("input");
-        checkbox.setAttribute("type", "checkbox");
-        checkbox.checked = ControlPanel.HACK_state; 
-        checkbox.addEventListener('change', (function (e) { this.showUnmappedSegments(e) }).bind(this));
-        cell.appendChild(checkbox);
+        this.unmappedCheckbox = document.createElement("input");
+        this.unmappedCheckbox.setAttribute("type", "checkbox");
+        this.unmappedCheckbox.checked = this.controller.settings.showUnmappedSegments; 
+        this.unmappedCheckbox.addEventListener('change', (e) => {
+            this.controller.updateShowUnmappedSegments(this.unmappedCheckbox.checked, this);
+        });
+        cell.appendChild(this.unmappedCheckbox);
 
         // background
         var row = cur_panel.insertRow(cur_row); 
@@ -303,14 +273,14 @@ class ControlPanel extends EventEmitter {
         cell.innerHTML = "Background";
 
         cell = row.insertCell(1);
-        var color = document.createElement("input");
-        color.id = "controlpanel-settings-background";
-        color.setAttribute("type", "color");
-        color.setAttribute("value", ControlPanel.HACK_color);
-            // TODO: clean up event notification (no need for second functions -
-            // instead do it like this
-        color.addEventListener('change', (function (e) { this.onBackgroundColorChanged(e) }).bind(this));
-        cell.appendChild(color);
+        this.bgColorInput = document.createElement("input");
+        this.bgColorInput.id = "controlpanel-settings-background";
+        this.bgColorInput.setAttribute("type", "color");
+        this.bgColorInput.value = this.controller.settings.backgroundColor;
+        this.bgColorInput.addEventListener('change', (e) => {
+            this.controller.updateBackgroundColor(this.bgColorInput.value, this);
+        });
+        cell.appendChild(this.bgColorInput);
 
         // create the links section
             // title
@@ -352,19 +322,6 @@ class ControlPanel extends EventEmitter {
 
     }
 
-    /**
-     * Set a new selection controller for the Control Panel.
-     * Changing the selection in the control panel will trigger 'selectionChanged' events
-     * in the controller, and the control panel will also respond to those events from
-     * the controller.
-     * @param {Controller} controller 
-     */
-    setController(controller) {
-        this.controller = controller;
-        this.controller.addListener('selectionChanged',   (e) => this.onSelectionChanged(e)   );
-        this.controller.addListener('selectionDebounced', (e) => this.onSelectionDebounced(e) );
-    }
-
     //
     // returns a color of the form #000000
     //
@@ -393,16 +350,13 @@ class ControlPanel extends EventEmitter {
         return this.colormapchoice.options[this.colormapchoice.selectedIndex].value;
     }
 
-    updateArrayNames() {
-        Client.TheClient.get_structure_arrays( (response) => {
-            for (const f of response['arrays']) { 
-                var option = document.createElement('option');
-                option.value = f['name'];
-                option.varID = f['id'];
-                option.innerHTML = f['name'];
-                this.variablechoice.appendChild(option)
-            }
-        });
+    updateArrayNames(project) {
+        for (let f of project.getVariables()) {
+            var option = document.createElement('option');
+            option.value = f['id'];
+            option.innerText = f['name'];
+            this.variablechoice.appendChild(option)
+        }
     }
 
     updateColormapNames() {
@@ -432,36 +386,6 @@ class ControlPanel extends EventEmitter {
             option.value = f;
             option.innerHTML = f;
             this.locationchoice.appendChild(option)
-        }
-    }
-
-//  onLocationSelect(e) {
-//      super.emit("locationChanged", e.target.value);
-//  }
-
-//  onGeneSelect(e) {
-//      super.emit("geneChanged", e.target.value);
-//  }
-
-    onVariableSelect(e) {
-        var varID = e.target.options[e.target.selectedIndex].varID;
-        super.emit("variableChanged", varID);
-    }
-
-    onColormapSelect(e) {
-        super.emit("colormapChanged", e.target.value);
-    }
-
-    onCreateTrack(e) {
-        super.emit("createTrack", { varname:    this.getCurrentVariableName(), 
-                                    varid:      this.getCurrentVariableID(),
-                                    numbins:    HACK_numbins, 
-                                    locations:  this.getSelectedLocationsList()})
-    }
-
-    onClearTracks(e) {
-        if (confirm("Are you sure you want to clear the data tracks?")) {
-            super.emit("clearTracks")
         }
     }
 
@@ -507,45 +431,39 @@ class ControlPanel extends EventEmitter {
     /**
      * Called in response to the 'selectionChanged' event on the selection controller
      */
-    onSelectionChanged(selectionEvent) {
-        const { selection } = selectionEvent;
-        this.currentSelection = selection;
+    onSelectionChanged(selection, options) {
         this.locationentry.value = Util.rangesToRangeString( selection.asLocations() );
         this.segmententry.value  = Util.rangesToRangeString( selection.asSegments()  );
+
         // To prevent excess fetch calls, we don't retrieve the genes until the selection
-        // has stabilized (via the selectionDebounced) event
+        // has stabilized (debounced)
+        if (options.debounced) {
+            selection.asGenes().then( (genes) => {
+                // If the selection changed again by the time this resolves, forget it
+                if (this.controller.selection !== selection) return;
+                this.geneentry.value = genes.join(',') 
+            });
+        }
     }
 
-    /**
-     * Called in response to the 'selectionDebounced' event on the selection controller.
-     * Fetches gene data for the selection and writes it in the text box
-     */
-    onSelectionDebounced(selectionEvent) {
-        const { selection } = selectionEvent;
-        selection.asGenes().then( (genes) => {
-            // If the selection changed again by the time this resolves, forget it
-            if (this.currentSelection !== selection) return;
-            this.geneentry.value = genes.join(',') 
-        });
+    onVariableChanged(value, options) {
+        if (options.source === this) return; // ignore an event that came from this Control Panel
+        this.variablechoice.value = value;
     }
 
-    /**
-     * Create a URL that contains the current selection as a query parameter
-     * and copy it to the sytstem clipboard
-     */
-    createPermalink() {
-        if (this.currentSelection === undefined) return;
+    onColormapChanged(value, options) {
+        if (options.source === this) return; // ignore an event that came from this Control Panel
+        this.colormapchoice.value = value;
+    }
 
-        const serialized = this.currentSelection.serialize();
+    onShowUnmappedSegmentsChanged(value, options) {
+        if (options.source === this) return; // ignore an event that came from this Control Panel
+        this.unmappedCheckbox.checked = value;
+    }
 
-        const permalink = new URL(window.location.href);
-        permalink.searchParams.set('selection', serialized);
-
-        window.alert(
-        `Use this URL to share your current selection:
-        
-        ${permalink.toString()}
-        `);
+    onBackgroundColorChanged(value, options) {
+        if (options.source === this) return; // ignore an event that came from this Control Panel
+        this.bgColorInput.value = value;
     }
 
     /**
@@ -698,97 +616,12 @@ class ControlPanel extends EventEmitter {
         return success; 
     }
 
-    initializeInfoTab(parent, project) {
-        // create the tab
-        this.infotab = document.createElement("button");
-        this.infotab.className = "tablinks";
-        this.infotab.innerHTML = "Info";
-        this.infotab.onclick = (function (e) { this.openTab(e, "infotab") }).bind(this);
-        this.tabdiv.appendChild(this.infotab);
-        this.infotabcontent = document.createElement("div");
-        this.infotabcontent.className = "tabcontent";
-        this.infotabcontent.id = "infotab";
-        root.appendChild(this.infotabcontent);
-
-        // create the controls
-        this.info = document.createElement("table");
-        this.info.className = "gtkcontroltable";
-        this.infotabcontent.appendChild(this.info);
-    }
-
-    initializeSettingsTab(parent, project) {
-        // create the tab
-        this.settingstab = document.createElement("button");
-        this.settingstab.className = "tablinks";
-        this.settingstab.innerHTML = "Settings";
-        this.settingstab.onclick = (function (e) { this.openTab(e, "settingstab") }).bind(this);
-        this.tabdiv.appendChild(this.settingstab);
-        this.settingstabcontent = document.createElement("div");
-        this.settingstabcontent.className = "tabcontent";
-        this.settingstabcontent.id = "settingstab";
-        parent.appendChild(this.settingstabcontent);
-
-        // create the content 
-        this.settings = document.createElement("table");
-        this.settings.className = "gtkcontroltable";
-        this.settingstabcontent.appendChild(this.settings);
-
-        // title
-        var cur_row = 0;
-        var row = this.settings.insertRow(cur_row); 
-        cur_row += 1;
-        var cell = row.insertCell(0);
-        cell.colSpan = 3;
-        cell.innerHTML = "GeometryCanvas";
-        cell.className = "gtktitlecell";
-
-        // unmapped  
-        var row = this.settings.insertRow(cur_row); 
-        cur_row += 1;
-        cell = row.insertCell(0);
-        cell.innerHTML = "Show Unmapped Segments";
-
-        cell = row.insertCell(1);
-        var checkbox = document.createElement("input");
-        checkbox.setAttribute("type", "checkbox");
-        checkbox.checked = ControlPanel.HACK_state; 
-        checkbox.addEventListener('change', (function (e) { this.showUnmappedSegments(e) }).bind(this));
-        cell.appendChild(checkbox);
-
-        // background
-        var row = this.settings.insertRow(cur_row); 
-        cur_row += 1;
-        cell = row.insertCell(0);
-        cell.innerHTML = "Background";
-
-        cell = row.insertCell(1);
-        var color = document.createElement("input");
-        color.id = "controlpanel-settings-background";
-        color.setAttribute("type", "color");
-        color.setAttribute("value", ControlPanel.HACK_color);
-            // TODO: clean up event notification (no need for second functions -
-            // instead do it like this
-        color.addEventListener('change', (function (e) { this.onBackgroundColorChanged(e) }).bind(this));
-        cell.appendChild(color);
-    }
-
-    onBackgroundColorChanged(e) {
-        super.emit("backgroundColorChanged");
-    }
-
     onOpenDocumentation(e) {
         window.open("v0.9.0.pdf", '_blank').focus();
     }
 
     onAboutDocumentation(e) {
         window.open("https://github.com/lanl/4DGB/wiki/About-v0.9", '_blank').focus();
-    }
-
-    showUnmappedSegments(e) {
-        if (event.currentTarget.checked != GeometryCanvas.ShowUnmappedSegments) {
-            GeometryCanvas.ShowUnmappedSegments = event.currentTarget.checked;
-            super.emit("render");
-        }
     }
 
 }

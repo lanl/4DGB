@@ -7,15 +7,17 @@ module.exports = {
     TrackPanel:         require('./GTK/TrackPanel'),
     TrackChart:         require('./GTK/TrackChart'),
     Client:             require('./GTK/Client'),
+    Component:          require('./GTK/Component'),
     ContactMap:         require('./GTK/ContactMap'),
     ContactMapCanvas:   require('./GTK/ContactMapCanvas'),
+    Controller:         require('./GTK/Controller'),
     Dataset:            require('./GTK/Dataset'),
-    Geometry:           require('./GTK/Geometry'),
     GeometryCanvas:     require('./GTK/GeometryCanvas'),
     Project:            require('./GTK/Project'),
     ScalarBarCanvas:    require('./GTK/ScalarBarCanvas'),
     Segment:            require('./GTK/Segment'),
     Selections:         require('./GTK/selections'),
+    Structure:          require('./GTK/Structure'),
     ViewerPanel:        require('./GTK/ViewerPanel'),
     Util:               require('./GTK/Util')
 }

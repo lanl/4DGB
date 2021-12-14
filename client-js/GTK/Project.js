@@ -78,6 +78,21 @@ class Project {
                                                                  g["endpoint"]["segments"], 
                                                                  g["endpoint"]["segments"] );
         Segment.GhostOpacity   = g["ghost"]["opacity"];
+
+        // Fetch additional project data from server
+        // The static getProject method will wait for this
+        // to resolve before it returns the project, so if you've
+        // got a Project instance, you can be sure this has completed
+
+        this._extraDataFetch = Promise.all([
+            // Fetch structure arrays
+            new Promise( (resolve, reject) => {
+                try { Client.TheClient.get_structure_arrays( (response) => {
+                    this.structure_arrays = response['arrays'];
+                    resolve();
+                })} catch (err) { reject(err); }
+            })
+        ]);
     }
 
     /**
@@ -94,7 +109,10 @@ class Project {
             catch (err) { reject(err); }
         });
 
-        return new Project(CONSTRUCTOR_PASS, project_data);
+        const proj = new Project(CONSTRUCTOR_PASS, project_data);
+        await proj._extraDataFetch;
+
+        return proj;
     }
 
     getInterval() {
@@ -130,6 +148,27 @@ class Project {
             }
         }
         return dataset 
+    }
+
+    /**
+     * Get a list of the specifications for each variable array to be mapped over structures.
+     * Returns an array of objects where each object has fields for `id', `name', `min` and `max. 
+     * You can use the id to get the data for an array with the Client's `get_array` method.
+     */
+    getVariables() {
+        return this.structure_arrays;
+    }
+
+    /**
+     * Get the specification for the variable array with the given ID. The returned object (if
+     * there is one) has fields for `id`, `name`, `min` and `max`. If there is no array with
+     * the given id, returns undefined.
+     */
+    getVariableByID(id) {
+        for (let arr of this.structure_arrays) {
+            if (arr['id'] == id) return arr;
+        }
+        return undefined;
     }
 }
 
