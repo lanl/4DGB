@@ -136,6 +136,16 @@ class GeometryCanvas extends Component {
         this.raycaster = new THREE.Raycaster();
         this.canvas.onclick = (e) => this.onMouseClick(e);
 
+        // We have to do a little workaround to stop 'click' events from
+        // registering at the end of a click-and-drag. Basically, we time how
+        // long the mouse was down, and if it's too long, the onMouseClick handler
+        // will ignore it.
+        // This bit sets a listener to record the time whenever the mouse is pressed down.
+        this.last_mousedown_time = Date.now();
+        this.canvas.onmousedown = (e) => {
+            this.last_mousedown_time = Date.now();
+        }
+
         // axes
         if (false) {
             this.axes = new THREE.AxesHelper( 1 );
@@ -289,7 +299,12 @@ class GeometryCanvas extends Component {
         // If we haven't loaded yet, it doesn't matter
         if (!this.loaded) return;
 
-        
+        // Ignore this if its been a long time since the mouse was pressed down
+        // (implying this is the end of a click-and-drag)
+        const now = Date.now();
+        if (now - this.last_mousedown_time > 300) return;
+                                           //^^^-- 300 milliseconds is our cutoff
+
         // Coordinates of the mouse click, THREE.js wants this to
         // be normalized with the origin in the center of the viewport/canvas
         const bounds = this.canvas.getBoundingClientRect();
