@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#
+# The entrypoint for the browser runner container.
+# Sets permissions on the /srv directory, changes
+# user to www-data and executes the setup script.
+#
+# We do this at runtime (instead of a 'USER' directive in the Dockefile)
+# because we need to set permissions on the in the persistent volume
+# for the release directory (which isn't mounted until runtime)
+#
+
+if [ "$BROWSERCONTAINER" != "yes" ] ; then
+    echo "This script needs to be run inside the 4DGB Browser docker container" 1>&2
+    exit 1
+fi
+
+chown -R www-data:www-data /srv
+gosu www-data /srv/setup

@@ -63,7 +63,8 @@ class Controller extends EventEmitter {
      * 
      * @typedef {String} BackgroundSetting Background color for the geometry view. A string in `#FFFFFF' format
      * 
-     * @typedef {Number[]} CameraSetting Array of [x,y,z] values for camera position
+     * @typedef {Number[]} Vector3Setting Array of [x,y,z] values representing a THREE.js vector3
+     * (like for the camera position of center-of-rotation position)
     **/
 
     /**
@@ -116,8 +117,11 @@ class Controller extends EventEmitter {
             showUnmappedSegments: false,
             /** @type {BackgroundSetting} */
             backgroundColor: '#FFFFFF',
-            /** @type {CameraSetting} */
-            cameraPos: this.project.getApplicationData('gtk')['geometrycanvas']['scene']['camera']['position']
+            /** @type {Vector3Setting} */
+            cameraPos: this.project.getApplicationData('gtk')['geometrycanvas']['scene']['camera']['position'],
+            /** @type {vector3Setting?} */
+            centerPos: null // A null value indicates that the center-of-rotation should be
+                            // a structure's centroid
         }
     }
 
@@ -191,7 +195,7 @@ class Controller extends EventEmitter {
 
      /**
      * Trigger an update to the `cameraPosition` setting on this Controller and Components connected to it.
-     * @param {CameraSetting} value The new setting value
+     * @param {Vector3Setting} value The new setting value
      * @param {Component} source The component initiating the change. (If you're calling this method
      * from a Component, then make this `this`). 
      * @param {*} decoration Any additional data to pass along to other Components
@@ -200,6 +204,19 @@ class Controller extends EventEmitter {
         this.settings.cameraPos = value;
         this._triggerEvent('cameraPositionChanged', 'onCameraPositionChanged', false, value, {decoration, source});
     }
+
+    /**
+     * Trigger an update to the 'centerPosition' setting on this Controller and the Components connected to it.
+     * @param {Vector3Setting} value The new setting value
+     * @param {Component} source The component initiating the change. (If you're calling this method
+     * from a Component, then make this `this`). 
+     * @param {*} decoration Any additional data to pass along to other Components
+     */
+    updateCenterPosition = (value, source, decoration) => {
+        this.settings.centerPos = value;
+        this._triggerEvent('centerPositionChanged', 'onCenterPositionChanged', false, value, {decoration, source});
+    }
+
 
     /**
      * Add a new track based on the current selection and variable. Will trigger the tracksChanged
@@ -245,12 +262,15 @@ class Controller extends EventEmitter {
         const s = this.settings;
         return UTIL.objToBase64url({
             selection: this.selection === null ? null : this.selection.asPlainObject(),
+            settings: {
+                variable:  s.variable,
+                colormap:  s.colormap,
+                cameraPos: s.cameraPos,
+                centerPos: s.centerPos,
+                showUnmappedSegments: s.showUnmappedSegments,
+                backgroundColor:      s.backgroundColor
+            },
             tracks:    this.tracks,
-            variable:  s.variable,
-            colormap:  s.colormap,
-            cameraPos: s.cameraPos,
-            showUnmappedSegments: s.showUnmappedSegments,
-            backgroundColor:      s.backgroundColor
         });
     }
 
@@ -263,17 +283,30 @@ class Controller extends EventEmitter {
     deserialize(str) {
         const from = UTIL.base64urlToObj(str);
 
-        if (from.selection) 
-            this.updateSelection( Selection.fromPlainObject(from.selection) );
-        
-        this.updateVariable(from.variable);
-        this.updateColormap(from.colormap);
-        this.updateCameraPosition(from.cameraPos);
-        this.updateShowUnmappedSegments(from.showUnmappedSegments);
-        this.updateBackgroundColor(from.backgroundColor);
+        if (from.selection)
+            this.selection = Selection.fromPlainObject(from.selection);
+
+        this.settings = from.settings;
 
         // Update tracks
         this.tracks = from.tracks;
+
+        this.triggerAll();
+    }
+
+    /**
+     * Trigger all event handlers with the current state of the Controller
+     */
+    triggerAll() {
+        this.updateSelection(this.selection);
+
+        this.updateVariable( this.settings.variable );
+        this.updateColormap( this.settings.colormap );
+        this.updateCameraPosition( this.settings.cameraPos );
+        this.updateCenterPosition( this.settings.centerPos );
+        this.updateShowUnmappedSegments( this.settings.showUnmappedSegments );
+        this.updateBackgroundColor( this.settings.backgroundColor );
+
         this._triggerEvent('tracksChanged', 'onTracksChanged', false, this.tracks, {});
     }
 

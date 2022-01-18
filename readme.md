@@ -53,7 +53,3 @@ Clicking on the grey zone or the image of the app will take you to the running i
 <div align="center">
 <img src="doc/img/test.01.png"></img>
 </div>
-
-## To run a public instance
-
-See the [Deployment Guide](doc/deployment.md)

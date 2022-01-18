@@ -97,14 +97,21 @@ class Component extends EventEmitter {
      * @param {BackgroundSetting} value
      * @param {EventOptions} options 
      */
-     onBackgroundColorChanged(value, options) {}
+    onBackgroundColorChanged(value, options) {}
 
      /**
       * Called in response to a cameraPositionChanged event in the Controller
       * @param {CameraSetting} value 
       * @param {EventOptions} options 
       */
-     onCameraPositionChanged(value, options) {}
+    onCameraPositionChanged(value, options) {}
+
+    /**
+     * Called in response to a centerPositionChanged event in the Controller
+     * @param {CenterPosition} value 
+     * @param {EventOptions} options 
+     */
+    onCenterPositionChanged(value, options) {}
 
 }
 

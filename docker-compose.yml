@@ -1,0 +1,15 @@
+version: "3"
+
+volumes:
+  4dgbprojects:
+
+services: 
+  browser:
+    image: "4dgbrunner"
+    volumes:
+      - "./projects/test.01/:/project:ro"
+      - "4dgbprojects:/srv/release"
+    stdin_open: true
+    tty: true
+    ports:
+      - "127.0.0.1:8000:8000"

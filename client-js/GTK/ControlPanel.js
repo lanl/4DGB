@@ -282,6 +282,21 @@ class ControlPanel extends Component {
         });
         cell.appendChild(this.bgColorInput);
 
+        // reset camera button
+        row = cur_panel.insertRow(cur_row);
+        cur_row += 1;
+        cell = row.insertCell(0);
+        cell.colSpan = 3;
+        this.resetCamera = document.createElement('button');
+        this.resetCamera.innerText = "Reset Camera";
+        this.resetCamera.onclick = () => {
+            this.controller.updateCenterPosition(null);
+            this.controller.updateCameraPosition(
+                project.getApplicationData('gtk')['geometrycanvas']['scene']['camera']['position']
+            );
+        };
+        cell.appendChild(this.resetCamera);
+
         // create the links section
             // title
         var row = cur_panel.insertRow(cur_row); 

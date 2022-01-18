@@ -119,7 +119,6 @@ class GeometryCanvas extends Component {
         this.camera.updateProjectionMatrix();
 
         // controls
-        // this.controls = new THREE.TrackballControls(this.camera, this.canvas);
         this.controls = new THREE.OrbitControls(this.camera, this.canvas);
         this.controls.target.set(cam["center"][0], cam["center"][1], cam["center"][2]);
         this.controls.update();
@@ -136,6 +135,16 @@ class GeometryCanvas extends Component {
         // raycaster
         this.raycaster = new THREE.Raycaster();
         this.canvas.onclick = (e) => this.onMouseClick(e);
+
+        // We have to do a little workaround to stop 'click' events from
+        // registering at the end of a click-and-drag. Basically, we time how
+        // long the mouse was down, and if it's too long, the onMouseClick handler
+        // will ignore it.
+        // This bit sets a listener to record the time whenever the mouse is pressed down.
+        this.last_mousedown_time = Date.now();
+        this.canvas.onmousedown = (e) => {
+            this.last_mousedown_time = Date.now();
+        }
 
         // axes
         if (false) {
@@ -197,11 +206,6 @@ class GeometryCanvas extends Component {
         this.scalarBarCanvas.setLUT(this.geometry.LUT);
     }
 
-    setRotationCenter( center ) {
-        this.controls.target.set(center.x, center.y, center.z);
-        this.controls.update();
-    }
-
     /**
      * Called in response to 'selectionChanged' events. Sets the visibility of segments
      */
@@ -222,6 +226,22 @@ class GeometryCanvas extends Component {
         this.camera.lookAt(this.controls.target);
         this.camera.updateProjectionMatrix();
         this.render();
+    }
+
+    onCenterPositionChanged(value, options) {
+        // Ignore this if it's coming from this very same Geometry Canvas
+        if (options && options.source === this) return;
+
+        if (value == null) {
+            if (!this.loaded) return;
+            // A null center-of-rotation means to use the structure's centroid
+            this.controls.target.copy( this.geometry.centroid );
+        }
+        else {
+            this.controls.target.fromArray(value);
+        }
+
+        this.controls.update();
     }
 
     showAxes( state ) {
@@ -279,7 +299,12 @@ class GeometryCanvas extends Component {
         // If we haven't loaded yet, it doesn't matter
         if (!this.loaded) return;
 
-        
+        // Ignore this if its been a long time since the mouse was pressed down
+        // (implying this is the end of a click-and-drag)
+        const now = Date.now();
+        if (now - this.last_mousedown_time > 300) return;
+                                           //^^^-- 300 milliseconds is our cutoff
+
         // Coordinates of the mouse click, THREE.js wants this to
         // be normalized with the origin in the center of the viewport/canvas
         const bounds = this.canvas.getBoundingClientRect();
@@ -294,9 +319,13 @@ class GeometryCanvas extends Component {
 
         if (intersections.length > 0) {
             const i = intersections[0];
+            // Uncomment to set selection to clicked segment
+            /*
             const seg = this.geometry.meshesToSegments[i.object.uuid];
             const selection = Selection.fromSegments( Util.valuesToRanges([seg]) );
             this.controller.updateSelection(selection, this);
+            */
+            this.controller.updateCenterPosition( i.point.toArray() );
         }
     }
 
@@ -306,7 +335,7 @@ class GeometryCanvas extends Component {
         this.geometry.addToScene(this.scene);
 
         // set the centroid
-        this.setRotationCenter( this.geometry.centroid );
+        this.onCenterPositionChanged( this.controller.settings.centerPos );
          
         // turn off the unmapped ones
         this.onShowUnmappedSegmentsChanged( false );
