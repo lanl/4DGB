@@ -19,6 +19,9 @@ helptext = "\n\
 \n\
 examples: \n\
 \n\
+    genflow create <file.hic>\n\
+       create a structure from the file.hic data input\n\
+\n\
     genflow init\n\
        initialize the application data\n\
 \n\
