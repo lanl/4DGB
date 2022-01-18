@@ -9,9 +9,9 @@ import logging
 class workflow():
 
     def __init__(self):
-        self.appdir = os.path.join(Path.home(), ".gwork")
+        self.appdir = os.path.join(Path.home(), ".genflow")
         self.projectdir = os.path.join(self.appdir, "projects")
-        self.logfile = os.path.join(self.appdir, "gwork.log")
+        self.logfile = os.path.join(self.appdir, "genflow.log")
 
         # set basic logging
         # logging.basicConfig(format='%(levelname)s: %(message)s', filename=self.logfile, level=logging.DEBUG)

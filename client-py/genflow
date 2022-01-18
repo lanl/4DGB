@@ -19,17 +19,17 @@ helptext = "\n\
 \n\
 examples: \n\
 \n\
-    gwork init\n\
+    genflow init\n\
        initialize the application data\n\
 \n\
-    gwork list\n\
+    genflow list\n\
        print a list of the projects\n\
 \n\
 " 
  
 # normal option parsing 
 parser = argparse.ArgumentParser(  
-            description="gwork: genome browser workflow command line tool",
+            description="genflow: genome browser workflow command line tool",
             epilog=helptext, 
             formatter_class=argparse.RawDescriptionHelpFormatter ) 
 

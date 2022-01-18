@@ -23,7 +23,7 @@ setuptools.setup(
     ],
     scripts=[
         "genex",
-        "gwork"
+        "genflow"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
