@@ -1,0 +1,85 @@
+#!/usr/bin/env python
+
+import argparse
+import sys
+import gentk
+import os
+# import jsonschema
+# import json
+
+# ----------------------------------------------------------------------------
+#
+# parse command line options
+#
+# ----------------------------------------------------------------------------
+
+GENTK_VERSION = "0.5.4" 
+
+helptext = "\n\
+\n\
+examples: \n\
+\n\
+    gwork init\n\
+       initialize the application data\n\
+\n\
+    gwork list\n\
+       print a list of the projects\n\
+\n\
+" 
+ 
+# normal option parsing 
+parser = argparse.ArgumentParser(  
+            description="gwork: genome browser workflow command line tool",
+            epilog=helptext, 
+            formatter_class=argparse.RawDescriptionHelpFormatter ) 
+
+parser.add_argument(    "--version", 
+                        action='version',
+                        version='{}'.format(GENTK_VERSION),
+                        help="print version of this script") 
+
+
+subparsers = parser.add_subparsers(title='subcommands',
+                                   description='valid subcommands',
+                                   help='additional help')
+
+#
+# create a workflow object
+#
+
+workflow = gentk.workflow.workflow()
+
+#
+# list
+#
+def list(args):
+    workflow.list()
+
+parser_list = subparsers.add_parser('list')
+parser_list.set_defaults(func=list)
+
+#
+# create
+#
+def create(args):
+    project = os.path.basename(args.infile)
+    workflow.create(project, args.infile)
+
+parser_create = subparsers.add_parser('create')
+parser_create.add_argument( "infile", help="input project file") 
+parser_create.set_defaults(func=create)
+
+#
+# init
+#
+def init(args):
+    workflow.init()
+
+parser_init = subparsers.add_parser('init')
+parser_init.set_defaults(func=init)
+
+#
+#
+#
+args = parser.parse_args()
+args.func(args)

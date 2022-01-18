@@ -15,13 +15,15 @@ setuptools.setup(
     package_data={'': ['license.md', 'readme.md']},
     packages=[  "gentk", 
                 "gentk.client",
-                "gentk.project"
+                "gentk.project",
+                "gentk.workflow"
             ],
     install_requires=[
         "pypac==0.15.0"
     ],
     scripts=[
-        "genex"
+        "genex",
+        "gwork"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
