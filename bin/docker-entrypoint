@@ -16,4 +16,4 @@ if [ "$BROWSERCONTAINER" != "yes" ] ; then
 fi
 
 chown -R www-data:www-data /srv
-gosu www-data /srv/setup
+gosu www-data /srv/setup "$@"
