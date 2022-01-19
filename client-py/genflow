@@ -28,6 +28,9 @@ examples: \n\
     genflow list\n\
        print a list of the projects\n\
 \n\
+    genflow view <project>\n\
+       view a project\n\
+\n\
 " 
  
 # normal option parsing 
@@ -53,15 +56,6 @@ subparsers = parser.add_subparsers(title='subcommands',
 workflow = gentk.workflow.workflow()
 
 #
-# list
-#
-def list(args):
-    workflow.list()
-
-parser_list = subparsers.add_parser('list')
-parser_list.set_defaults(func=list)
-
-#
 # create
 #
 def create(args):
@@ -80,6 +74,24 @@ def init(args):
 
 parser_init = subparsers.add_parser('init')
 parser_init.set_defaults(func=init)
+
+#
+# list
+#
+def list(args):
+    workflow.list()
+
+parser_list = subparsers.add_parser('list')
+parser_list.set_defaults(func=list)
+
+#
+# view
+#
+def view(args):
+    workflow.view()
+
+parser_view = subparsers.add_parser('view')
+parser_view.set_defaults(func=view)
 
 #
 #

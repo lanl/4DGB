@@ -91,10 +91,11 @@ class workflow():
 
 
     def list(self):
-        subfolders= [f.path for f in os.scandir(self.projectdir) if f.is_dir()]
-        subfolders.sort()
-        for d in subfolders:
-            print(os.path.basename(d))
+        if os.path.isdir(self.projectdir):
+            subfolders= [f.path for f in os.scandir(self.projectdir) if f.is_dir()]
+            subfolders.sort()
+            for d in subfolders:
+                print(os.path.basename(d))
 
     def structure(self):
         parser = argparse.ArgumentParser(
