@@ -97,6 +97,7 @@ def view(args):
     workflow.view()
 
 parser_view = subparsers.add_parser('view')
+parser_view.add_argument( "infile", help="input project file") 
 parser_view.set_defaults(func=view)
 
 #

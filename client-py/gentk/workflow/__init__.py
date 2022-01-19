@@ -112,4 +112,4 @@ class workflow():
         parser.add_argument('project')
         args = parser.parse_args(sys.argv[2:])
 
-        logging.info("Viewing {}".format(args.project))
+        logging.info("Viewing {}".format(os.path.join( self.projectdir, args.project)))
