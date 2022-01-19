@@ -60,10 +60,16 @@ workflow = gentk.workflow.workflow()
 #
 def create(args):
     project = os.path.basename(args.infile)
+    if args.projectname is not None:
+        project = args.projectname
+
     workflow.create(project, args.infile)
 
 parser_create = subparsers.add_parser('create')
 parser_create.add_argument( "infile", help="input project file") 
+parser_create.add_argument( "--projectname", 
+                                type=str,
+                                help="name of the project to create") 
 parser_create.set_defaults(func=create)
 
 #
