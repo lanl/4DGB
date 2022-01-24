@@ -1,0 +1,72 @@
+#!/bin/bash
+
+read -r -d '' HELP<<'ENDHELP'
+    run_project
+
+    Start an instance of the 4DGB Browser for a project.
+
+    Usage:
+        ./run_project [-h|--help] [-|--port PORT] [-n|--name NAME] PROJECT_DIRECTORY
+
+    Options:
+        -h, --help:     View this help and exit
+        -n, --name:     Set the name for the project
+                        (defaults to the name of the project directory)
+        -p, --port:     Set the port for the server to run on.
+                        (default: 8000)
+
+    Arguments:
+        PROJECT_DIRECTORY:  Directory containing the project
+                            (and project.json)
+ENDHELP
+
+# Reset IFS (newline, tab, space)
+IFS='
+     '
+set -eu
+
+PORT=8000
+PROJECT=""
+NAME_OVERRIDE=""
+
+while [ "$#" -gt 0 ] ; do
+    case "$1" in
+        -h|--help)
+            echo "$HELP"
+            exit
+            ;;
+        -p|--port)
+            shift
+            PORT="$1"
+            ;;
+        -n|--name)
+            shift
+            NAME_OVERRIDE="yes"
+            NAME="$1"
+            ;;
+        -*)
+            echo "unrecognized option: $1"
+            ;;
+        *)
+            PROJECT="$1"
+            ;;
+    esac
+    shift
+done
+
+if [ -z "$PROJECT" ] ; then
+    echo "No project specified." 1>&2
+    echo "Usage: ./run_project [-|--port PORT] [-h|--help] PROJECT_DIRECTORY" 1>&2
+    exit 1
+fi
+
+PROJECT="$(realpath -e "$PROJECT")"
+if [ -z "$NAME_OVERRIDE" ] ; then
+    NAME="$(basename "$PROJECT")"
+fi
+
+docker run --rm -it \
+    -p "127.0.0.1:$PORT:80" \
+    -v "$PROJECT:/project:ro" \
+    -v "4dgbprojects:/srv/release" \
+    4dgbrunner "$NAME" "$PORT"

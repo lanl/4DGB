@@ -1,0 +1,10 @@
+.*/
+client-py/
+doc/
+node_modules/
+*.egg-info
+release/
+projects/
+schema/
+testing/
+venv/

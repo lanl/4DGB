@@ -13,44 +13,64 @@ FROM ubuntu:20.04
 # Install dependencies
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3 python3 python3-pip rsync cpanminus gosu \
-    ca-certificates build-essential curl
+    ca-certificates build-essential curl nginx jq
 RUN ln -s /usr/bin/python3 /usr/bin/python
 # Install scroller (for pretty output!)
 RUN cpanm Term::Scroller
 
 # Setup NodeJS PPA
 # Download setup script and verify hash
-RUN curl -fsSL 'https://deb.nodesource.com/setup_16.x' \
-        > setup_16.x \
-    && [ "$(sha256sum setup_16.x | cut -d' ' -f1)" \
-        = "a112ad2cf36a1a2e3e233310740de79d2370213f757ca1b7f93de2f744fb265c" ]
+RUN curl -fsSL 'https://deb.nodesource.com/setup_16.x' > setup_16.x
 RUN bash setup_16.x
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
 
-#Setup Directories
+#Setup Directories/Permissions
+# We need to set permissions on a few things so nginx can
+# read them when running as www-data (instead of root)
+RUN mkdir -p /var/lib/nginx /var/log/nginx \
+    && touch /run/nginx.pid \
+    && chown -R www-data:www-data /var/lib/nginx /run/nginx.pid /var/log/nginx \
+    # If the container is using a tty, then we'll need to be in the tty group
+    # in order to write to stdout
+    && usermod -aG tty www-data
 WORKDIR /srv
+
+# Javascript Stuff
+COPY package.json ./
+COPY client-js ./client-js
+RUN npm install \
+    && npx webpack --config client-js/webpack.config.js
+
+# Python Stuff
+COPY server/requirements.txt ./server/requirements.txt
+RUN  pip3 install -r ./server/requirements.txt \
+     && pip3 install gunicorn pandas
 
 # Persistent volume to store the project release directory
 VOLUME /srv/release
 
-# (We copy these files first because we don't exepct them to change as much)
+# Server Configuration
 COPY bin/db_pop ./
 COPY bin/docker-entrypoint ./entrypoint
 COPY bin/docker-setup      ./setup
+COPY server/ ./server
 RUN chmod +x ./entrypoint  ./setup
 
-# Server and Python Stuff
-COPY server/ ./server
-RUN  pip3 install -r ./server/requirements.txt && pip3 install gunicorn pandas
+#Determine if this is going to be a production, or a local setup
+ARG MODE=local
+ENV MODE ${MODE}
+RUN if [ "${MODE}" != "production" ] && [ "${MODE}" != "local" ] ; then \
+        echo "MODE must be either 'production' or 'local'" \
+        && exit 1 \
+    ; fi
 
-# Javascript Stuff
-COPY package.json ./
-RUN npm install
-COPY client-js ./client-js
-RUN npx webpack --config client-js/webpack.config.js
+# If in production mode, symlink nginx's access log to stdout
+RUN if [ "${MODE}" = "production" ] ; then \
+    ln -sf /dev/stdout /var/log/nginx/access.log \
+    ; fi
+
+RUN cp ./server/nginx-${MODE}.conf /etc/nginx/nginx.conf
 
 ENV BROWSERCONTAINER "yes"
-
-EXPOSE 8000
 
 ENTRYPOINT [ "./entrypoint" ]

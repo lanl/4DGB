@@ -16,6 +16,11 @@ DESTDIR=/srv/release            # A persistent Docker volume to store the releas
 
 set -eu
 
+NAME="$1"
+PORT="${2:-8000}"
+DEST="$DESTDIR/$NAME"
+URLNAME="$(perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "$NAME")"
+
 ########################
 # HELPER FUNCTIONS
 ########################
@@ -45,6 +50,12 @@ function do_task {
         set -- bash -c "$1"
     fi
 
+    # For a production setup, we don't need any of the fancy output
+    if [ "$MODE" = "production" ] ; then
+        "$@"
+        return "$?"
+    fi
+
     echo -e "\t\e[2;3m> $*\e[0m" >&2
     set -- scroller --size 20 --color '[2m' --on-exit 'error' --window flagpole-ascii "$@"
 
@@ -68,9 +79,14 @@ function print_alert {
 }
 
 function main {
-    
+
     if [ "$BROWSERCONTAINER" != "yes" ] ; then
         print_alert "This script needs to be run inside the 4DGB Browser docker container"
+        exit 1
+    fi
+
+    if [ -z "$NAME" ] ; then
+        print_alert "Invalid project name: Project name cannot be empty"
         exit 1
     fi
 
@@ -82,13 +98,14 @@ function main {
     fi
 
     mkdir -p "$BUILDDIR"
+    mkdir -p "$DEST"
 
     # We only want to import and re-build if the input directory has had
     # changes made to it since last time
-    if [ "$(dir_last_mod_time $INPUTDIR)" -gt "$(dir_last_mod_time "$DESTDIR")" ] \
-       || dir_is_empty "$DESTDIR" ; 
+    if [ "$(dir_last_mod_time $INPUTDIR)" -gt "$(dir_last_mod_time "$DEST")" ] \
+       || dir_is_empty "$DEST" ; 
     then
-        do_task "Importing project..." rsync -hvrlt --delete "$INPUTDIR/" "$BUILDDIR/"
+        do_task "Importing project ($NAME)..." rsync -hvrlt --delete "$INPUTDIR/" "$BUILDDIR/"
 
         if [ -x "$BUILDDIR/process-data" ] ; then
             ( cd "$BUILDDIR" && do_task "Pre-processing project data..." ./process-data )
@@ -96,28 +113,37 @@ function main {
 
         do_task "Generating database..." ./db_pop "$BUILDDIR"
 
-        mkdir -p "$DESTDIR/server/static"
+        mkdir -p "$DEST/server/static"
 
         do_task "Copying files..." "
-            cp server/license.md \"$DESTDIR/\" \\
-            && cp -r server/{gtkserver.py,gunicorn.conf.py,static} \"$DESTDIR/server/\" \\
-            && cp -r \"$BUILDDIR\" \"$DESTDIR/server/static/\"
+            cp server/license.md \"$DEST/\" \\
+            && cp -r server/{gtkserver.py,gunicorn.conf.py,static} \"$DEST/server/\" \\
+            && cp -r \"$BUILDDIR\" \"$DEST/server/static/\"
         "
 
         touch "$BUILDDIR"
     fi
 
-    echo -e '
-    \e[1m#
-    \e[1m# \e[32mReady!\e[0m
-    \e[1m# Open your web browser and visit: 
-    \e[1m# http://localhost:8000/compare.html?gtkproject=project
-    \e[1m#
-    '
 
-    # Start gunicorn
-    cd $DESTDIR/server
-    do_task "Starting server..." gunicorn --workers 4 gtkserver:app
+    # Start Server
+    cd "$DEST/server"
+    gunicorn --workers 4 --daemon gtkserver:app
+
+    if [ "$MODE" = "production" ] ; then
+        echo "Ready: Listening on port $PORT"
+    else 
+        echo -e "
+        \e[1m#
+        \e[1m# \e[32mReady!\e[0m
+        \e[1m# Open your web browser and visit: 
+        \e[1m# http://localhost:${PORT}/compare.html?gtkproject=$URLNAME
+        \e[1m#
+        \e[1m# Press [Ctrl-C] to exit
+        \e[1m#
+        "
+    fi
+
+    nginx
 }
 
-main
+main "$@"
