@@ -1,6 +1,6 @@
 # 4DGB Browser Public Deployment
 
-This guide explains how to set up an instance of the 4DGB browser suitable to be accessed from other machines over the internet. It assumes you are already familiar with the basic principles of running/hosting web services.
+This guide explains how to set up an instance of the 4DGB browser suitable to be accessed from other machines over the internet. It assumes you are already familiar with the basic principles of running/hosting web services and/or using Docker.
 
 **⚠ WARNING:** 4DGB is still a *research prototype*. The setup described here is secured only through HTTP Basic Auth, and is not designed to handle large amounts of traffic. This is best suited for internal (univeristy or organization-wide) deployments. Use caution if deploying somewhere visible to the entire internet.
 
@@ -27,7 +27,7 @@ Adding password for user bob
 
 ## Deployment
 
-Running the Docker container has a few requirements:
+Running the Docker container has a "few" requirements:
 
 * You need to expose **port 443** in the container. Which port you map it to is up to you.
 * The directory for the project you wish to view should be bind-mounted at `/project` in the container.

@@ -19,7 +19,6 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN cpanm Term::Scroller
 
 # Setup NodeJS PPA
-# Download setup script and verify hash
 RUN curl -fsSL 'https://deb.nodesource.com/setup_16.x' > setup_16.x
 RUN bash setup_16.x
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
