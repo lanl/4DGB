@@ -118,6 +118,7 @@ function main {
         do_task "Copying files..." "
             cp server/license.md \"$DEST/\" \\
             && cp -r server/{gtkserver.py,gunicorn.conf.py,static} \"$DEST/server/\" \\
+            && cp /srv/client-js/gtk-dist/gtk.min.js \"$DEST/server/static/gtk/js/\" \\
             && cp -r \"$BUILDDIR\" \"$DEST/server/static/\"
         "
 
