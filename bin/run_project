@@ -60,7 +60,7 @@ if [ -z "$PROJECT" ] ; then
     exit 1
 fi
 
-PROJECT="$(realpath -e "$PROJECT")"
+PROJECT="$(realpath "$PROJECT")"
 if [ -z "$NAME_OVERRIDE" ] ; then
     NAME="$(basename "$PROJECT")"
 fi

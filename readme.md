@@ -1,4 +1,4 @@
-# 🧬 4D Genome Browser project 🧬
+# <img src="doc/img/4DGB_logo_07-01_25x25.png"></img> 4D Genome Browser project 
 ![client](https://github.com/lanl/4DGB/actions/workflows/client.yml/badge.svg)
 ![client-js](https://github.com/lanl/4DGB/actions/workflows/client-js.yml/badge.svg)
 ![selection](https://github.com/lanl/4DGB/actions/workflows/selection.yml/badge.svg)
