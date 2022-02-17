@@ -12,11 +12,14 @@ import pandas as pd
 # handle command line arguments
 #
 project = ""
-if (len(sys.argv) != 2):
+server_dir = "./server"
+if len(sys.argv) < 2:
     print("ERROR: must include path to project directory")
-    exit(0)
-else:
-    project = sys.argv[1]
+    exit(1)
+project = sys.argv[1]
+
+if len(sys.argv) > 2:
+    server_dir= sys.argv[2]
 
 #
 # establish the generated data directory and files 
@@ -49,7 +52,7 @@ with open(os.path.join(project, "project.json")) as jdata:
 # ---------------------------------------------------------------------------
 # get the current version
 gtkversion = None
-with open("server/version.md", "r") as vfile:
+with open(os.path.join(server_dir, "version.md"), "r") as vfile:
     gtkversion = vfile.readline().strip()
 
     # start from scratch
