@@ -1,6 +1,7 @@
 import bbi
 import yaml
 import sys
+import os
 from os import path, chdir
 import numpy
 import re
@@ -8,7 +9,7 @@ import math
 
 from math import nan
 
-from flask import Flask, request, jsonify, render_template, url_for
+from flask import Flask, request, jsonify, render_template, send_file, url_for, send_from_directory
 from flask_restful import Resource, Api
 from sqlalchemy import create_engine
 import json
@@ -24,10 +25,15 @@ import json
 
 #
 # initialize
+# when run as a script, these can be overriden with command-line arguments
 #
-PROJECT_HOME = path.abspath(
-    path.join( path.dirname(__file__), 'static', 'project')
-)
+if '4DGB_PROJECT_HOME' in os.environ:
+    PROJECT_HOME = os.environ['4DGB_PROJECT_HOME']
+else:
+    PROJECT_HOME = path.abspath(
+        path.join( path.dirname(__file__), 'static', 'project')
+    )
+
 PROJECT_FILE = path.join( PROJECT_HOME, 'project.json' )
 
 DB_PATH = path.abspath(
@@ -129,7 +135,11 @@ def home():
 
 @app.route('/<path:path>')
 def root(path):
-    return app.send_static_file(path)
+    return send_from_directory('static', path)
+
+@app.route('/project/project.json')
+def project():
+    return send_file(PROJECT_FILE)
 
 #
 # return a list of the variables available
@@ -544,19 +554,17 @@ if __name__ == '__main__':
     parser.add_argument('--host', default="127.0.0.1", help="Server bind address")
 
     parser.add_argument(
-        '-d', '--database', default=DB_PATH, metavar="PATH",
-        help="Custom path to project database"
-    )
-
-    parser.add_argument(
         '--project', default=PROJECT_HOME, metavar="PATH",
         help="Custom path to project directory"
     )
 
     args = parser.parse_args()
-
-    DB_PATH      = path.abspath(args.database)
     PROJECT_HOME = path.abspath(args.project)
+
+    PROJECT_FILE = path.join( PROJECT_HOME, 'project.json' )
+    DB_PATH = path.abspath(
+        path.join( PROJECT_HOME, 'generated', 'generated-project.db')
+    )
 
     db_connect = create_engine('sqlite:///'+DB_PATH)
 
