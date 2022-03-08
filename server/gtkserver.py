@@ -4,6 +4,7 @@ import sys
 from os import path, chdir
 import numpy
 import re
+import math
 
 from math import nan
 
@@ -105,10 +106,15 @@ def load_array_data(arrayID, arraySlice):
 
     if (array['type'] != None):
         # determine if there is data there
-        if (array['data']['values'][int(arraySlice)]['url'] != ""):
+        info = array['data']['values'][int(arraySlice)]
+        if (info['url'] != ""):
             # load the data from disk
-            values = numpy.load(PROJECT_HOME + "/" + array['data']['values'][int(arraySlice)]['url'])
-            array['data']['values'] = values[array['data']['values'][int(arraySlice)]['id']].tolist() 
+            data = numpy.load(PROJECT_HOME + "/" + info['url'])
+            values = list(map(
+                lambda d: None if math.isnan(d) else d,
+                data[info['id']]
+            ))
+            array['data']['values'] = values
         # else:
             # TODO: determine the correct behavior
 

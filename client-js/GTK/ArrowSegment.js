@@ -40,6 +40,8 @@ const THREE   = require('three')
 class ArrowSegment extends Segment {
 
     // class global settings
+    // These are set in the Project constructor when it loads
+    // since they are specified in the project configuration
     static RadiusEnd      = 0.0; 
     static RadiusBegin    = 0.0; 
 

@@ -53,23 +53,3 @@ Clicking on the grey zone or the image of the app will take you to the running i
 <div align="center">
 <img src="doc/img/test.01.png"></img>
 </div>
-
-## To run the application locally (with Docker)
-
-- Build the Docker image and call it `4dgbrunner`
-```sh
-docker build -t 4dgbrunner .
-```
-
-- Execute the [run_project](bin/run_project) script, specifying the directory with your project.
-```sh
-./bin/run_project projects/test.01/
-```
-
-This will automatically process your project data and launch an instance you can view in your web browser.
-
-## To run the application publicly (with Docker)
-
-You can create an instance of the browser suitable for public access, which supports HTTPS and requires password authentication, although it requires some more setup.
-
-See the [deployment guide](doc/deployment.md) for more information.
