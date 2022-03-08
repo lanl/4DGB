@@ -112,7 +112,7 @@ def load_array_data(arrayID, arraySlice):
             data = numpy.load(PROJECT_HOME + "/" + info['url'])
             values = list(map(
                 lambda d: None if math.isnan(d) else d,
-                data[info['id']]
+                data[info['id']].tolist()
             ))
             array['data']['values'] = values
         # else:
