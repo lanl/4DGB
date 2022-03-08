@@ -197,7 +197,9 @@ class GeometryCanvas extends Component {
         // load data
         this.geometry = new Structure(this.dataset.structure, gdata["geometry"]);
         this.geometry.addListener('loaded', this.postLoad);
-        Client.TheClient.get_structure(this.geometry.load, this.geometry.id);
+        Client.TheClient.get_structure((data) => {
+            this.geometry.load(data, this.unmapped)
+        }, this.geometry.id);
         // this.geometry.load( this.dataset.id, this );
 
         // scalar bar

@@ -139,18 +139,29 @@ class Structure extends EventEmitter {
     }
 
     // loads the geometry
-    load(data) { 
+    load(data, unmapped_segments) { 
         // used to compute the centroid
         var center = new THREE.Vector3(0.0, 0.0, 0.0);
+        let num_mapped = 0;
+
+        // convert unmapped segments array to object
+        const unmapped = {}
+        for (let s of unmapped_segments) { unmapped[s] = true }
 
         if (this.segmentType == "arrow") {
+            let i = 0;
             for (var s of data["segments"]) {
 
                 let points = {
                     'start': new THREE.Vector3(s['start'][0], s['start'][1], s['start'][2]),
                     'end'  : new THREE.Vector3(s['end'][0], s['end'][1], s['end'][2])
                 }
-                center.add(points['end']);
+
+                if (!unmapped[i]) {
+                    center.add(points['end']);
+                    num_mapped++;
+                }
+
                 var radius = {
                     'start': ArrowSegment.RadiusBegin, 
                     'end'  : ArrowSegment.RadiusEnd 
@@ -158,6 +169,8 @@ class Structure extends EventEmitter {
                 const newSeg = new ArrowSegment(s['segid'], points, radius); 
                 newSeg.addToParent(this.root);
                 this.segments[s['segid']] = newSeg;
+
+                i++;
             }
         } else if (this.segmentType == "curve") {
             var segArray = {};
@@ -193,7 +206,11 @@ class Structure extends EventEmitter {
                     '3' : new THREE.Vector3(nSeg['end'][0],   nSeg['end'][1],   nSeg['end'][2]),
                 }
 
-                center.add(points['1'])
+                if (!unmapped[i]) {
+                    center.add(points['1']);
+                    num_mapped++;
+                }
+
                 const newSeg = new CurveSegment(i, points, CurveSegment.SegmentRadius); 
                 newSeg.addToParent(this.root);
                 this.segments[i] = newSeg;
@@ -202,11 +219,8 @@ class Structure extends EventEmitter {
             // TODO: report error
         }
 
-        // centroid
-        var numSegs = this.getNumSegments(); 
-        let centroid = center.divideScalar(numSegs);
-
         // reposition geometry so that its centroid will be at (0,0,0)
+        let centroid = center.divideScalar(num_mapped);
         this.root.position.addVectors( this.root.position, centroid.multiplyScalar(-1) )
         //this.centroid = new THREE.Vector3(0,0,0);
 
