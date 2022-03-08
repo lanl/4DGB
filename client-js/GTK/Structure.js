@@ -204,16 +204,20 @@ class Structure extends EventEmitter {
 
         // centroid
         var numSegs = this.getNumSegments(); 
-        this.centroid = center.divideScalar(numSegs);
+        let centroid = center.divideScalar(numSegs);
+
+        // reposition geometry so that its centroid will be at (0,0,0)
+        this.root.position.addVectors( this.root.position, centroid.multiplyScalar(-1) )
+        //this.centroid = new THREE.Vector3(0,0,0);
 
         // create geometry for the centroid
-        var cGeom = new THREE.SphereBufferGeometry( 0.5, 8, 8, );
+        /*var cGeom = new THREE.SphereBufferGeometry( 0.5, 8, 8, );
         var cMaterial = new THREE.MeshPhongMaterial();
         this.centroidMarker = new THREE.Mesh(cGeom, cMaterial);
         this.centroidMarker.position.x = this.centroid.x;
         this.centroidMarker.position.y = this.centroid.y;
         this.centroidMarker.position.z = this.centroid.z;
-        this.centroidMarker.visible = false;
+        this.centroidMarker.visible = false;*/
 
         // init meshesToSegments map
         for (let segid in this.segments) {
@@ -230,7 +234,7 @@ class Structure extends EventEmitter {
 
     addToScene(scene) {
         scene.add(this.root);
-        scene.add(this.centroidMarker);
+        //scene.add(this.centroidMarker);
     }
 
     showCentroid(state) {
