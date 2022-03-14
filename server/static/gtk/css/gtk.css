@@ -99,6 +99,7 @@ div.gtk { padding: 5px;
     position: relative;
     margin: 5px;
     line-height: 0;
+    height: 300px;
 }
 
 .gtkoverlay {
@@ -146,6 +147,15 @@ div.gtk { padding: 5px;
     position: absolute;
     bottom: 0;
     left: 0;
+}
+
+.gtkcontactmappanel {
+    width:    200px; 
+    height:   250px; 
+    position: relative;
+    left:     300px;
+    top:      -280px;
+    border:   1px solid #D3D3D3;
 }
 
 .gtkscalarbarcanvas {

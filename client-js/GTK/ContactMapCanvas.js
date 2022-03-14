@@ -154,6 +154,7 @@ class ContactMapCanvas extends Component {
                 width:    ${this.displayOpts.width}px;
                 height:   ${this.displayOpts.height}px;
             `).node();
+        this.boundingDiv.className = "gtkcontactmapboundingdiv";
         this.contdiv.appendChild(this.boundingDiv);
 
         /**
@@ -201,16 +202,6 @@ class ContactMapCanvas extends Component {
         this.contdiv.appendChild(this.helpLabel.node());
         **/
 
-        /** A d3 selection of a button to clear all of the selection brushes */
-        this.clearButton = d3.create('button')
-            .attr('style', `
-                position: absolute;
-                bottom: 2px;
-                left: ${self.margin.left+5}px
-            `)
-            .text("Clear")
-            .on('click', () => this._clearBrushes() );
-        this.boundingDiv.appendChild(this.clearButton.node());
 
         /** A d3 selection of the SVG handling brush selection */
         this.brushSVG = d3.create('svg').call(overlay)
@@ -349,10 +340,55 @@ class ContactMapCanvas extends Component {
         // Add to global list of instances
         ContactMapCanvas.instances.push( new WeakRef(this) );
 
+        // Add some other elements
+        this.metadata = document.createElement("div");
+        this.metadata.className = "gtkcontactmappanel";
+        this.metadata.width = 150;
+        this.metadata.height = 150;
+        this.contdiv.appendChild(this.metadata);
+
+        // set metadata text
+        // TODO: make this more robust (requires project data to be present)
+        var d_structure = project.getData("structure", dataset["structure"]); 
+        var t_file = d_structure["url"].split("/");
+        var t_structure = t_file[t_file.length - 1];
+        var t_interval = project.getInterval();
+        this.metatext = `
+            <small>
+            <p><b>${dataset["name"]}</b></p>
+            <p>&nbsp</p>
+            <p><b>&nbsp&nbsp structure</b></p>
+            <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${t_structure}</p>
+            <p>&nbsp</p>
+            <p><b>&nbsp&nbsp resolution</b></p>
+            <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${t_interval} beads</p>
+            <p>&nbsp</p>
+            <p><b>&nbsp&nbsp dataset</b></p>
+            <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${dataset["id"]}</p>
+            </small>
+        `;
+
         // add a scalar bar
-        this.scalarBarCanvas = new ScalarBarCanvas(this.contdiv);
+        this.scalarBarCanvas = new ScalarBarCanvas(this.metadata);
         this.scalarBarCanvas.setLUT(this.lut);
         this.scalarBarCanvas.title = "";
+        this.scalarBarCanvas.left  = "0px";
+        this.scalarBarCanvas.top   = "160px";
+
+        /** A d3 selection of a button to clear all of the selection brushes */
+        this.clearButton = d3.create('button')
+            .attr('style', `
+                position: relative;
+                bottom: -280px;
+                left: ${self.margin.left}px
+            `)
+            .text("Clear selection")
+            .on('click', () => this._clearBrushes() );
+        this.boundingDiv.appendChild(this.clearButton.node());
+    }
+
+    set metatext(t) {
+        this.metadata.innerHTML = t;
     }
 
     /**
