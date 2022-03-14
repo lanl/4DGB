@@ -62,17 +62,25 @@ class ScalarBarCanvas {
         this.LUT.setMax(1.0);
 
         // create elements
-        var contdiv = document.createElement("div");
-        contdiv.className = ScalarBarCanvas.Classname; 
-        rootElem.appendChild(contdiv);
+        this.contdiv = document.createElement("div");
+        this.contdiv.className = ScalarBarCanvas.Classname; 
+        rootElem.appendChild(this.contdiv);
 
         // canvas
         this.canvas = document.createElement("canvas");
         this.canvas.width  = width; 
         this.canvas.height = height; 
-        contdiv.appendChild(this.canvas);
+        this.contdiv.appendChild(this.canvas);
 
         this.redraw();
+    }
+
+    set left(l) {
+        this.contdiv.style.left = l;
+    }
+
+    set top(t) {
+        this.contdiv.style.top = t;
     }
 
     set borderColor(c) {
