@@ -31,11 +31,17 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class Point {
 
-    constructor( ID ) { 
-        this._ID = ID;
-        this._x  = 0.0;
-        this._y  = 0.0;
-        this._z  = 0.0;
+    /*
+     *    p = {
+     *      ID: value,
+     *      point: [x, y, z]
+     *    }
+     */
+    constructor( p ) { 
+        this._ID = p["ID"]; 
+        this._x  = p["point"][0]; 
+        this._y  = p["point"][1];  
+        this._z  = p["point"][2]; 
     }
 
     // -------------------------------------------------------------------
@@ -73,5 +79,3 @@ class Point {
         return this._z;
     }
 }
-
-exports.Point = Point;

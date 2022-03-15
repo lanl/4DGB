@@ -29,40 +29,18 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-class Structure {
-    /**
-     * Class Structure
-     *
-     * data describing a set of segments 
-     *
-     */
+class Viewer {
 
-    /*
-     * constructs an instance, give input parameters
-     */
-    constructor( s ) {
-        // super();
+    constructor( ID ) { 
+        this._scene = THREE.Scene();
+        this._camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+        this._renderer = new THREE.WebGLRenderer({antialias: true});
 
-        let len = s.length;
-        this._segments = {};
-        for (const [key, segdata] of Object.entries(s)) { 
-            this._segments[s["ID"]] = new Segment(segdata);
-        }
-
+        this._renderer.setSize( window.innerWidth, window.innerHeight );
+        document.body.appendChild( this._renderer.domElement );
     }
 
     // -------------------------------------------------------------------
     // BEGIN: get and set methods
     // -------------------------------------------------------------------
-    get ID() {
-        return this._ID;
-    }
-
-    set ID(ID) {
-        this._ID = ID;
-    }
-
-    get segments() {
-        return this._segments;
-    }
 }

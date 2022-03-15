@@ -29,16 +29,23 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const Point = require('./Point.js');
-
 class Segment {
 
-    constructor( ID, startID, start, endID, end, center) { 
-        this._ID     = ID;
-        this._start  = new Point(startid,  start[0],  start[1],  start[2]); 
-        this._end    = new Point(endid,      end[0],    end[1],    end[2]);
-        this._center = new Point(-1,      center[0], center[1], center[2]); 
-        this._length = length;
+    /*
+     * segment: {
+     *    ID: value,
+     *    start: {
+     *      (data needed for point class)
+     *    },
+     *    end: {
+     *      (data needed for point class)
+     *    }
+     * }
+     */
+    constructor( s ) { 
+        this._ID    = s["ID"];
+        this._start = new Point(s["start"]);
+        this._end   = new Point(s["end"]);
     }
 
     // -------------------------------------------------------------------
@@ -56,13 +63,4 @@ class Segment {
         return this._end;
     }
 
-    get center() {
-        return this._center;
-    }
-
-    get length() {
-        return this._length;
-    }
 }
-
-exports.Segment = Segment;
