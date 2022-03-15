@@ -29,39 +29,24 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-class Structure {
-    /**
-     * Class Structure
-     *
-     * data describing a set of segments 
-     *
-     */
+class StructureGeometry {
 
     /*
-     * constructs an instance, give input parameters
      */
-    constructor( s ) {
-        // super();
-
+    constructor( s ) { 
+        this._root = new THREE.Group();
+        this._structure = s;
         this._segments = {};
-        for (const [key, segdata] of Object.entries(s)) { 
-            this._segments[segdata["ID"]] = new Segment(segdata);
+        for (const [key, sdata] of Object.entries(s.segments)) { 
+            this._segments[sdata["ID"]] = new SegmentGeometry(sdata);
+            this._root.add(this._segments[sdata["ID"]].root);
         }
-
     }
 
     // -------------------------------------------------------------------
     // BEGIN: get and set methods
     // -------------------------------------------------------------------
-    get ID() {
-        return this._ID;
-    }
-
-    set ID(ID) {
-        this._ID = ID;
-    }
-
-    get segments() {
-        return this._segments;
+    get root () {
+        return this._root;
     }
 }

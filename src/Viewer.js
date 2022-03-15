@@ -32,12 +32,28 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class Viewer {
 
     constructor( ID ) { 
-        this._scene = THREE.Scene();
+        this._scene = new THREE.Scene();
         this._camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+        this._camera.position.x = 2;
+        this._camera.position.y = 2;
+        this._camera.position.z = 2;
+        this._camera.lookAt(0,0,0);
         this._renderer = new THREE.WebGLRenderer({antialias: true});
+        this._renderer.setClearColor("#555555")
+        const light = new THREE.AmbientLight( 0xaaaaaa ); // soft white light
+        this._scene.add( light );
+
 
         this._renderer.setSize( window.innerWidth, window.innerHeight );
         document.body.appendChild( this._renderer.domElement );
+    }
+
+    add( o ) {
+        this._scene.add(o.root);
+    }
+
+    render() {
+        this._renderer.render(this._scene, this._camera);;
     }
 
     // -------------------------------------------------------------------

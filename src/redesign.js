@@ -55,9 +55,8 @@ let s = {
         }
     }
 }
-let struct = new Structure(s);
-
-alert("Made a structure");
-
-let viewer = new Viewer(0);
-alert("Made a viewer");
+let struct  = new Structure(s);
+let geom    = new StructureGeometry(struct);
+let viewer  = new Viewer(0);
+viewer.add(geom);
+viewer.render();
