@@ -42,7 +42,7 @@ class Segment {
 
     static Color = new THREE.Color(1.0, 0.0, 0.0); 
     static EndpointRadius = 0.1; 
-    static GeomEndpoint = new THREE.SphereBufferGeometry( Segment.EndpointRadius, 8, 8, );
+    static GeomEndpoint = new THREE.SphereGeometry( Segment.EndpointRadius, 8, 8 );
     static GhostOpacity = 0.2;
 
     constructor( ID, points, radius) { 
@@ -138,8 +138,8 @@ class Segment {
         this.endpointMesh.position.z = center.z;
         this.endpointMesh.updateMatrix();
         this.endpointMesh.matrixAutoUpdate = false;
-        this.endpointMesh.castShadow = true;
-        this.endpointMesh.receiveShadow = true;
+        // this.endpointMesh.castShadow = true;
+        // this.endpointMesh.receiveShadow = true;
         this.endpointMesh.name = "endpoint";
         this.endpointMesh.userData.id = this.ID; 
         this.root.add(this.endpointMesh);
@@ -165,10 +165,10 @@ class Segment {
                     this.spanMesh.material.transparent = false;
                     this.spanMesh.material.opacity = 1.0;
                     // shadow
-                    this.endpointMesh.castShadow    = true;
-                    this.endpointMesh.receiveShadow = true;
-                    this.spanMesh.castShadow        = true;
-                    this.spanMesh.receiveShadow     = true;
+                    // this.endpointMesh.castShadow    = true;
+                    // this.endpointMesh.receiveShadow = true;
+                    // this.spanMesh.castShadow        = true;
+                    // this.spanMesh.receiveShadow     = true;
                     result = true;
                     break;
                 case Segment.State.GHOST:
@@ -183,10 +183,10 @@ class Segment {
                     this.spanMesh.material.transparent = true;
                     this.spanMesh.material.opacity =  Segment.GhostOpacity;
                     // shadow
-                    this.endpointMesh.castShadow    = false;
-                    this.endpointMesh.receiveShadow = false;
-                    this.spanMesh.castShadow        = false;
-                    this.spanMesh.receiveShadow     = false;
+                    // this.endpointMesh.castShadow    = false;
+                    // this.endpointMesh.receiveShadow = false;
+                    // this.spanMesh.castShadow        = false;
+                    // this.spanMesh.receiveShadow     = false;
                     result = true;
                     break;
                 case Segment.State.SKELETON:

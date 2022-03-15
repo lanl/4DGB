@@ -170,10 +170,15 @@ class GeometryCanvas extends Component {
                     light.shadow.camera.left    = curLight["shadow"]["camera"]["left"];
                     light.shadow.camera.right   = curLight["shadow"]["camera"]["right"];
                 }
-                //  debugging
+                //  debugging: show the camera
                 if (false) {
                     const helper = new THREE.CameraHelper( light.shadow.camera );
                     this.scene.add(helper);
+                }
+                //  debugging: show the light
+                if (false) {
+                    const lighthelper = new THREE.DirectionalLightHelper( light, 5, 0xAABBCC );
+                    this.scene.add(lighthelper);
                 }
                 this.scene.add(light);
                 
