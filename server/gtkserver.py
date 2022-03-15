@@ -27,8 +27,8 @@ import json
 # initialize
 # when run as a script, these can be overriden with command-line arguments
 #
-if '4DGB_PROJECT_HOME' in os.environ:
-    PROJECT_HOME = os.environ['4DGB_PROJECT_HOME']
+if 'PROJECT_HOME' in os.environ:
+    PROJECT_HOME = os.environ['PROJECT_HOME']
 else:
     PROJECT_HOME = path.abspath(
         path.join( path.dirname(__file__), 'static', 'project')
