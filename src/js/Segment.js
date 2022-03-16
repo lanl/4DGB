@@ -29,24 +29,42 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-class StructureGeometry {
+import Point from './Point.js';
+
+class Segment {
 
     /*
+     * segment: {
+     *    ID: value,
+     *    start: {
+     *      (data needed for point class)
+     *    },
+     *    end: {
+     *      (data needed for point class)
+     *    }
+     * }
      */
     constructor( s ) { 
-        this._root = new THREE.Group();
-        this._structure = s;
-        this._segments = {};
-        for (const [key, sdata] of Object.entries(s.segments)) { 
-            this._segments[sdata["ID"]] = new SegmentGeometry(sdata);
-            this._root.add(this._segments[sdata["ID"]].root);
-        }
+        this._ID    = s["ID"];
+        this._start = new Point(s["start"]);
+        this._end   = new Point(s["end"]);
     }
 
     // -------------------------------------------------------------------
     // BEGIN: get and set methods
     // -------------------------------------------------------------------
-    get root () {
-        return this._root;
+    get ID() {
+        return this._ID;
     }
+
+    get start() {
+        return this._start;
+    }
+
+    get end() {
+        return this._end;
+    }
+
 }
+
+export default Segment;

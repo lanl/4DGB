@@ -29,34 +29,29 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-class Viewer {
+import * as THREE from   '../node_modules/three/build/three.module.js';
+import SegmentGeometry from './SegmentGeometry.js'
 
-    constructor( ID ) { 
-        this._scene = new THREE.Scene();
-        this._camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-        this._camera.position.x = 2;
-        this._camera.position.y = 2;
-        this._camera.position.z = 2;
-        this._camera.lookAt(0,0,0);
-        this._renderer = new THREE.WebGLRenderer({antialias: true});
-        this._renderer.setClearColor("#555555")
-        const light = new THREE.AmbientLight( 0xaaaaaa ); // soft white light
-        this._scene.add( light );
+class StructureGeometry {
 
-
-        this._renderer.setSize( window.innerWidth, window.innerHeight );
-        document.body.appendChild( this._renderer.domElement );
-    }
-
-    add( o ) {
-        this._scene.add(o.root);
-    }
-
-    render() {
-        this._renderer.render(this._scene, this._camera);;
+    /*
+     */
+    constructor( s ) { 
+        this._root = new THREE.Group();
+        this._structure = s;
+        this._segments = {};
+        for (const [key, sdata] of Object.entries(s.segments)) { 
+            this._segments[sdata["ID"]] = new SegmentGeometry(sdata);
+            this._root.add(this._segments[sdata["ID"]].root);
+        }
     }
 
     // -------------------------------------------------------------------
     // BEGIN: get and set methods
     // -------------------------------------------------------------------
+    get root () {
+        return this._root;
+    }
 }
+
+export default StructureGeometry;

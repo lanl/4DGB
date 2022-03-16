@@ -1,3 +1,11 @@
+import * as THREE from   '../node_modules/three/build/three.module.js';
+import Point from './js/Point.js';
+import Segment from './js/Segment.js';
+import SegmentGeometry from './js/SegmentGeometry.js';
+import Structure from './js/Structure.js';
+import StructureGeometry from './js/StructureGeometry.js';
+import Viewer from './js/Viewer.js';
+
 let s = {
     "0" : {
         "ID" : 0,

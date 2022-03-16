@@ -29,23 +29,27 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-class Segment {
+import Segment from './Segment.js';
+
+class Structure {
+    /**
+     * Class Structure
+     *
+     * data describing a set of segments 
+     *
+     */
 
     /*
-     * segment: {
-     *    ID: value,
-     *    start: {
-     *      (data needed for point class)
-     *    },
-     *    end: {
-     *      (data needed for point class)
-     *    }
-     * }
+     * constructs an instance, give input parameters
      */
-    constructor( s ) { 
-        this._ID    = s["ID"];
-        this._start = new Point(s["start"]);
-        this._end   = new Point(s["end"]);
+    constructor( s ) {
+        // super();
+
+        this._segments = {};
+        for (const [key, segdata] of Object.entries(s)) { 
+            this._segments[segdata["ID"]] = new Segment(segdata);
+        }
+
     }
 
     // -------------------------------------------------------------------
@@ -55,12 +59,13 @@ class Segment {
         return this._ID;
     }
 
-    get start() {
-        return this._start;
+    set ID(ID) {
+        this._ID = ID;
     }
 
-    get end() {
-        return this._end;
+    get segments() {
+        return this._segments;
     }
-
 }
+
+export default Structure;

@@ -29,39 +29,55 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-class Structure {
-    /**
-     * Class Structure
-     *
-     * data describing a set of segments 
-     *
-     */
+class Point {
 
     /*
-     * constructs an instance, give input parameters
+     *    p = {
+     *      ID: value,
+     *      point: [x, y, z]
+     *    }
      */
-    constructor( s ) {
-        // super();
-
-        this._segments = {};
-        for (const [key, segdata] of Object.entries(s)) { 
-            this._segments[segdata["ID"]] = new Segment(segdata);
-        }
-
+    constructor( p ) { 
+        this._ID = p["ID"]; 
+        this._x  = p["point"][0]; 
+        this._y  = p["point"][1];  
+        this._z  = p["point"][2]; 
     }
 
     // -------------------------------------------------------------------
     // BEGIN: get and set methods
     // -------------------------------------------------------------------
+    set ID(value) {
+        this._ID = value;
+    }
+
     get ID() {
         return this._ID;
     }
 
-    set ID(ID) {
-        this._ID = ID;
+    set x(value) {
+        this._x = value;
     }
 
-    get segments() {
-        return this._segments;
+    get x() {
+        return this._x;
+    }
+
+    set y(value) {
+        this._y = value;
+    }
+
+    get y() {
+        return this._y;
+    }
+
+    set z(value) {
+        this._z = value;
+    }
+
+    get z() {
+        return this._z;
     }
 }
+
+export default Point;
