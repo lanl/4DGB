@@ -65,6 +65,16 @@ let s = {
 }
 let struct  = new Structure(s);
 let geom    = new StructureGeometry(struct);
-let viewer  = new Viewer(0);
+
+let vparams = {
+    "renderer" : {
+        "clearColor" : 0x555555 
+    },
+    "camera" : {
+        "position": [2, 2, 2],
+        "lookAt"  : [0, 0, 0]
+    }
+}
+let viewer  = new Viewer(vparams);
 viewer.add(geom);
 viewer.render();

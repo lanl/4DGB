@@ -34,17 +34,22 @@ import { OrbitControls } from '../node_modules/three/examples/jsm/controls/Orbit
 
 class Viewer {
 
-    constructor( ID ) { 
+    constructor( parameters ) { 
         this._scene = new THREE.Scene();
         this._camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-        this._camera.position.x = 2;
-        this._camera.position.y = 2;
-        this._camera.position.z = 2;
-        this._camera.lookAt(0,0,0);
+        this._camera.position.x = parameters["camera"]["position"][0];
+        this._camera.position.y = parameters["camera"]["position"][1];
+        this._camera.position.z = parameters["camera"]["position"][2];
+        this._camera.lookAt(parameters["camera"]["lookAt"]);
         this._renderer = new THREE.WebGLRenderer({antialias: true});
-        this._renderer.setClearColor("#555555")
+        this._renderer.setClearColor(parameters["renderer"]["clearColor"])
+
+        // ambient
         const light = new THREE.AmbientLight( 0xaaaaaa ); // soft white light
-        this._scene.add( light );
+        this._scene.add(light);
+        // directional light
+        const dlight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+        this._scene.add(dlight);
 
         this._controls = new OrbitControls(this._camera, this._renderer.domElement);
         this._controls.addEventListener('change', this.render.bind(this));
