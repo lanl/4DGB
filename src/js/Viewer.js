@@ -32,6 +32,9 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import * as THREE from   '../node_modules/three/build/three.module.js';
 import { OrbitControls } from '../node_modules/three/examples/jsm/controls/OrbitControls.js'
 
+//
+// A viewer has a scene and a way to render it to the screen
+//
 class Viewer {
 
     constructor( parameters ) { 
@@ -41,21 +44,32 @@ class Viewer {
         this._camera.position.y = parameters["camera"]["position"][1];
         this._camera.position.z = parameters["camera"]["position"][2];
         this._camera.lookAt(parameters["camera"]["lookAt"]);
-        this._renderer = new THREE.WebGLRenderer({antialias: true});
-        this._renderer.setClearColor(parameters["renderer"]["clearColor"])
+        this.renderer = new THREE.WebGLRenderer({antialias: true});
+        this.renderer.setClearColor(parameters["renderer"]["clearColor"])
 
         // ambient
-        const light = new THREE.AmbientLight( 0xaaaaaa ); // soft white light
-        this._scene.add(light);
-        // directional light
-        const dlight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-        this._scene.add(dlight);
+        for (let i = 0, len = parameters["lights"].length; i < len; i++) {
+            let l = parameters["lights"][i];
+            if (l["type"] == "ambient") {
+                this.addAmbientLight(l);
+            } else if (l["type"] == "directional") {
+                this.addDirectionalLight(l)
+            }
+        }
 
-        this._controls = new OrbitControls(this._camera, this._renderer.domElement);
+        this._controls = new OrbitControls(this._camera, this.renderer.domElement);
         this._controls.addEventListener('change', this.render.bind(this));
 
-        this._renderer.setSize( window.innerWidth, window.innerHeight );
-        document.body.appendChild( this._renderer.domElement );
+        this.renderer.setSize( window.innerWidth, window.innerHeight );
+        document.body.appendChild( this.renderer.domElement );
+    }
+
+    addAmbientLight( l ) {
+        this.add(new THREE.AmbientLight(l["color"]));
+    }
+
+    addDirectionalLight( l ) {
+        this.add(new THREE.DirectionalLight(l["color"], 0.5));
     }
 
     add( o ) {
@@ -63,12 +77,19 @@ class Viewer {
     }
 
     render() {
-        this._renderer.render(this._scene, this._camera);;
+        this.renderer.render(this._scene, this._camera);;
     }
 
     // -------------------------------------------------------------------
     // BEGIN: get and set methods
     // -------------------------------------------------------------------
+    get renderer() {
+        return this._renderer;
+    }
+
+    set renderer( r ) {
+        this._renderer = r;
+    }
 }
 
 export default Viewer;

@@ -84,7 +84,17 @@ let vparams = {
     "camera" : {
         "position": [2, 2, 2],
         "lookAt"  : [0, 0, 0]
-    }
+    },
+    "lights" : [ 
+        {
+            "type": "ambient",
+            "color": 0xaaaaaa
+        },
+        {
+            "type": "directional",
+            "color": 0xffffff
+        }
+    ]
 }
 let viewer  = new Viewer(vparams);
 viewer.add(geom);

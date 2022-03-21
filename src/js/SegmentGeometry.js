@@ -57,9 +57,10 @@ class SegmentGeometry extends THREE.Group {
         this._endpointMesh;
         this._spanMesh;
         this._skeletonMesh;
-        this._state;
+        this._state = SegmentGeometry.State.LIVE;
 
         this.createEndpointMesh( s.end, SegmentGeometry.Material );
+        this.createSpanMesh( s.start, s.end, SegmentGeometry.Material );
     }
 
     // -------------------------------------------------------------------
@@ -132,6 +133,18 @@ class SegmentGeometry extends THREE.Group {
         this.endpointMesh.name = "endpoint";
         this.endpointMesh.userData.id = this.ID; 
         this.add(this.endpointMesh);
+    }
+
+    //
+    // create a line between points
+    //
+    createSpanMesh( start, end, newMat ) {
+        const points = [];
+        points.push(start, end);
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        this.spanMesh = new THREE.Line( geometry, newMat ); 
+        // initially, the skeleton is not visible
+        this.add( this.spanMesh );
     }
 
     //
