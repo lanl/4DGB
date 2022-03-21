@@ -41,15 +41,38 @@ class StructureGeometry extends THREE.Group {
 
         this._structure = s;
         this._segments = {};
+        this._segAveLength = 0.0;
+        this._segTotalLength = 0.0;
         for (const [key, sdata] of Object.entries(s.segments)) { 
-            this._segments[sdata["ID"]] = new SegmentGeometry(sdata);
+            this.segments[sdata["ID"]] = new SegmentGeometry(sdata);
             this.add(this._segments[sdata["ID"]]);
+            this.SegTotalLength = this.segTotalLength + this.segments[sdata["ID"]];
         }
+        this.segAveLength = this.segTotalLength/this.segments.length;
     }
 
     // -------------------------------------------------------------------
     // BEGIN: get and set methods
     // -------------------------------------------------------------------
+    get segments() {
+        return this._segments;
+    }
+
+    get segTotalLength() {
+        return this._segTotalLength;
+    }
+
+    set segTotalLength( l ) {
+        this._segTotalLength = l;
+    }
+
+    get segAveLength() {
+        return this._segAveLength;
+    }
+
+    set segAveLength( l ) {
+        this._segAveLength = l;
+    }
 }
 
 export default StructureGeometry;
