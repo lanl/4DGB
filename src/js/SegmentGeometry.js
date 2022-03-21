@@ -53,7 +53,7 @@ class SegmentGeometry extends THREE.Group {
         super();
 
         this._ID = s.ID;
-        this._length = 0; 
+        this._length = this.computeLength(s.start, s.end); 
         this._endpointMesh;
         this._spanMesh;
         this._skeletonMesh;
@@ -145,6 +145,14 @@ class SegmentGeometry extends THREE.Group {
         this.spanMesh = new THREE.Line( geometry, newMat ); 
         // initially, the skeleton is not visible
         this.add( this.spanMesh );
+    }
+
+    //
+    //
+    //
+    computeLength( start, end ) {
+        let vstart = new THREE.Vector3(start[0], start[1], start[2]);
+        return vstart.distanceTo(new THREE.Vector3(end[0], end[1], end[2]));
     }
 
     //
