@@ -32,26 +32,24 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import * as THREE from   '../node_modules/three/build/three.module.js';
 import SegmentGeometry from './SegmentGeometry.js'
 
-class StructureGeometry {
+class StructureGeometry extends THREE.Group {
 
     /*
      */
     constructor( s ) { 
-        this._root = new THREE.Group();
+        super();
+
         this._structure = s;
         this._segments = {};
         for (const [key, sdata] of Object.entries(s.segments)) { 
             this._segments[sdata["ID"]] = new SegmentGeometry(sdata);
-            this._root.add(this._segments[sdata["ID"]].root);
+            this.add(this._segments[sdata["ID"]]);
         }
     }
 
     // -------------------------------------------------------------------
     // BEGIN: get and set methods
     // -------------------------------------------------------------------
-    get root () {
-        return this._root;
-    }
 }
 
 export default StructureGeometry;

@@ -59,7 +59,7 @@ class Viewer {
     }
 
     add( o ) {
-        this._scene.add(o.root);
+        this._scene.add(o);
     }
 
     render() {

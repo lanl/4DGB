@@ -31,7 +31,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import * as THREE from   '../node_modules/three/build/three.module.js';
 
-class SegmentGeometry {
+class SegmentGeometry extends THREE.Group {
 
     static State = {
         LIVE: "live",
@@ -50,8 +50,9 @@ class SegmentGeometry {
      * s segment
      */
     constructor( s ) { 
+        super();
+
         this._ID = s.ID;
-        this._root = new THREE.Group(); 
         this._length = 0; 
         this._endpointMesh;
         this._spanMesh;
@@ -64,16 +65,6 @@ class SegmentGeometry {
     // -------------------------------------------------------------------
     // BEGIN: get and set methods
     // -------------------------------------------------------------------
-    set visible(value) {
-        this.root.visible = value;
-        this.endpointMesh.visible = value;
-        this.spanMesh.visible = value;
-    }
-
-    get visible() {
-        return this.root.visible;
-    }
-
     set state(value) {
         this._state = value;
     }
@@ -104,14 +95,6 @@ class SegmentGeometry {
 
     get skeletonMesh() {
         return this._skeletonMesh;
-    }
-
-    set root(value) {
-        this._root = value;
-    }
-
-    get root() {
-        return this._root
     }
 
     set id(value) {
@@ -148,7 +131,7 @@ class SegmentGeometry {
         // this.endpointMesh.receiveShadow = true;
         this.endpointMesh.name = "endpoint";
         this.endpointMesh.userData.id = this.ID; 
-        this.root.add(this.endpointMesh);
+        this.add(this.endpointMesh);
     }
 
     //
@@ -225,10 +208,6 @@ class SegmentGeometry {
     setColor( c ) {
         this.endpointMesh.material.color.set(c);
         this.spanMesh.material.color.set(c);
-    }
-
-    addToParent( p ) {
-        p.add(this.root);
     }
 
 }
