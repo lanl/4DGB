@@ -348,25 +348,7 @@ class ContactMapCanvas extends Component {
         this.contdiv.appendChild(this.metadata);
 
         // set metadata text
-        // TODO: make this more robust (requires project data to be present)
-        var d_structure = project.getData("structure", dataset["structure"]); 
-        var t_file = d_structure["url"].split("/");
-        var t_structure = t_file[t_file.length - 1];
-        var t_interval = project.getInterval();
-        this.metatext = `
-            <small>
-            <p><b>${dataset["name"]}</b></p>
-            <p>&nbsp</p>
-            <p><b>&nbsp&nbsp structure</b></p>
-            <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${t_structure}</p>
-            <p>&nbsp</p>
-            <p><b>&nbsp&nbsp resolution</b></p>
-            <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${t_interval} beads</p>
-            <p>&nbsp</p>
-            <p><b>&nbsp&nbsp dataset</b></p>
-            <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${dataset["id"]}</p>
-            </small>
-        `;
+        this._updateMetaHTML(project, dataset);
 
         // add a scalar bar
         this.scalarBarCanvas = new ScalarBarCanvas(this.metadata);
@@ -689,6 +671,31 @@ class ContactMapCanvas extends Component {
     _scaleBrushCoords(selection, xScale, yScale) {
         if (selection === null) return null;
         return selection.map( ([x,y]) => [ xScale(x), yScale(y) ] );
+    }
+
+    /**
+     * get an html text string that displays metadata information 
+     * TODO: make this more robust (requires project data to be present)
+     */
+    _updateMetaHTML(project, dataset) {
+        var d_structure = project.getData("structure", dataset["structure"]); 
+        var t_file      = d_structure["url"].split("/");
+        var t_structure = t_file[t_file.length - 1];
+        var t_interval  = project.getInterval();
+        this.metatext   = `
+            <small>
+            <p><b>${dataset["name"]}</b></p>
+            <p>&nbsp</p>
+            <p><b>&nbsp&nbsp structure</b></p>
+            <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${t_structure}</p>
+            <p>&nbsp</p>
+            <p><b>&nbsp&nbsp resolution</b></p>
+            <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${t_interval} beads</p>
+            <p>&nbsp</p>
+            <p><b>&nbsp&nbsp hic tolerance</b></p>
+            <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${d_structure["hic_comparison_tolerance"]["computed"]}</p>
+            </small>
+        `;
     }
 
 }
