@@ -682,7 +682,7 @@ class ContactMapCanvas extends Component {
         var t_file      = d_structure["url"].split("/");
         var t_structure = t_file[t_file.length - 1];
         var t_interval  = project.getInterval();
-        this.metatext   = `
+        var metatext = ` 
             <small>
             <p><b>${dataset["name"]}</b></p>
             <p>&nbsp</p>
@@ -691,11 +691,21 @@ class ContactMapCanvas extends Component {
             <p>&nbsp</p>
             <p><b>&nbsp&nbsp resolution</b></p>
             <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${t_interval} beads</p>
-            <p>&nbsp</p>
+            <p>&nbsp</p>`;
+
+        if (d_structure.hasOwnProperty("hic_comparison_tolerance")) {
+            metatext += `
             <p><b>&nbsp&nbsp hic tolerance</b></p>
             <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${d_structure["hic_comparison_tolerance"]["computed"]}</p>
-            </small>
-        `;
+            </small>\n`;
+        } else {
+            metatext += `
+            <p><b>&nbsp&nbsp dataset</b></p>
+            <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${dataset["id"]}</p>
+            </small>\n`;
+        }
+
+        this.metatext = metatext;
     }
 
 }
