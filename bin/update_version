@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# all steps to update the release
+
+# currently, this is the only step, but we have this script so that
+# anyone can see and update the steps needed.
+
+cp version.md server
+
+
