@@ -693,10 +693,10 @@ class ContactMapCanvas extends Component {
             <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${t_interval} beads</p>
             <p>&nbsp</p>`;
 
-        if (d_structure.hasOwnProperty("hic_comparison_tolerance")) {
+        if (d_structure.hasOwnProperty("spector_correlation")) {
             metatext += `
-            <p><b>&nbsp&nbsp hic tolerance</b></p>
-            <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${d_structure["hic_comparison_tolerance"]["computed"]}</p>
+            <p><b>&nbsp&nbsp spector correlation</b></p>
+            <p>&nbsp&nbsp &nbsp&nbsp&nbsp ${d_structure["spector_correlation"]["computed"]}</p>
             </small>\n`;
         } else {
             metatext += `
