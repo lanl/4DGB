@@ -113,6 +113,13 @@ class Component extends EventEmitter {
      */
     onCenterPositionChanged(value, options) {}
 
+    /**
+     * Called in response to a contactThresholdChnage event in the Controller
+     * @param {ThresholdSetting} value
+     * @param {EventOptions} options
+     */
+    onContactThresholdChanged(value, options) {}
+
 }
 
 module.exports = Component;

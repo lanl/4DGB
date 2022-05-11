@@ -1,7 +1,7 @@
 /**
  * Utility Functions
  * 
- * Usually related to shuffling around the different ways selection values can be represented.
+ * Mostly related to shuffling around the different ways selection values can be represented.
  */
 
 /**

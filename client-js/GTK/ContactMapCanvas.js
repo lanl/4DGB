@@ -51,6 +51,24 @@ const MAX_ZOOM = 10;
 class ContactMapCanvas extends Component {
 
     /**
+     * Static function to create a THREE.js LUT that
+     * varies from white to red
+     */
+    static makeContactMapLUT() {
+        // 100 colors from white to red
+        const colors = [];
+        for (let i = 0; i <= 1; i += 0.01) {
+            colors.push([i, new THREE.Color(1, 1-i, 1-i).getHex() ]);
+        }
+
+        const lut = new THREE.Lut('rainbow', 100);
+        lut.addColorMap('contact', colors);
+        lut.setColorMap('contact');
+
+        return lut;
+    }
+
+    /**
      * The DOM layout of the widget looks like this:
      *      div (this.contdiv)
      *          - div (this.boundingDiv)
@@ -274,13 +292,41 @@ class ContactMapCanvas extends Component {
         /**
          * colormap for rendering data
          */
-        this.lutNumBins   = 256;
-        this.lut = new THREE.Lut( this.displayOpts["colormap"], this.lutNumBins ); 
-        this.lut.setMin(this.displayOpts["threshold"]);
-        this.lut.setMax(1.0);
+        this.lut = ContactMapCanvas.makeContactMapLUT();
             // the color value is of the form 0xCCCCCC, so we must convert it to 
             // #CCCCCC in order to use it with the canvas context 
         this.background = "#" + this.displayOpts["background"].substring(2); 
+
+        // Add to global list of instances
+        ContactMapCanvas.instances.push( new WeakRef(this) );
+
+        // Add some other elements
+        this.metadata = document.createElement("div");
+        this.metadata.className = "gtkcontactmappanel";
+        this.metadata.width = 150;
+        this.metadata.height = 150;
+        this.contdiv.appendChild(this.metadata);
+
+        // set metadata text
+        this._updateMetaHTML(project, dataset);
+
+        // add a scalar bar
+        this.scalarBarCanvas = new ScalarBarCanvas(this.metadata);
+        this.scalarBarCanvas.setLUT(this.lut);
+        this.scalarBarCanvas.title = "";
+        this.scalarBarCanvas.left  = "0px";
+        this.scalarBarCanvas.top   = "160px";
+
+        /** A d3 selection of a button to clear all of the selection brushes */
+        this.clearButton = d3.create('button')
+            .attr('style', `
+                position: relative;
+                bottom: -280px;
+                left: ${self.margin.left}px
+            `)
+            .text("Clear selection")
+            .on('click', () => this._clearBrushes() );
+        this.boundingDiv.appendChild(this.clearButton.node());
 
         // Load data
         ContactMap.loadNew( dataset.md_contact_mp ).then( (contactMap) => {
@@ -288,9 +334,6 @@ class ContactMapCanvas extends Component {
              * This chunk is called after the contact map data has finished loading
             *************************************************************************/
             this.contactMap = contactMap;
-
-            // Render image
-            this.imageData = this._renderToImageData(contactMap);
 
             const rect = contactMap.bounds;
             const margin = this.margin;
@@ -326,7 +369,8 @@ class ContactMapCanvas extends Component {
                 .on( 'zoom', (e) => { this._onZoom(e) } );
             this.zoomSVG.call(this.zoom);
 
-            this._redrawCanvas();
+            // Update LUT and trigger a redraw
+            this.onContactThresholdChanged(this.controller.settings.contactThreshold);
 
             this.loaded = true;
 
@@ -337,36 +381,6 @@ class ContactMapCanvas extends Component {
 
         });
 
-        // Add to global list of instances
-        ContactMapCanvas.instances.push( new WeakRef(this) );
-
-        // Add some other elements
-        this.metadata = document.createElement("div");
-        this.metadata.className = "gtkcontactmappanel";
-        this.metadata.width = 150;
-        this.metadata.height = 150;
-        this.contdiv.appendChild(this.metadata);
-
-        // set metadata text
-        this._updateMetaHTML(project, dataset);
-
-        // add a scalar bar
-        this.scalarBarCanvas = new ScalarBarCanvas(this.metadata);
-        this.scalarBarCanvas.setLUT(this.lut);
-        this.scalarBarCanvas.title = "";
-        this.scalarBarCanvas.left  = "0px";
-        this.scalarBarCanvas.top   = "160px";
-
-        /** A d3 selection of a button to clear all of the selection brushes */
-        this.clearButton = d3.create('button')
-            .attr('style', `
-                position: relative;
-                bottom: -280px;
-                left: ${self.margin.left}px
-            `)
-            .text("Clear selection")
-            .on('click', () => this._clearBrushes() );
-        this.boundingDiv.appendChild(this.clearButton.node());
     }
 
     set metatext(t) {
@@ -406,6 +420,17 @@ class ContactMapCanvas extends Component {
     
             this._redrawBrushes( brushCoords );
         }
+    }
+
+    onContactThresholdChanged(value, options) {
+        const threshold = value;
+        const max = threshold * this.contactMap.maxValue;
+        this.lut.setMax(max);
+        this.lut.setMin(0.01 * max);
+        this.scalarBarCanvas.redraw();
+
+        this.imageData = this._renderToImageData(this.contactMap, value);
+        this._redrawCanvas();
     }
 
     /**
@@ -559,26 +584,26 @@ class ContactMapCanvas extends Component {
 
     /**
      * Render a contact map to ImageData
-     * @param {ContactMap} cm 
+     * @param {ContactMap} cm
+     * @param {Number} threshold
      * @returns {ImageData}
      */
-    _renderToImageData(cm) {
+    _renderToImageData(cm, threshold) {
         const pixels = new Uint8ClampedArray(cm.data.length * 4);
-
-        const magnification = this.displayOpts["magnify"] || 1;
 
         for (let i = 0; i < pixels.length; i+= 4) {
             const val = cm.data[i/4];
-            const normalized = (val - cm.minValue) / (cm.maxValue - cm.minValue) * magnification;
 
             // color using the lut 
-            const color = this.lut.getColor(normalized);
-            pixels[i]   = color.r*(255);
-            pixels[i+1] = color.g*(255);
-            pixels[i+2] = color.b*(255);
-            pixels[i+3] = 255; 
-            if (normalized <= this.lut.minV) {
+            if (val <= this.lut.minV) {
+                // Pixels below the threshold are transparent
                 pixels[i+3] = 0;
+            } else {
+                const color = this.lut.getColor(val);
+                pixels[i]   = color.r*(255);
+                pixels[i+1] = color.g*(255);
+                pixels[i+2] = color.b*(255);
+                pixels[i+3] = 255; 
             }
         }
 

@@ -282,6 +282,28 @@ class ControlPanel extends Component {
         });
         cell.appendChild(this.bgColorInput);
 
+        // contact map threshold slider
+        row = cur_panel.insertRow(cur_row);
+        cur_row += 1;
+        cell = row.insertCell();
+        cell.colSpan = 2;
+        cell.innerText = "Contact Map Threshold"
+        cell = row.insertCell();
+        cell.colSpan = 1;
+        this.thresholdSlider = document.createElement('input');
+        this.thresholdSlider.id = "controlpanel-settings-threshold";
+        this.thresholdSlider.setAttribute("type", "range");
+        this.thresholdSlider.setAttribute("min", "0.001");
+        this.thresholdSlider.setAttribute("max", "0.1");
+        this.thresholdSlider.setAttribute("step", "0.001");
+        this.thresholdSlider.addEventListener('input', (e) => {
+            // The slider ranges from 0.001 to 0.1, but moving it all the way to the max just sets
+            // the threshold to 1.0
+            const value = this.thresholdSlider.value >= 0.1 ? 1.0 : this.thresholdSlider.value;
+            this.controller.updateContactThreshold(value, this);
+        });
+        cell.appendChild(this.thresholdSlider);
+
         // reset camera button
         row = cur_panel.insertRow(cur_row);
         cur_row += 1;
@@ -296,6 +318,27 @@ class ControlPanel extends Component {
             );
         };
         cell.appendChild(this.resetCamera);
+
+        // clear settings button
+        row = cur_panel.insertRow(cur_row);
+        cur_row +=1;
+        cell = row.insertCell(0);
+        cell.colSpan = 3;
+        this.clearSettings = document.createElement('button');
+        this.clearSettings.innerText = "Clear Settings";
+        this.clearSettings.onclick = () => {
+            // Clear settings from browser's local storage
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('gtkproject')) {
+                const store = window.localStorage;
+                const key = `settings_${params.get('gtkproject')}`;
+                store.removeItem(key);
+
+                // Refresh page
+                window.location.reload();
+            }
+        }
+        cell.appendChild(this.clearSettings);
 
         // create the links section
             // title

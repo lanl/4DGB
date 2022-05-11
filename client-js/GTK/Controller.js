@@ -65,6 +65,9 @@ class Controller extends EventEmitter {
      * 
      * @typedef {Number[]} Vector3Setting Array of [x,y,z] values representing a THREE.js vector3
      * (like for the camera position of center-of-rotation position)
+     * 
+     * @typedef {Number} ThresholdSetting Value between 0 and 1 representing the cutoff point for
+     * the maximum value used when coloring the contact maps.
     **/
 
     /**
@@ -120,8 +123,10 @@ class Controller extends EventEmitter {
             /** @type {Vector3Setting} */
             cameraPos: this.project.getApplicationData('gtk')['geometrycanvas']['scene']['camera']['position'],
             /** @type {vector3Setting?} */
-            centerPos: null // A null value indicates that the center-of-rotation should be
+            centerPos: null, // A null value indicates that the center-of-rotation should be
                             // a structure's centroid
+            /** @type {ThresholdSetting} */
+            contactThreshold: 1
         }
     }
 
@@ -217,6 +222,17 @@ class Controller extends EventEmitter {
         this._triggerEvent('centerPositionChanged', 'onCenterPositionChanged', false, value, {decoration, source});
     }
 
+    /**
+     * Trigger an update to the 'contactThreshold' setting on this Controller and the Components connected to it.
+     * @param {ThresholdSetting} value The new setting value 
+     * @param {Component} source The component initiating the change. (If you're calling this method
+     * from a component, then make this `this`). 
+     * @param {*} decoration Any additional data to pass along to other Components
+     */
+    updateContactThreshold = (value, source, decoration) => {
+        this.settings.contactThreshold = value;
+        this._triggerEvent('contactThresholdChnaged', 'onContactThresholdChanged', false, value, {decoration, source});
+    }
 
     /**
      * Add a new track based on the current selection and variable. Will trigger the tracksChanged
@@ -268,7 +284,8 @@ class Controller extends EventEmitter {
                 cameraPos: s.cameraPos,
                 centerPos: s.centerPos,
                 showUnmappedSegments: s.showUnmappedSegments,
-                backgroundColor:      s.backgroundColor
+                backgroundColor:      s.backgroundColor,
+                contactThreshold:     s.contactThreshold
             },
             tracks:    this.tracks,
         });
