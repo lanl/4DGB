@@ -36,6 +36,8 @@ class Dataset {
         this.name           = d["name"];
         this.structure      = d["structure"]["id"]; 
         this.md_contact_mp  = d["structure"]["md-contact-map"];
+        this.input_set_url  = d["structure"]["input_set"];
+        this.output_set_url = d["structure"]["output_set"];
         this.epigenetics    = d["epigenetics"];
     }
 }

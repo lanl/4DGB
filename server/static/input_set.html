@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>4D Genome Browser</title>
+    <meta charset="utf-8">
+
+    <script src="gtk/js/gtk.min.js"></script>
+    <script src="gtk/js/contact_set_canvas.js"></script>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <link rel="stylesheet" href="gtk/css/ct-custom.css">
+    <link rel="stylesheet" href="gtk/css/gtk.css">
+    <link rel="stylesheet" href="gtk/css/gtkslider.css">
+    <link rel="stylesheet" href="gtk/css/tab.css">
+</head>
+
+<body>
+
+<div id="gtkbody">
+<div class="gtkheader" id="gtkheadertitle">
+    <img class="gtkicon" src="gtk/img/logo_25x25.png"></img>
+    4DGenomeBrowser
+</div>
+    <div class="gtkrow" style="justify-content: center;">
+        <div id="sidepanel" style="max-width: 300px;">
+            <h2>Input Contact Records</h2>
+            <p>
+                <b>Dataset:</b> <span id="dataset"></span>
+            </p>
+            <p>
+                This shows the set of contact records read from the input
+                Hi-C file and given to LAMMPS to create the 3D Structure.
+            </p>
+            <p>
+                Red indicates a pair of bin coordinates that was used as
+                input, while White indicates pairs that were not used. Note
+                that the actual value of the contact is not a part of the
+                LAMMPS simulation, which is why there is no gradation in the
+                plot.
+            </p>
+        </div>
+        <div id="mainpanel">
+            <div id="viewpanel" class="gtkviewerpanel">
+                <!-- Widget will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+<div class="gtkfooter">
+    Copyright (c) 2020 Los Alamos National Laboratory
+</div>
+</div> <!-- gtkbody -->
+
+<script>
+    GTK.Client.TheClient = new GTK.Client();
+
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+
+    const index = params.get("d");
+    if (index === null) {
+        throw Error("URL Parameter 'd', must be specified");
+    }
+
+    GTK.Project.getProject().then( (project) => {
+        const datasets = project.getDatasets();
+        const dataset  = new GTK.Dataset(datasets[index]);
+        const path     = `/project/${dataset.input_set_url}`;
+
+        const nametext = document.getElementById('dataset');
+        nametext.innerText = dataset.name || dataset.id;
+
+        console.log(`Creating canvas from contact set at ${path}...`);
+        new ContactSetCanvas(path, 'viewpanel');
+    });
+</script>
+
+</body>
+
+</html>

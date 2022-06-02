@@ -32,6 +32,7 @@ const Component         = require('./Component');
 const Util              = require('./Util');
 
 const { Selection, UNIT } = require('./selections');
+const Dataset = require('./Dataset');
 class ControlPanel extends Component {
 
     constructor(project, parent) {
@@ -339,6 +340,45 @@ class ControlPanel extends Component {
             }
         }
         cell.appendChild(this.clearSettings);
+
+        // intermediate data section
+        // (only included if the project datasets have that data)
+        const datasets = project.getDatasets().map( (d) => new Dataset(d) )
+        if ( datasets.every( (d)=> d.input_set_url ) ) {
+            // title
+            var row = cur_panel.insertRow(cur_row);
+            cur_row += 1;
+            var cell = row.insertCell(0);
+            cell.colSpan = 3;
+            cell.innerHTML = "Intermediate Data"
+            cell.className = "gtktitlecell";
+
+            for (let i in datasets) {
+                const dataset = datasets[i];
+                const title = dataset.name || dataset.id;
+                var row = cur_panel.insertRow(cur_row);
+                cur_row += 1;
+                cell = row.insertCell(0);
+                cell.colSpan = 1;
+                cell.innerText = `${title}:`;
+
+                // Input
+                cell = row.insertCell();
+                cell.colSpan = 1;
+                const input_link = document.createElement('a');
+                input_link.innerText = "Input set";
+                input_link.href = `/input_set.html?d=${i}`;
+                cell.appendChild(input_link);
+
+                // Output
+                cell = row.insertCell();
+                cell.colSpan = 1;
+                const output_link = document.createElement('a');
+                output_link.innerText = "Output set";
+                output_link.href = `/output_set.html?d=${i}`;
+                cell.appendChild(output_link);
+            }
+        }
 
         // create the links section
             // title

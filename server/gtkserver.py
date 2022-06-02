@@ -141,6 +141,10 @@ def root(path):
 def project():
     return send_file(PROJECT_FILE)
 
+@app.route('/project/<path:path>')
+def projectdir(path):
+    return send_from_directory(PROJECT_HOME, path)
+
 #
 # return a list of the variables available
 #
