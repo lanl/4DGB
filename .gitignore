@@ -22,8 +22,9 @@ client-py/dist/
 client-py/build/
 *.egg-info
 client-js/gtk-dist/
+client-js/dist/
 gtk.min.js
 gtkclient_*_test.json
 testing/scratch
 package-lock.json
-
+result

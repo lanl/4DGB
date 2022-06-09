@@ -12,11 +12,10 @@ module.exports = {
     externals: {
         'node-fetch': 'fetch'
     },
-    devtool: "eval-source-map",
+    devtool: process.env.NODE_ENV === "production" ? undefined : "eval-source-map",
     plugins: [
         // THREE's OrbitControls plugin requires that 'THREE' be available globally,
-        // and since we're exporting THREE globally, it feels right to just do the same
-        // with d3
+        // and since we're exporting THREE globally, it feels right to just do the same with d3
         new webpack.ProvidePlugin({
             THREE: 'three',
             d3: 'd3'

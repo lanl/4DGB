@@ -22,6 +22,7 @@ source venv/bin/activate
 pip3 install -r requirements.txt
 
 # Init npm
+cd client-js/
 npm install
 ```
 
