@@ -15,10 +15,6 @@
 #   - db_pop: Executable of the db_pop script
 #   - gtk-js: Minified GTK Javascript library
 #   - gtkserver: Executable of GTK Flask server
-#   - gtkserver-static: Static files used by gtkserver
-#   - nodeDependencies: node_modules contents for NodeJS dependencies
-#   - pybbi: Build of pybbi Python package
-#   - venv: Python environment with required packages installed
 #
 # (The GTK client python library is currently not included)
 #
@@ -58,25 +54,15 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-
-        nodePkgs = pkgs.callPackage ./nix-files/node.nix {
-          nodeEnv = (import ./nix-files/node2nix { inherit system pkgs; });
-        };
-
-        pythonPkgs = pkgs.callPackage ./nix-files/python.nix { inherit (nodePkgs) gtk-js; };
-
-      in rec {
-        packages = {
-          inherit (nodePkgs) gtk-js nodeDependencies;
-          inherit (pythonPkgs) venv pybbi gtkserver db_pop gtkserver-static;
-        };
+        myPkgs = import ./pkgs.nix { inherit pkgs; };
+      in 
+      rec {
+        # Export packages
+        packages = { inherit (myPkgs) gtkserver db_pop gtk-js; };
+        defaultPackage = packages.gtkserver;
 
         # Development environment
-        devShell = pkgs.mkShell {
-          buildInputs = with pkgs; [ python3 node2nix nodejs-14_x just ]
-            ++ [ nodePkgs.nodeShell] ++ pythonPkgs.pydeps;
-          shellHook = nodePkgs.nodeShell.shellHook;
-        };
+        devShell = myPkgs.devShell;
       }
     );
 }

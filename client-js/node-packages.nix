@@ -3996,7 +3996,7 @@ let
     name = "gtk-js";
     packageName = "gtk-js";
     version = "0.5.0";
-    src = ../../client-js;
+    src = ./.;
     dependencies = [
       sources."@ampproject/remapping-2.2.0"
       sources."@babel/code-frame-7.16.7"
