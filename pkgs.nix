@@ -103,7 +103,7 @@ let
     mkShell, python3,
     nodejs, node2nix, just
   }: with python3.pkgs; mkShell {
-    buildInputs = [ python3 node2nix nodejs just nodeEnv.shell ]
+    buildInputs = [ python3 node2nix nodejs just nodeEnv.shell pytest ]
       ++ (pydeps {inherit python3;});
     shellHook = nodeEnv.shell.shellHook;
   };

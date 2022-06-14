@@ -23,7 +23,7 @@ jobs:
     - name: Make the release 
       run: |
         pip install pandas
-        npm install
+        (cd client-js && npm install)
         ./bin/make_release test.00
     - name: Install dependencies
       run: |
@@ -38,4 +38,4 @@ jobs:
         python3 release/test.00/server/gtkserver.py &
         sleep 5
         echo 'running javascript test'
-        npm run test testing/selection.test.js
+        (cd client-js && npm run test --detectOpenHandles tests/selection.test.js)

@@ -23,7 +23,7 @@ jobs:
     - name: Make the release 
       run: |
         pip install pandas
-        npm install
+        (cd client-js && npm install)
         ./bin/make_release test.00
     - name: Install dependencies
       run: |

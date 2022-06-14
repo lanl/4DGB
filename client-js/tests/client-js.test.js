@@ -1,4 +1,4 @@
-const Client = require('../client-js/GTK/Client.js');
+const Client = require('../GTK/Client.js');
 var fs = require('fs');
 
 //

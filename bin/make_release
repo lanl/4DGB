@@ -78,7 +78,7 @@ mkdir -p "$DEST/server" "$DEST/gentk"
 
 echo ""
 echo "Building Javascript library ..."
-npx webpack --config client-js/webpack.config.js
+(cd client-js && npx webpack)
 cp  client-js/gtk-dist/gtk.min.js server/static/gtk/js/gtk.min.js
 
 echo ""
