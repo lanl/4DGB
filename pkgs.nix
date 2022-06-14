@@ -57,7 +57,7 @@ let
     '';
   };
 
-  gtk-version = pkgs.lib.strings.fileContents server/version.md;
+  gtk-version = pkgs.lib.strings.fileContents ./server/version.md;
 
   # gtkserver static files
   gtkserver-static = pkgs.runCommandLocal "gtkserver-static" {
@@ -87,14 +87,16 @@ let
   '';
 
   # db_pop executable
-  # (well, a wrapper that executes it with the GTK_VERSION variable set)
-  db_pop = { python3 }: pkgs.writeShellScriptBin "db_pop" (
-  let
-    py = venv {inherit python3;};
-    db_pop = ./bin/db_pop;
-  in ''
-    GTK_VERSION=${gtk-version} ${py}/bin/python3 ${db_pop} "$@"
-  '');
+  db_pop = { python3 }: pkgs.runCommandLocal "db_pop" {
+    src = ./bin/db_pop;
+    versionfile = ./server/version.md;
+    venv = venv {inherit python3;};
+  } ''
+    mkdir -p $out/bin $out/server
+    ln -s $versionfile $out/server/version.md
+    substitute $src $out/bin/db_pop --replace "#!/usr/bin/env python3" "#!''${venv}/bin/python3"
+    chmod +x $out/bin/db_pop
+  '';
 
   # Development shell
   devShell = { 

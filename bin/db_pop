@@ -12,6 +12,10 @@ import pandas as pd
 # handle command line arguments
 #
 project = ""
+server_dir = os.path.join(
+    os.path.dirname(__file__),
+    '..', 'server'
+)
 if len(sys.argv) < 2:
     print("ERROR: must include path to project directory")
     exit(1)
@@ -48,20 +52,9 @@ with open(os.path.join(project, "project.json")) as jdata:
 # ---------------------------------------------------------------------------
 # get the current version
 gtkversion = None
-versionfile = os.path.join(
-    os.path.dirname(__file__),
-    '..','server','version.md'
-)
-if os.path.exists(versionfile):
-    with open(versionfile, "r") as vfile:
-        gtkversion = vfile.readline().strip()
-elif 'GTK_VERSION' in os.environ:
-    gtkversion = os.environ.get('GTK_VERSION')
-else:
-    print("ERROR: Could not determine GTK version number. Please set the 'GTK_VERSION' environment variable")
-    exit(1)
+with open(os.path.join(server_dir, "version.md"), "r") as vfile:
+    gtkversion = vfile.readline().strip()
 
-print(f"Version: {gtkversion}")
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS gtk''')
     # create the table 
