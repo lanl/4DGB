@@ -364,19 +364,11 @@ class ControlPanel extends Component {
 
                 // Input
                 cell = row.insertCell();
-                cell.colSpan = 1;
+                cell.colSpan = 2;
                 const input_link = document.createElement('a');
-                input_link.innerText = "Input set";
-                input_link.href = `/input_set.html?d=${i}`;
+                input_link.innerText = "Input/Output Contact Records";
+                input_link.href = `/contact_set.html?d=${i}`;
                 cell.appendChild(input_link);
-
-                // Output
-                cell = row.insertCell();
-                cell.colSpan = 1;
-                const output_link = document.createElement('a');
-                output_link.innerText = "Output set";
-                output_link.href = `/output_set.html?d=${i}`;
-                cell.appendChild(output_link);
             }
         }
 

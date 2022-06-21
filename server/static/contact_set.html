@@ -25,27 +25,41 @@
 </div>
     <div class="gtkrow" style="justify-content: center;">
         <div id="sidepanel" style="max-width: 300px;">
-            <h2>Output Contact Records</h2>
+            <h2>Input/Output Contact Records</h2>
             <p>
                 <b>Dataset:</b> <span id="dataset"></span>
             </p>
             <p>
-                This shows the set of contact records read from the output
-                of the LAMMPS simulation defining the 3D Structure. In
-                particular, these "contacts" represent the points that were
-                closer to each other than the '<em>distance_threshold</em>'
-                defined in the project settings.
+                This shows the set of contact records read from the input
+                Hi-C file and given to LAMMPS to create the 3D Structure
+                alongside the set of contacts in the structure output by
+                LAMMPS.
             </p>
             <p>
-                Red indicates a pair of bin coordinates that were included, 
-                while White indicates pairs that were not included. Note
+                Red indicates a pair of bin coordinates that was used as
+                input, while White indicates pairs that were not used. Note
                 that the actual value of the contact is not a part of the
-                data, which is why there is no gradation in the
+                LAMMPS simulation, which is why there is no gradation in the
                 plot.
             </p>
+            <p>
+                For the input set, these are all of the contact records whose
+                value has greater than the '<em>count_threshold</em>' defined
+                in the project settings. For the output set, these are all of
+                the points in the structure that were closer to eachother than
+                the '<em>distance_threshold</em>' defined in the project
+                settings
+            </p>
         </div>
-        <div id="mainpanel">
-            <div id="viewpanel" class="gtkviewerpanel">
+        <div>
+            <div id="inpanel" class="gtkviewerpanel">
+                <div class="gtktitle">Input Set</div>
+                <!-- Widget will be inserted here -->
+            </div>
+        </div>
+        <div>
+            <div id="outpanel" class="gtkviewerpanel">
+                <div class="gtktitle">Output Set</div>
                 <!-- Widget will be inserted here -->
             </div>
         </div>
@@ -70,13 +84,14 @@
     GTK.Project.getProject().then( (project) => {
         const datasets = project.getDatasets();
         const dataset  = new GTK.Dataset(datasets[index]);
-        const path     = `/project/${dataset.output_set_url}`;
+        const inpath   = `/project/${dataset.input_set_url}`;
+        const outpath  = `/project/${dataset.output_set_url}`;
 
         const nametext = document.getElementById('dataset');
         nametext.innerText = dataset.name || dataset.id;
 
-        console.log(`Creating canvas from contact set at ${path}...`);
-        new ContactSetCanvas(path, 'viewpanel');
+        new ContactSetCanvas(inpath, 'inpanel');
+        new ContactSetCanvas(outpath, 'outpanel');
     });
 </script>
 
