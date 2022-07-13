@@ -334,10 +334,9 @@ class ControlPanel extends Component {
                 const store = window.localStorage;
                 const key = `settings_${params.get('gtkproject')}`;
                 store.removeItem(key);
-
-                // Refresh page
-                window.location.reload();
             }
+            // Refresh page
+            window.location.reload();
         }
         cell.appendChild(this.clearSettings);
 
