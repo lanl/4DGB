@@ -33,7 +33,7 @@
 #   Just remember to remove it when you're done!
 #
 {
-  description = "Python module for processing Hi-C files through LAMMPS";
+  description = "4D Genome Browser";
 
   inputs = {
     # Nixpkgs
