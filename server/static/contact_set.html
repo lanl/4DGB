@@ -30,6 +30,17 @@
                 <b>Dataset:</b> <span id="dataset"></span>
             </p>
             <p>
+                <h4>Project Settings</h4>
+                <ul>
+                    <li><b>Chromosome:</b> <span id="chromosome"></span></li>
+                    <li><b>Count threshold:</b> <span id="count"></span></li>
+                    <li><b>Distance threshold:</b> <span id="distance"></span></li>
+                    <li><b>Resolution:</b> <span id="resolution"></span></li>
+                    <li><b>Bond Coefficient:</b> <span id="bond"></span></li>
+                    <li><b>Timesteps:</b> <span id="timesteps"></span></li>
+                </ul>
+            </p>
+            <p>
                 This shows the set of contact records read from the input
                 Hi-C file and given to LAMMPS to create the 3D Structure
                 alongside the set of contacts in the structure output by
@@ -86,9 +97,21 @@
         const dataset  = new GTK.Dataset(datasets[index]);
         const inpath   = `/project/${dataset.input_set_url}`;
         const outpath  = `/project/${dataset.output_set_url}`;
+        const settingspath = `/project/${dataset.settings_url}`;
 
         const nametext = document.getElementById('dataset');
         nametext.innerText = dataset.name || dataset.id;
+
+        fetch(settingspath)
+            .then( (response) => response.json() )
+            .then( (settings) => {
+                document.getElementById('chromosome').innerText = settings.chromosome;
+                document.getElementById('count').innerText      = settings.count_threshold;
+                document.getElementById('distance').innerText   = settings.distance_threshold;
+                document.getElementById('resolution').innerText = settings.resolution;
+                document.getElementById('bond').innerText       = settings.bond_coeff;
+                document.getElementById('timesteps').innerText  = settings.timesteps;
+            });
 
         new ContactSetCanvas(inpath, 'inpanel');
         new ContactSetCanvas(outpath, 'outpanel');
