@@ -55,6 +55,7 @@ class GeometryCanvas extends Component {
         this.unmapped = [];
         this.loaded = false;
         this.setDataset(dataset);
+        this.dirLight;
 
         // bind this pointer to appropriate class methods
         this.postLoad = this.postLoad.bind(this);
@@ -160,7 +161,7 @@ class GeometryCanvas extends Component {
             curLight = lights[l];
             if (curLight["type"] == "directional") {
                 light = new THREE.DirectionalLight(curLight["color"], curLight["intensity"]);
-                light.position.set(curLight["position"][0], curLight["position"][1], curLight["position"][2] );
+                // light.position.set(curLight["position"][0], curLight["position"][1], curLight["position"][2] );
                 if ("shadow" in curLight) {
                     light.castShadow            = curLight["shadow"]["castshadow"];
                     light.shadow.camera.near    = curLight["shadow"]["camera"]["near"];
@@ -181,6 +182,10 @@ class GeometryCanvas extends Component {
                     this.scene.add(lighthelper);
                 }
                 this.scene.add(light);
+                this.dirLight = light;
+                this.controls.addEventListener('change', () => {
+                    this.dirLight.position.copy( this.camera.position );
+                });
                 
             } else if (curLight["type"] == "point") {
                 var light = new THREE.PointLight(curLight["color"], curLight["intensity"], curLight["distance"], curLight["decay"]);
@@ -232,6 +237,7 @@ class GeometryCanvas extends Component {
         this.camera.position.fromArray(value);
         this.camera.lookAt(this.controls.target);
         this.camera.updateProjectionMatrix();
+        this.dirLight.position.copy( this.camera.position );
         this.render();
     }
 
