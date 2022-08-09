@@ -305,7 +305,7 @@ class GeometryCanvas extends Component {
 
     /**
      * Respond to a mouse click on the canvas. If a segment is clicked on,
-     * sets a new center of rotation.
+     * select that segment
      * @param {MouseEvent} event 
      */
     onMouseClick(event) {
@@ -332,13 +332,12 @@ class GeometryCanvas extends Component {
 
         if (intersections.length > 0) {
             const i = intersections[0];
-            // Uncomment to set selection to clicked segment
-            /*
             const seg = this.geometry.meshesToSegments[i.object.uuid];
             const selection = Selection.fromSegments( Util.valuesToRanges([seg]) );
             this.controller.updateSelection(selection, this);
-            */
-            this.controller.updateCenterPosition( i.point.toArray() );
+
+            // Uncomment to also set a new center-of-rotation for the camera
+            //this.controller.updateCenterPosition( i.point.toArray() );
         }
     }
 
