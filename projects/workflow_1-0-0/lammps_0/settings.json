@@ -1,0 +1,1 @@
+{"chromosome": "chr22", "count_threshold": 2.0, "distance_threshold": 3.3, "resolution": 200000, "bond_coeff": 55, "timesteps": 1000000}

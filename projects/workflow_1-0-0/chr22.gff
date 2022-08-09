@@ -1,0 +1,20 @@
+chr22	BestRefSeq Gnomon	gene	21549447	21624034	.	+	.	ID=gene-UBE2L3;Dbxref=GeneID:7332,HGNC:HGNC:12488,MIM:603721;Name=UBE2L3;description=ubiquitin conjugating enzyme E2 L3;gbkey=Gene;gene=UBE2L3;biotype=protein_coding;gene_synonym=E2-F1,L-UBC,UBCH7,UbcM4
+chr22	Gnomon	gene	22402797	22409381	.	-	.	ID=gene-LOC101929255;Dbxref=GeneID:101929255;Name=LOC101929255;gbkey=Gene;gene=LOC101929255;biotype=lncRNA
+chr22	Curated Genomic	gene	22910570	22910607	.	+	.	ID=gene-IGLJ4;Dbxref=GeneID:28830,HGNC:HGNC:5866,IMGT/GENE-DB:IGLJ4;Name=IGLJ4;description=immunoglobulin lambda joining 4 (non-functional);gbkey=Gene;gene=IGLJ4;biotype=J_segment
+chr22	BestRefSeq	gene	21354613	21358067	.	+	.	ID=gene-LINC01651;Dbxref=GeneID:105372944,HGNC:HGNC:52439;Name=LINC01651;description=long intergenic non-protein coding RNA 1651;gbkey=Gene;gene=LINC01651;biotype=lncRNA
+chr22	BestRefSeq	gene	41551709	41560883	.	-	.	ID=gene-LOC105373044;Dbxref=GeneID:105373044;Name=LOC105373044;description=uncharacterized LOC105373044;gbkey=Gene;gene=LOC105373044;biotype=lncRNA
+chr22	BestRefSeq Gnomon	gene	25742133	26063847	.	+	.	ID=gene-MYO18B;Dbxref=GeneID:84700,HGNC:HGNC:18150,MIM:607295;Name=MYO18B;description=myosin XVIIIB;gbkey=Gene;gene=MYO18B;biotype=protein_coding;gene_synonym=KFS4
+chr22	BestRefSeq	gene	30331988	30356894	.	-	.	ID=gene-SF3A1;Dbxref=GeneID:10291,HGNC:HGNC:10765,MIM:605595;Name=SF3A1;description=splicing factor 3a subunit 1;gbkey=Gene;gene=SF3A1;biotype=protein_coding;gene_synonym=PRP21,PRPF21,SAP114,SF3A120
+chr22	BestRefSeq Gnomon	gene	29073035	29168333	.	+	.	ID=gene-KREMEN1;Dbxref=GeneID:83999,HGNC:HGNC:17550,MIM:609898;Name=KREMEN1;description=kringle containing transmembrane protein 1;gbkey=Gene;gene=KREMEN1;biotype=protein_coding;gene_synonym=ECTD13,KREMEN,KRM1
+chr22	Gnomon	gene	32587214	32589050	.	+	.	ID=gene-LOC105373003;Dbxref=GeneID:105373003;Name=LOC105373003;gbkey=Gene;gene=LOC105373003;biotype=lncRNA
+chr22	BestRefSeq	gene	40410289	40636719	.	-	.	ID=gene-MRTFA;Dbxref=GeneID:57591,HGNC:HGNC:14334,MIM:606078;Name=MRTFA;description=myocardin related transcription factor A;gbkey=Gene;gene=MRTFA;biotype=protein_coding;gene_synonym=BSAC,MAL,MKL,MKL1,MRTF-A
+chr22	BestRefSeq Gnomon	gene	50502949	50507781	.	-	.	ID=gene-LMF2;Dbxref=GeneID:91289,HGNC:HGNC:25096;Name=LMF2;description=lipase maturation factor 2;gbkey=Gene;gene=LMF2;biotype=protein_coding;gene_synonym=TMEM112B,TMEM153
+chr22	BestRefSeq	gene	29883174	30030868	.	+	.	ID=gene-MTMR3;Dbxref=GeneID:8897,HGNC:HGNC:7451,MIM:603558;Name=MTMR3;description=myotubularin related protein 3;gbkey=Gene;gene=MTMR3;biotype=protein_coding;gene_synonym=FYVE-DSP1,ZFYVE10
+chr22	BestRefSeq Gnomon	gene	45163925	45188017	.	+	.	ID=gene-NUP50;Dbxref=GeneID:10762,HGNC:HGNC:8065,MIM:604646;Name=NUP50;description=nucleoporin 50;gbkey=Gene;gene=NUP50;biotype=protein_coding;gene_synonym=NPAP60,NPAP60L
+chr22	Gnomon	gene	44624078	44624792	.	+	.	ID=gene-LOC105373060;Dbxref=GeneID:105373060;Name=LOC105373060;gbkey=Gene;gene=LOC105373060;biotype=lncRNA
+chr22	Gnomon	gene	20226945	20235971	.	+	.	ID=gene-LOC105372863;Dbxref=GeneID:105372863;Name=LOC105372863;gbkey=Gene;gene=LOC105372863;biotype=lncRNA
+chr22	Gnomon	gene	29455287	29480046	.	-	.	ID=gene-LOC107985541;Dbxref=GeneID:107985541;Name=LOC107985541;gbkey=Gene;gene=LOC107985541;biotype=lncRNA
+chr22	Gnomon	gene	50541383	50543005	.	+	.	ID=gene-LOC102724608;Dbxref=GeneID:102724608;Name=LOC102724608;gbkey=Gene;gene=LOC102724608;biotype=lncRNA
+chr22	BestRefSeq	gene	23573125	23580290	.	-	.	ID=gene-IGLL1;Dbxref=GeneID:3543,HGNC:HGNC:5870,MIM:146770;Name=IGLL1;description=immunoglobulin lambda like polypeptide 1;gbkey=Gene;gene=IGLL1;biotype=protein_coding;gene_synonym=14.1,AGM2,CD179b,IGL1,IGL5,IGLJ14.1,IGLL,IGO,IGVPB,VPREB2
+chr22	Curated Genomic	gene	22214807	22215271	.	+	.	ID=gene-IGLV10-54;Dbxref=GeneID:28772,HGNC:HGNC:5884,IMGT/GENE-DB:IGLV10-54;Name=IGLV10-54;description=immunoglobulin lambda variable 10-54;gbkey=Gene;gene=IGLV10-54;biotype=V_segment;gene_synonym=IGLV1054,V1-20
+chr22	Gnomon	gene	42895527	42896869	.	+	.	ID=gene-LOC107985550;Dbxref=GeneID:107985550;Name=LOC107985550;gbkey=Gene;gene=LOC107985550;biotype=lncRNA

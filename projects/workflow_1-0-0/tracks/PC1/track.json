@@ -1,0 +1,22 @@
+{
+"name"      : "PC1",
+"type"      : "structure",
+"version"   : "0.1",
+"tags"      : [],
+"data"      : {
+    "type"  : "float",
+    "dim"   : 1,
+    "min"   : -0.1402542181774382,
+    "max"   : 0.1395253669450473,
+    "values" : [
+        {
+            "id"  : "arr_0",
+            "url" : "tracks/PC1/track.npz"
+        },
+        {
+            "id"  : "arr_1",
+            "url" : "tracks/PC1/track.npz"
+        }
+    ]
+}
+}
