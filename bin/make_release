@@ -86,6 +86,7 @@ echo "Copying files ..."
 
 # Server and served content
 cp -a server/static "$DEST/server/static"
+sed -i.bak "s/GTK_PROJECT_NAME/$PROJECT/" "$DEST/server/static/index.html"
 cp server/{gtkserver.py,requirements.txt} "$DEST/server"
 cp -a "$SRC" "$DEST/server/static/project"
 
