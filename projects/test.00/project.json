@@ -77,8 +77,8 @@
     "structure": [
         {
             "id": 0,
-            "description": "pdb structure file",
-            "url": "source/0/test.pdb",
+            "description": "csv structure file",
+            "url": "source/0/test.csv",
             "type" : {
                 "name" : "gtk-estimated",
                 "version" : "0.1"
@@ -90,8 +90,8 @@
         },
         {
             "id": 1,
-            "description": "pdb structure file",
-            "url": "source/1/test.pdb",
+            "description": "csv structure file",
+            "url": "source/1/test.csv",
             "type" : {
                 "name" : "gtk-estimated",
                 "version" : "0.1"
