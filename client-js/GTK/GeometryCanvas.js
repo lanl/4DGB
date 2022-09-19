@@ -94,9 +94,9 @@ class GeometryCanvas extends Component {
         // var groot  = document.createElement("td");
         // gtkroot.appendChild(groot);
 
-        var contdiv = document.createElement("div");
-        contdiv.className = "gtkviewcontainer";
-        gtkroot.appendChild(contdiv);
+        this.composite = document.createElement("div");
+        this.composite.className = "gtkviewcontainer";
+        gtkroot.appendChild(this.composite);
 
         var canvas_idstring = "gtkgeometry-" + this.dataset.id.toString();
         this.canvas = document.createElement("canvas");
@@ -104,10 +104,14 @@ class GeometryCanvas extends Component {
         this.canvas.id = canvas_idstring; 
         this.canvas.width  = gdata["width"];
         this.canvas.height = gdata["height"];
-        contdiv.appendChild(this.canvas);
+        this.composite.appendChild(this.canvas);
 
         // renderer
-        this.renderer = new THREE.WebGLRenderer({canvas: this.canvas, antialias: true});
+        this.renderer = new THREE.WebGLRenderer({
+                                                    canvas: this.canvas, 
+                                                    preserveDrawingBuffer: true,
+                                                    antialias: true
+                                                });
         this.renderer.shadowMap.enabled = true;
 
         // camera
@@ -202,7 +206,7 @@ class GeometryCanvas extends Component {
         }
 
         // axes
-        this.axesCanvas = new AxesCanvas(contdiv, this.camera);
+        this.axesCanvas = new AxesCanvas(this.composite, this.camera);
 
         // load data
         this.geometry = new Structure(this.dataset.structure, gdata["geometry"]);
@@ -213,7 +217,7 @@ class GeometryCanvas extends Component {
         // this.geometry.load( this.dataset.id, this );
 
         // scalar bar
-        this.scalarBarCanvas = new ScalarBarCanvas(contdiv);
+        this.scalarBarCanvas = new ScalarBarCanvas(this.composite);
             // share the geometry's LUT
         this.scalarBarCanvas.setLUT(this.geometry.LUT);
     }
@@ -398,6 +402,22 @@ class GeometryCanvas extends Component {
         }
     }
 
+    //
+    // capture an image of the webgl window, including axes and colorbar
+    // we must use html2canvas because there are several elements composed
+    // together that make up the image that the user is expecting.
+    //
+    onCaptureImages(value, options) {
+        html2canvas(this.composite).then(function(canvas) {
+            var url = canvas.toDataURL("image/png")
+            // create a temporary link that can download the image
+            var link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('target', '_blank');
+            link.setAttribute('download', "image.png");
+            link.click();
+        });
+    }
 }
 
 module.exports = GeometryCanvas;

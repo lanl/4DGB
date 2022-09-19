@@ -18,7 +18,8 @@ module.exports = {
         // and since we're exporting THREE globally, it feels right to just do the same with d3
         new webpack.ProvidePlugin({
             THREE: 'three',
-            d3: 'd3'
+            d3: 'd3',
+            html2canvas: 'html2canvas'
         })
     ]
 }

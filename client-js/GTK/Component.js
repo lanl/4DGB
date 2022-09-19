@@ -120,6 +120,10 @@ class Component extends EventEmitter {
      */
     onContactThresholdChanged(value, options) {}
 
+     /**
+      */
+    onCaptureImages(value, options) {}
+
 }
 
 module.exports = Component;

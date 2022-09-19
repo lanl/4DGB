@@ -340,34 +340,48 @@ class ControlPanel extends Component {
         }
         cell.appendChild(this.clearSettings);
 
+        // capture image button 
+        row = cur_panel.insertRow(cur_row);
+        cur_row += 1;
+        cell = row.insertCell(0);
+        cell.colSpan = 3;
+        this.captureImages = document.createElement('button');
+        this.captureImages.innerText = "Capture Images";
+        this.captureImages.onclick = () => {
+            this.controller.captureImages()
+        };
+        cell.appendChild(this.captureImages);
+
         // intermediate data section
         // (only included if the project datasets have that data)
-        const datasets = project.getDatasets().map( (d) => new Dataset(d) )
-        if ( datasets.every( (d)=> d.input_set_url ) ) {
-            // title
-            var row = cur_panel.insertRow(cur_row);
-            cur_row += 1;
-            var cell = row.insertCell(0);
-            cell.colSpan = 3;
-            cell.innerHTML = "Intermediate Data"
-            cell.className = "gtktitlecell";
-
-            for (let i in datasets) {
-                const dataset = datasets[i];
-                const title = dataset.name || dataset.id;
+        if (false) {
+            const datasets = project.getDatasets().map( (d) => new Dataset(d) )
+            if ( datasets.every( (d)=> d.input_set_url ) ) {
+                // title
                 var row = cur_panel.insertRow(cur_row);
                 cur_row += 1;
-                cell = row.insertCell(0);
-                cell.colSpan = 1;
-                cell.innerText = `${title}:`;
+                var cell = row.insertCell(0);
+                cell.colSpan = 3;
+                cell.innerHTML = "Intermediate Data"
+                cell.className = "gtktitlecell";
 
-                // Input
-                cell = row.insertCell();
-                cell.colSpan = 2;
-                const input_link = document.createElement('a');
-                input_link.innerText = "Input/Output Contact Records";
-                input_link.href = `/contact_set.html?d=${i}`;
-                cell.appendChild(input_link);
+                for (let i in datasets) {
+                    const dataset = datasets[i];
+                    const title = dataset.name || dataset.id;
+                    var row = cur_panel.insertRow(cur_row);
+                    cur_row += 1;
+                    cell = row.insertCell(0);
+                    cell.colSpan = 1;
+                    cell.innerText = `${title}:`;
+
+                    // Input
+                    cell = row.insertCell();
+                    cell.colSpan = 2;
+                    const input_link = document.createElement('a');
+                    input_link.innerText = "Input/Output Contact Records";
+                    input_link.href = `/contact_set.html?d=${i}`;
+                    cell.appendChild(input_link);
+                }
             }
         }
 

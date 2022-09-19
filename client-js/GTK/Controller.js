@@ -402,6 +402,13 @@ class Controller extends EventEmitter {
         }, 500);
         // ^^^ (that's 500 milliseconds)
     }
+
+     /**
+     * Trigger an update to the `captureImages` setting on this Controller and Components connected to it.
+     */
+    captureImages = (value, source, decoration) => {
+        this._triggerEvent('captureImages', 'onCaptureImages', true, value, {decoration, source});
+    }
 }
 
 module.exports = Controller;

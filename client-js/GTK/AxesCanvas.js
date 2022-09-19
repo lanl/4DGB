@@ -51,7 +51,11 @@ class AxesCanvas {
         this.canvas.height = height; 
         contdiv.appendChild(this.canvas);
 
-        this.renderer = new THREE.WebGLRenderer( {canvas: this.canvas, alpha: true } );
+        this.renderer = new THREE.WebGLRenderer({
+                                                    canvas: this.canvas, 
+                                                    preserveDrawingBuffer: true,
+                                                    alpha: true
+                                                });
         this.renderer.setClearColor( AxesCanvas.ClearColor, 0 );
         this.renderer.setClearAlpha( AxesCanvas.ClearAlpha );
 

@@ -23,6 +23,7 @@
         "d3": "^7.0.0",
         "debounce": "^1.2.1",
         "events": "^3.3.0",
+        "html2canvas": "^1.4.1",
         "node-fetch": "^2.6.1",
         "three": "^0.131.3",
         "xmlhttprequest": "^1.8.0",
