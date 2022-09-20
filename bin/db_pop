@@ -62,6 +62,18 @@ c.execute('''DROP TABLE IF EXISTS gtk''')
 c.execute('''CREATE TABLE gtk (version TEXT)''')
 c.execute('''INSERT INTO gtk (version) VALUES(?)''', [gtkversion])
 
+# ---------------------------------------------------------------------------
+# USER table
+# ---------------------------------------------------------------------------
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS user''')
+    # create the table 
+c.execute('''CREATE TABLE user (givenname TEXT, familyname TEXT, login TEXT)''')
+u = jsondata["project"]["creator"]
+c.execute('''INSERT INTO user (givenname,familyname,login) VALUES(?,?,?)''', [u['givenName'], u['familyName'], u['login']])
+print("Creating user table ...")
+print("")
+
 
 # ---------------------------------------------------------------------------
 # PROJECT table
@@ -69,10 +81,10 @@ c.execute('''INSERT INTO gtk (version) VALUES(?)''', [gtkversion])
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS project''')
     # create the table 
-c.execute('''CREATE TABLE project (projid TEXT, name TEXT, description TEXT, interval INT)''')
+c.execute('''CREATE TABLE project (projid TEXT, name TEXT, creator TEXT, description TEXT, interval INT)''')
 p = jsondata["project"]
 projid = p['id']
-c.execute('''INSERT INTO project (projid,name,description,interval) VALUES(?,?,?,?)''', [p['id'], p['name'], p['description'], p['interval']])
+c.execute('''INSERT INTO project (projid,name,creator,description,interval) VALUES(?,?,?,?,?)''', [p['id'], p['name'], u['login'], p['description'], p['interval']])
 print("Creating project table ...")
 print("")
 
@@ -336,7 +348,7 @@ if os.path.isfile(annotations_file):
     print("    processing annotations file: {}".format(annotations_file))
     df = pd.read_csv(annotations_file)
     for e in df.to_dict(orient='records'):
-        c.execute(insert, [ int(e['start']), int(e['end']), 
+        c.execute(insert, [ projid, int(e['start']), int(e['end']), 
                             int(e['end']) - int(e['start']),
                             e['id'], e['type'], e['name'] ] 
                  )

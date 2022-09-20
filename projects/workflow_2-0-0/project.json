@@ -5,9 +5,11 @@
     "project": {
         "name": "workflow_2-0-0",
         "creator": {
+            "givenName": "David",
+            "familyName": "Rogers",
             "login": "dhr"
         },
-        "id": "ABCDEFGHIJKL",
+        "id": "workflow200",
         "description": "",
         "interval": 200000,
         "created": ""

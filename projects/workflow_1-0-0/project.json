@@ -5,9 +5,11 @@
     "project": {
         "name": "example_project",
         "creator": {
-            "givenName": "",
-            "familyName": ""
+            "givenName": "David",
+            "familyName": "Rogers",
+            "login": "dhr"
         },
+        "id": "workflow100",
         "description": "",
         "interval": 200000,
         "created": ""
