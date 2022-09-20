@@ -1,17 +1,20 @@
 {
 
 "schema": {
-    "version": "0.5"
+    "version": "2.0"
 },
 
 "project": { 
     "name": "Test Project",
     "creator": {
-        "givenName" : "David",
-        "familyName" : "Rogers"
+        "givenName"     : "David",
+        "familyName"    : "Rogers",
+        "login"         : "dhr"
     },
-    "interval"  : 400000,
-    "created"   : "2021-04-20T20:20:39+00:00"
+    "id"            : "test00projid",
+    "description"   : "automatically generated dataset for testing",
+    "interval"      : 400000,
+    "created"       : "2021-04-20T20:20:39+00:00"
 },
 
 "data" : {

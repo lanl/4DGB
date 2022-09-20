@@ -7,12 +7,14 @@
 "project": { 
     "name": "Test Project:Generated Sequence",
     "creator": {
-        "givenName" : "David",
-        "familyName" : "Rogers"
+        "givenName"     : "David",
+        "familyName"    : "Rogers",
+        "login"         : "dhr"
     },
-    "description" : "automatically generated dataset for testing",
-    "interval" : 200000,
-    "created" : "Wed Sep 22 10:00:00 MDT 2021"
+    "id"            : "test01projid",
+    "description"   : "automatically generated dataset for testing",
+    "interval"      : 200000,
+    "created"       : "Wed Sep 22 10:00:00 MDT 2021"
 },
 
 "data" : {
