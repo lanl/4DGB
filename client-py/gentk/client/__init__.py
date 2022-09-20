@@ -8,6 +8,7 @@ class client:
         self.port = port
         self.url  = url
         self.project = ""
+        self.projid  = ""
 
         self.session = requests.Session()
 
@@ -21,6 +22,14 @@ class client:
     @project.setter
     def project(self, value):
         self._project = value
+
+    @property
+    def projid(self):
+        return self._projid
+
+    @projid.setter
+    def projid(self, value):
+        self._projid = value
 
     @property
     def url(self):
@@ -53,7 +62,7 @@ class client:
         return response.json()
 
     def get_project_interval(self):
-        return self._request('project/interval')
+        return self._request(f'project/{self.projid}/interval')
 
     def get_structure(self, structureID):
         return self._request(f'data/structure/{structureID}/segments')
@@ -62,7 +71,7 @@ class client:
         return self._request(f'data/structure/{structureID}/unmapped')
 
     def get_genes(self):
-        return self._request('genes')
+        return self._request(f'{self.projid}/genes')
 
     def get_gene_metadata(self, gene):
         return self._request(f'gene/{gene}')

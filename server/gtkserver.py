@@ -332,19 +332,24 @@ def ContactMap(identifier):
 #
 # get the project-wide interval
 #
-@app.route('/project/interval')
-def ProjectInterval():
-    return jsonify(get_dataset_interval())
+@app.route('/project/<projid>/interval')
+def ProjectInterval(projid):
+    conn = db_connect.connect()
+
+    query = conn.execute("SELECT interval FROM project WHERE projid == ?", [projid])
+    results = query.cursor.fetchone()
+
+    return jsonify(results[0])
 
 #
 # get all genes in a project
 #
-@app.route('/genes')
-def Genes():
+@app.route('/<projid>/genes')
+def Genes(projid):
     # return all genes
     conn = db_connect.connect()
 
-    query = conn.execute("SELECT DISTINCT gene_name from genes ORDER BY gene_name")
+    query = conn.execute("SELECT DISTINCT gene_name from genes WHERE projid == ? ORDER BY gene_name", [projid])
     genes = []
     for g in query.cursor.fetchall():
         genes.append(g[0])
