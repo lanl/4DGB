@@ -5,13 +5,13 @@
 },
 
 "project": { 
-    "name": "Test Project",
+    "id"    : "test00projid",
+    "name"  : "Test Project",
     "creator": {
         "givenName"     : "David",
         "familyName"    : "Rogers",
         "login"         : "dhr"
     },
-    "id"            : "test00projid",
     "description"   : "automatically generated dataset for testing",
     "interval"      : 400000,
     "created"       : "2021-04-20T20:20:39+00:00"

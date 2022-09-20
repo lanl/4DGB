@@ -3,13 +3,13 @@
         "version": "0.5"
     },
     "project": {
+        "id": "workflow100",
         "name": "example_project",
         "creator": {
             "givenName": "David",
             "familyName": "Rogers",
             "login": "dhr"
         },
-        "id": "workflow100",
         "description": "",
         "interval": 200000,
         "created": ""
