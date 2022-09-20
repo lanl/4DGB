@@ -95,7 +95,6 @@ cp server/license.md "$DEST"
 echo ""
 echo "Copying gentk python package ..."
 cp -a client-py/gentk "$DEST/gentk"
-cp client-py/requirements.txt client-py/genex "$DEST"
 
 echo ""
 echo "Done!"

@@ -4,9 +4,11 @@ import math
 Test = "test.00"
 Url  = "http://127.0.0.1"
 Port = "8000"
+ID   = "test00projid"
 
 client = gentk.client.client(Url, Port)
 client.project = Test
+client.projid  = ID
 
 def test_gene_query():
     interval = client.get_project_interval() 
