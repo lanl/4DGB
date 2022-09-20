@@ -1,0 +1,20 @@
+{
+    "arrays": [
+        {
+            "id": 0,
+            "url": "/project/.build/tracks/ATAC/track.json"
+        },
+        {
+            "id": 1,
+            "url": "/project/.build/tracks/H3K27ac/track.json"
+        },
+        {
+            "id": 2,
+            "url": "/project/.build/tracks/H3K9me3/track.json"
+        },
+        {
+            "id": 3,
+            "url": "/project/.build/tracks/PC1/track.json"
+        }
+    ]
+}

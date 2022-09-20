@@ -1,0 +1,22 @@
+{
+"name"      : "H3K27ac",
+"type"      : "structure",
+"version"   : "0.1",
+"tags"      : [],
+"data"      : {
+    "type"  : "float",
+    "dim"   : 1,
+    "min"   : 0.0,
+    "max"   : 2.50863,
+    "values" : [
+        {
+            "id"  : "arr_0",
+            "url" : "tracks/H3K27ac/track.npz"
+        },
+        {
+            "id"  : "arr_1",
+            "url" : "tracks/H3K27ac/track.npz"
+        }
+    ]
+}
+}

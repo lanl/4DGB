@@ -1,0 +1,22 @@
+{
+"name"      : "H3K9me3",
+"type"      : "structure",
+"version"   : "0.1",
+"tags"      : [],
+"data"      : {
+    "type"  : "float",
+    "dim"   : 1,
+    "min"   : 0.0,
+    "max"   : 0.417485,
+    "values" : [
+        {
+            "id"  : "arr_0",
+            "url" : "tracks/H3K9me3/track.npz"
+        },
+        {
+            "id"  : "arr_1",
+            "url" : "tracks/H3K9me3/track.npz"
+        }
+    ]
+}
+}

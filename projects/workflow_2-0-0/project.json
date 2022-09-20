@@ -1,0 +1,244 @@
+{
+    "schema": {
+        "version": "2.0"
+    },
+    "project": {
+        "name": "workflow_2-0-0",
+        "creator": {
+            "login": "dhr"
+        },
+        "id": "ABCDEFGHIJKL",
+        "description": "",
+        "interval": 200000,
+        "created": ""
+    },
+    "data": {
+        "sequence": {
+            "url": "",
+            "type": "",
+            "name": "",
+            "citation": "",
+            "license": ""
+        },
+        "array": [
+            {
+                "id": 0,
+                "url": "tracks/ATAC/track.json"
+            },
+            {
+                "id": 1,
+                "url": "tracks/H3K27ac/track.json"
+            },
+            {
+                "id": 2,
+                "url": "tracks/H3K9me3/track.json"
+            },
+            {
+                "id": 3,
+                "url": "tracks/PC1/track.json"
+            }
+        ],
+        "md-contact-map": [
+            {
+                "id": 0,
+                "version": "1.0",
+                "url": "lammps_0/contactmap.tsv",
+                "interval": 200000
+            },
+            {
+                "id": 1,
+                "version": "1.0",
+                "url": "lammps_1/contactmap.tsv",
+                "interval": 200000
+            }
+        ],
+        "structure": [
+            {
+                "id": 0,
+                "type": {
+                    "version": "1.0",
+                    "name": "LAMMPS"
+                },
+                "md-contact-map": 0,
+                "unmapped_segments": [
+                    [
+                        1,
+                        85
+                    ]
+                ],
+                "num_segments": 254,
+                "url": "lammps_0/structure.csv",
+                "interval": 200000
+            },
+            {
+                "id": 1,
+                "type": {
+                    "version": "1.0",
+                    "name": "LAMMPS"
+                },
+                "md-contact-map": 1,
+                "unmapped_segments": [
+                    [
+                        1,
+                        85
+                    ]
+                ],
+                "num_segments": 254,
+                "url": "lammps_1/structure.csv",
+                "interval": 200000
+            }
+        ],
+        "annotations": {
+            "url": "chr22.gff",
+            "citation": "Your description or citation here"
+        }
+    },
+    "datasets": [
+        {
+            "id": 0,
+            "name": "0 Hours",
+            "structure": {
+                "id": 0,
+                "md-contact-map": 0,
+                "input_set": "lammps_0/inputset.tsv",
+                "output_set": "lammps_0/outputset.tsv",
+                "settings": "lammps_0/settings.json"
+            },
+            "epigenetics": 0
+        },
+        {
+            "id": 1,
+            "name": "12 Hours",
+            "structure": {
+                "id": 1,
+                "md-contact-map": 1,
+                "input_set": "lammps_1/inputset.tsv",
+                "output_set": "lammps_1/outputset.tsv",
+                "settings": "lammps_1/settings.json"
+            },
+            "epigenetics": 1
+        }
+    ],
+    "application": {
+        "gtk": {
+            "application": {
+                "name": "viewer",
+                "version": "0.5"
+            },
+            "controlpanel": {
+                "variable": {
+                    "current": 0
+                },
+                "colormap": {
+                    "current": "grayscale"
+                },
+                "gene": {
+                    "current": "",
+                    "favorites": [
+                        "LOC105373060",
+                        "LOC105372863",
+                        "LOC107985541",
+                        "LOC102724608"
+                    ]
+                },
+                "location": {
+                    "current": "",
+                    "favorites": [
+                        "10600000-28800000",
+                        "28800000-49000000"
+                    ]
+                }
+            },
+            "contactmapcanvas": {
+                "width": 300,
+                "height": 300,
+                "background": "0xFFFFFF",
+                "colormap": "rainbow"
+            },
+            "geometrycanvas": {
+                "width": 500,
+                "height": 500,
+                "scene": {
+                    "background": "0xFFFFFF",
+                    "camera": {
+                        "fov": 10,
+                        "aspect": 1,
+                        "near": 1,
+                        "far": 1000,
+                        "center": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "position": [
+                            0.0,
+                            0.0,
+                            100.0
+                        ]
+                    },
+                    "lights": [
+                        {
+                            "label": "Directional Light 0",
+                            "type": "directional",
+                            "color": "0xFDF4DC",
+                            "distance": 0,
+                            "decay": 1,
+                            "position": [
+                                20,
+                                0,
+                                20
+                            ],
+                            "intensity": 0.8,
+                            "shadow": {
+                                "castshadow": true,
+                                "camera": {
+                                    "near": 0.5,
+                                    "far": 500,
+                                    "top": 10,
+                                    "bottom": -10,
+                                    "left": 10,
+                                    "right": -10
+                                }
+                            }
+                        },
+                        {
+                            "label": "Ambient Light 0",
+                            "type": "ambient",
+                            "color": "0xFDF4DC",
+                            "intensity": 0.25
+                        }
+                    ]
+                },
+                "geometry": {
+                    "attributes": {
+                        "interval": 200000
+                    },
+                    "colormap": {
+                        "name": "grayscale",
+                        "divs": 512,
+                        "highlight-color": "0x67F0D9",
+                        "opacity-clamp": 0.2
+                    },
+                    "segment": {
+                        "glyph": {
+                            "type": "arrow",
+                            "color": "0x0091ea",
+                            "endpoint": {
+                                "radius": 0.175,
+                                "segments": 16
+                            },
+                            "span": {
+                                "radius-beg": 0.1,
+                                "radius-end": 0.02
+                            },
+                            "ghost": {
+                                "opacity": 0.2
+                            },
+                            "skeleton": {}
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

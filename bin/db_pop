@@ -25,6 +25,7 @@ project = sys.argv[1]
 # establish the generated data directory and files 
 #
 db_generated = os.path.join(project, "generated")
+print(db_generated)
 if not os.path.isdir(db_generated):
     os.mkdir(db_generated)
 
@@ -68,7 +69,10 @@ c.execute('''INSERT INTO gtk (version) VALUES(?)''', [gtkversion])
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS project''')
     # create the table 
-c.execute('''CREATE TABLE project (name TEXT, title TEXT, num_segments INT)''')
+c.execute('''CREATE TABLE project (projid TEXT, name TEXT, description TEXT, interval INT)''')
+p = jsondata["project"]
+projid = p['id']
+c.execute('''INSERT INTO project (projid,name,description,interval) VALUES(?,?,?,?)''', [p['id'], p['name'], p['description'], p['interval']])
 print("Creating project table ...")
 print("")
 
@@ -78,11 +82,11 @@ print("")
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS datasets''')
     # create the table 
-c.execute('''CREATE TABLE datasets (ID TEXT, name TEXT, epigenetics TEXT, structure TEXT)''')
-insert = '''INSERT INTO datasets (ID,name,epigenetics,structure) values(?,?,?,?)'''
+c.execute('''CREATE TABLE datasets (projid TEXT, ID TEXT, name TEXT, epigenetics TEXT, structure TEXT)''')
+insert = '''INSERT INTO datasets (projid,ID,name,epigenetics,structure) values(?,?,?,?,?)'''
 print("Creating datasets table ...")
 for d in jsondata["datasets"]:
-    c.execute(insert, [d["id"], d["name"], d["epigenetics"], d["structure"]["id"]]) 
+    c.execute(insert, [projid, d["id"], d["name"], d["epigenetics"], d["structure"]["id"]]) 
 print("")
 
 # ---------------------------------------------------------------------------
@@ -92,8 +96,8 @@ print("")
 c.execute('''DROP TABLE IF EXISTS structure''')
 c.execute('''DROP TABLE IF EXISTS structure_metadata''')
     # create the table 
-c.execute('''CREATE TABLE structure (structureid INT, segid INT, startid INT, endid INT, length INT, startx REAL, starty REAL, startz REAL, endx REAL, endy REAL, endz REAL, centerx REAL, centery REAL, centerz REAL)''')
-c.execute('''CREATE TABLE structure_metadata (id INT, num_segments INT, interval INT, unmapped TEXT)''')
+c.execute('''CREATE TABLE structure (projid TEXT, structureid INT, segid INT, startid INT, endid INT, length INT, startx REAL, starty REAL, startz REAL, endx REAL, endy REAL, endz REAL, centerx REAL, centery REAL, centerz REAL)''')
+c.execute('''CREATE TABLE structure_metadata (projid TEXT, id INT, num_segments INT, interval INT, unmapped TEXT)''')
 
 # parse all structure files, and insert data into the table
 # a segment is based on two points from the file - the 
@@ -102,15 +106,15 @@ c.execute('''CREATE TABLE structure_metadata (id INT, num_segments INT, interval
 print("Creating structure table ...")
 for geom in jsondata["data"]["structure"]:
     infile = os.path.join( project, geom["url"])
-    insert = '''INSERT INTO structure (structureid,segid,startid,endid,length,startx,starty,startz,endx,endy,endz,centerx,centery,centerz) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
-    meta_insert = '''INSERT INTO structure_metadata (id,num_segments,interval,unmapped) VALUES(?,?,?,?)'''
+    insert = '''INSERT INTO structure (projid,structureid,segid,startid,endid,length,startx,starty,startz,endx,endy,endz,centerx,centery,centerz) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
+    meta_insert = '''INSERT INTO structure_metadata (projid,id,num_segments,interval,unmapped) VALUES(?,?,?,?,?)'''
     print("    reading: {}".format(infile))
     position = 0 
         # the first position is arbitrary, and will be re-computed after all values are inserted 
     prev = [0.0, 0.0, 0.0]
 
     # create metadata entry
-    c.execute(meta_insert, [geom["id"], geom["num_segments"], geom["interval"], json.dumps(geom["unmapped_segments"])] )
+    c.execute(meta_insert, [projid, geom["id"], geom["num_segments"], geom["interval"], json.dumps(geom["unmapped_segments"])] )
 
     # create structure data entries
     if (infile.endswith('.pdb')) :
@@ -126,7 +130,7 @@ for geom in jsondata["data"]["structure"]:
                     aid    = re.split(r'\s+', l)
                     cur    = [float(v[1]), float(v[2]), float(v[3])]
                     center = [ (prev[0]+cur[0])/2.0, (prev[1]+cur[1])/2.0, (prev[2]+cur[2])/2.0 ]
-                    c.execute(insert, [geom["id"], aid[1], position, position + geom["interval"], geom["interval"], 
+                    c.execute(insert, [projid, geom["id"], aid[1], position, position + geom["interval"], geom["interval"], 
                         prev[0], prev[1], prev[2], cur[0], cur[1], cur[2], center[0], center[1], center[2]])
                     prev = cur
                     position = position + geom["interval"]
@@ -138,7 +142,7 @@ for geom in jsondata["data"]["structure"]:
             for e in df.to_dict(orient='records'):
                 cur    = [float(e['x']), float(e['y']), float(e['z'])]
                 center = [ (prev[0]+cur[0])/2.0, (prev[1]+cur[1])/2.0, (prev[2]+cur[2])/2.0 ]
-                c.execute(insert, [geom["id"], e['id'], position, position + geom["interval"], geom["interval"], 
+                c.execute(insert, [projid, geom["id"], e['id'], position, position + geom["interval"], geom["interval"], 
                     prev[0], prev[1], prev[2], cur[0], cur[1], cur[2], center[0], center[1], center[2]])
                 prev = cur
                 position = position + geom["interval"]
@@ -173,7 +177,7 @@ print("")
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS array''')
     # create the table 
-c.execute('''CREATE TABLE array (id INT, name TEXT, type TEXT, min REAL, max REAL, url TEXT)''')
+c.execute('''CREATE TABLE array (projid TEXT, id INT, name TEXT, type TEXT, min REAL, max REAL, url TEXT)''')
 
 print("Creating array table")
 if "array" in jsondata["data"]: 
@@ -182,8 +186,8 @@ if "array" in jsondata["data"]:
         arraydata = {}
         with open(os.path.join(project, a["url"]), 'r') as afile:
             adata = json.load(afile)
-        c.execute('''INSERT INTO array (id,name,type,min,max,url) VALUES (?,?,?,?,?,?)''', 
-                    [a["id"], adata["name"], adata["type"], adata['data']['min'], adata['data']['max'], a["url"]])
+        c.execute('''INSERT INTO array (projid,id,name,type,min,max,url) VALUES (?,?,?,?,?,?,?)''', 
+                    [projid, a["id"], adata["name"], adata["type"], adata['data']['min'], adata['data']['max'], a["url"]])
 
 print("")
 
@@ -198,13 +202,13 @@ print("")
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS contactmap''')
     # create the table 
-c.execute('''CREATE TABLE contactmap (id INT, x INT, y INT, value REAL)''')
+c.execute('''CREATE TABLE contactmap (projid TEXT, id INT, x INT, y INT, value REAL)''')
 
 print("Creating contactmap records table")
 for contact_map in jsondata["data"]["md-contact-map"]:
     map_id = contact_map["id"]
     infile = os.path.join( project, contact_map["url"] )
-    insert = '''INSERT INTO contactmap (id,x,y,value) VALUES (?,?,?,?)'''
+    insert = '''INSERT INTO contactmap (projid,id,x,y,value) VALUES (?,?,?,?,?)'''
 
     print("    reading: {}".format(infile))
     with open(infile, 'r') as indata:
@@ -214,7 +218,7 @@ for contact_map in jsondata["data"]["md-contact-map"]:
                 columns[2] = float(columns[2])
             except ValueError:
                 columns[2] = nan
-            c.execute(insert, [map_id, *columns])
+            c.execute(insert, [projid, map_id, *columns])
 print("")
 
 # ---------------------------------------------------------------------------
@@ -227,10 +231,10 @@ print("")
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS genes''')
     # create the table
-c.execute('''CREATE TABLE genes (id INTEGER PRIMARY KEY AUTOINCREMENT, start INT, end INT, length INT, gID TEXT, gene_type TEXT, gene_name TEXT)''')
+c.execute('''CREATE TABLE genes (projid TEXT, id INTEGER PRIMARY KEY AUTOINCREMENT, start INT, end INT, length INT, gID TEXT, gene_type TEXT, gene_name TEXT)''')
 
 # populate the table from a file
-insert = '''INSERT INTO genes (start,end,length,gID,gene_type,gene_name) VALUES(?,?,?,?,?,?)'''
+insert = '''INSERT INTO genes (projid,start,end,length,gID,gene_type,gene_name) VALUES(?,?,?,?,?,?,?)'''
 print("Creating genes table ...")
 
 # check if there is an annotations file in the project
@@ -321,7 +325,7 @@ if "annotations" in jsondata["data"]:
                         # optionally print out anything without a name
                         # print("No name found: {}".format(l))
 
-                    c.execute(insert, [v[3], v[4], length, values["ID"], values["biotype"], name]) 
+                    c.execute(insert, [projid, v[3], v[4], length, values["ID"], values["biotype"], name]) 
 
 # ---------------------------------------------------------
 # if there is an annotations file, insert that data as well
