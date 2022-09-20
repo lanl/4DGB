@@ -155,10 +155,11 @@ for geom in jsondata["data"]["structure"]:
     # based on the data this reflects the endpoint from the second 
     # segment around the endpoint of the first segment
         # first
-    query  = conn.execute("SELECT * FROM structure where segid == 1 AND structureid == {}".format(geom["id"]))
+    cols = "structureid,segid,startid,endid,length,startx,starty,startz,endx,endy,endz,centerx,centery,centerz"
+    query  = conn.execute("SELECT {} FROM structure where segid == 1 AND structureid == {}".format(cols, geom["id"]))
     first  = query.fetchone()
         # second point
-    query  = conn.execute("SELECT * FROM structure where segid == 2 AND structureid == {}".format(geom["id"]))
+    query  = conn.execute("SELECT {} FROM structure where segid == 2 AND structureid == {}".format(cols, geom["id"]))
     point = query.fetchone()
         # compute new values and insert
     new    = [ (2.0*point[5] - point[8]), (2.0*point[6] - point[9]), (2.0*point[7] - point[10]) ]
