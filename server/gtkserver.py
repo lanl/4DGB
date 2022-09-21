@@ -52,6 +52,7 @@ if __file__ != '__main__':
 
 # verbose or not
 VERBOSE = False
+# VERBOSE = True
 
 #
 # get the interval of the datasets for this project
@@ -255,31 +256,52 @@ def SetArray():
 #
 # return the segments of a structure
 #
-@app.route('/data/structure/<identifier>/unmapped')
-def UnmappedData(identifier):
+@app.route('/data/structure/<projid>/<identifier>/unmapped')
+def UnmappedData(projid, identifier):
+    if (VERBOSE):
+        print("Querying UnmappedData ...")
+
     conn    = db_connect.connect()
-    query   = conn.execute("SELECT num_segments,unmapped FROM structure_metadata WHERE id == {}".format(identifier))
+    query   = conn.execute("SELECT num_segments,unmapped FROM structure_metadata WHERE projid == ? AND id == ?", [projid, identifier])
     results = query.cursor.fetchone()
 
-    num_elements = results[0]
-    # we are creating a 1-based array
-    data = numpy.zeros(num_elements + 1)
+    final = []
+    int_list = []
+    if results: 
+        if (results[1] != '[]'):
+            # make an int array the same size as the result array
+            int_list = [0] * results[0]
 
-    elem = results[1].replace(" ", "")
-    elem = elem[1:]
-    elem = elem[:-1]
-    for e in elem.split("],["):
-        e = e.replace("]", "")
-        e = e.replace("[", "")
+            if (VERBOSE):
+                print(results)
+                print("unmapped: {}".format(results[1]))
 
-        nums = e.split(",")
-        for i in range(int(nums[0]), int(nums[1]) + 1):
-            data[i] = 1
+            num_elements = results[0]
+            # we are creating a 1-based array
+            data = numpy.zeros(num_elements + 1)
 
-    # remove the 0th element
-    final = numpy.delete(data, 0)
+            elem = results[1].replace(" ", "")
+            elem = elem[1:]
+            elem = elem[:-1]
+            for e in elem.split("],["):
+                e = e.replace("]", "")
+                e = e.replace("[", "")
 
-    return jsonify({ 'unmapped': list(final) })
+                nums = e.split(",")
+                for i in range(int(nums[0]), int(nums[1]) + 1):
+                    data[i] = 1
+
+            # remove the 0th element
+            final = numpy.delete(data, 0)
+
+    # convert to python int array before serializing, b/c jsonify can't
+    # serialize numpy ints
+    cur = 0
+    for v in final:
+        int_list[cur] = int(v)
+        cur += 1
+
+    return jsonify({ 'unmapped': list(int_list) })
 
 
 #
@@ -490,7 +512,6 @@ def SegmentsForGene(projid, names, structureid):
     for s in snames:
         query = conn.execute("SELECT start, end FROM genes WHERE projid == ? AND gene_name == ?", [projid, s])
         results = query.cursor.fetchone()
-
 
         if (results != None) :
             g_start = results[0]

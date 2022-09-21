@@ -93,6 +93,37 @@ def test_get_structure():
             #comparing a fraction of the list
             assert (result['segments'][t['index']] == t['gold'])
 
+def test_get_structure_unmapped_segments():
+    tests = [
+                {
+                    'note'   : 'Edge test: first segment is 0. Should return empty list', 
+                    'sid'    : -1,
+                    'gold'   : []
+                },
+                {
+                    'note'   : 'structure 1',
+                    'sid'    : 0,
+                    'gold'   : [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+                    
+                },
+                {
+                    'note'   : 'structure 2',
+                    'sid'    : 1,
+                    'gold'   : [] 
+                },
+                {
+                    'note'   : 'Edge test: last segment is < 2. Should return empty list',
+                    'sid'    : 2,
+                    'gold'   : []
+                }
+            ]
+
+    for t in tests: 
+        result = client.get_structure_unmapped_segments(t['sid'])
+        #returns a list of dictionaries 
+        print(result)
+        assert(result['unmapped'] == t['gold'])
+
 
 def test_get_genes(): 
     
