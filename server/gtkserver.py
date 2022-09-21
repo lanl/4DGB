@@ -354,7 +354,6 @@ def Genes(projid):
     for g in query.cursor.fetchall():
         genes.append(g[0])
 
-    print("querying for genes")
     return jsonify({'genes': genes})
 
 #
@@ -382,8 +381,8 @@ def GetGeneMetadata(projid, name):
 #
 # genes for a list of segments or segment ranges
 #
-@app.route('/data/structure/<structureid>/segment/<segmentids>/genes')
-def GenesForSegments(structureid, segmentids):
+@app.route('/data/structure/<projid>/<structureid>/segment/<segmentids>/genes')
+def GenesForSegments(projid, structureid, segmentids):
     # if the query returns nothing, we return an empty list
     genes = []
 
@@ -400,20 +399,20 @@ def GenesForSegments(structureid, segmentids):
         if (match != None):
             # this is a range
                 # get the start
-            query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, match.group('start'))
+            query   = conn.execute("SELECT startid, endid FROM structure WHERE projid == ? AND structureid = ? AND segid = ?", projid, structureid, match.group('start'))
             results = query.cursor.fetchall()
             if (len(results) != 0):
                 seg_start = results[0][0]
 
                 # get the end
-            query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, match.group('end'))
+            query   = conn.execute("SELECT startid, endid FROM structure WHERE projid == ? AND structureid = ? AND segid = ?", projid, structureid, match.group('end'))
             results = query.cursor.fetchall()
 
             if (len(results) != 0):
                 seg_end = results[0][1]
         else:
             # find all genes that intersect with these segments 
-            query   = conn.execute("SELECT startid, endid FROM structure WHERE structureid = ? AND segid = ?", structureid, s)
+            query   = conn.execute("SELECT startid, endid FROM structure WHERE projid == ? AND structureid = ? AND segid = ?", projid, structureid, s)
             results = query.cursor.fetchall()
 
             # query and create a list of genes 
@@ -437,8 +436,8 @@ def GenesForSegments(structureid, segmentids):
 #
 # genes for a list of locations or location ranges
 #
-@app.route('/data/structure/<structureid>/locations/<locations>/genes')
-def GenesForLocations(structureid, locations):
+@app.route('/data/structure/<projid>/<structureid>/locations/<locations>/genes')
+def GenesForLocations(projid, structureid, locations):
     # if the query returns nothing, we return an empty list
     genes = []
 
@@ -481,7 +480,7 @@ def SegmentsForGene(names, structureid):
     snames = names.split(',')
 
     for s in snames:
-        query = conn.execute("SELECT start, end FROM genes WHERE gene_name == ?", s)
+        query = conn.execute("SELECT start, end FROM genes WHERE projid == ? AND gene_name == ?", [projid, s])
         results = query.cursor.fetchone()
 
 
@@ -489,10 +488,10 @@ def SegmentsForGene(names, structureid):
             g_start = results[0]
             g_end   = results[1]
 
-            query = conn.execute("SELECT segid from structure WHERE structureid = ? AND \
+            query = conn.execute("SELECT segid from structure WHERE projid == ? AND structureid = ? AND \
                                       ( ( startid BETWEEN ? AND ? ) OR ( endid BETWEEN ? AND ? ) OR \
                                         ( startid > ? AND endid < ? ) OR ( startid < ? AND endid > ? ) ) ORDER BY segid", 
-                                      structureid, g_start, g_end, g_start, g_end, g_start, g_end, g_start, g_end)
+                                      projid, structureid, g_start, g_end, g_start, g_end, g_start, g_end, g_start, g_end)
             for b in query.cursor.fetchall():
                 if (b[0] not in segments) :
                     segments.append(b[0])

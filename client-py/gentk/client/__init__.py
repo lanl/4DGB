@@ -71,13 +71,13 @@ class client:
     def get_gene_metadata(self, gene):
         return self._request(f'genes/meta/{self.projid}/{gene}')
 
-    # not updated
     def get_genes_for_locations(self, structureID, locations):
-        return self._request(f'data/structure/{structureID}/locations/{locations}/genes')
+        return self._request(f'data/structure/{self.projid}/{structureID}/locations/{locations}/genes')
 
     def get_genes_for_segments(self, structureID, segIDs):
-        return self._request(f'data/structure/{structureID}/segment/{segIDs}/genes')
+        return self._request(f'data/structure/{self.projid}/{structureID}/segment/{segIDs}/genes')
 
+    # not updated
     def get_segments_for_genes(self, structureID, gene):
         return self._request(f'genes/{gene}/data/structure/{structureID}')
 

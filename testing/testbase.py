@@ -2,6 +2,8 @@
 # Imported by the test_gentk.py and test_gentk_production.py scripts
 #
 
+import math
+
 client = None
 
 def set_client(new_client, project, projid):
@@ -25,3 +27,13 @@ def test_get_gene_metadata():
     assert(result['start'] == 3076875)
     assert(result['end']   == 3078817)
     assert(result['gID']   == 'gene:ENSMUSG00000100249')
+
+def test_get_gene_locations(): 
+    result = client.get_genes_for_locations(0, "3076875-3078817")
+    assert(result['genes'] == ["Btbd35f23"])
+
+def test_get_gene_segments(): 
+    interval = client.get_project_interval()
+    segment  = math.ceil(int(3076875)/interval)
+    result = client.get_genes_for_segments(0, f'{segment}') 
+    assert(result['genes'] == ['Btbd35f23', 'Btbd35f24'])
