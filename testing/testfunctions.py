@@ -4,10 +4,11 @@
 
 client = None
 
-def set_client(new_client, project):
+def set_client(new_client, project, projid):
     global client
     client = new_client
     client.project = project
+    client.projid  = projid
 
 
 def test_get_contactmap():

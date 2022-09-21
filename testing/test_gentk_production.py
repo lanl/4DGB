@@ -8,4 +8,4 @@ CERT_FILE = os.path.join(
 )
 os.environ['REQUESTS_CA_BUNDLE'] = CERT_FILE
 
-set_client( gentk.client.client("https://localhost", "4430", auth="user:password"), "test.00" )
+set_client( gentk.client.client("https://localhost", "4430", auth="user:password"), "test.00", "test00projid" )
