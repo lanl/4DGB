@@ -44,3 +44,7 @@ def test_get_segments_for_genes():
     gene = 'Btbd35f24'
     result = client.get_segments_for_genes(0, gene) 
     assert(result['segments'] == [segment])
+
+def test_get_structure():
+    result = client.get_genes_for_locations(0, "3076875-3078817")
+    assert(result['genes'] == ["Btbd35f23"])

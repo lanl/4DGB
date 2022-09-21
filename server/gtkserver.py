@@ -50,6 +50,9 @@ api = Api(app)
 if __file__ != '__main__':
     db_connect = create_engine('sqlite:///'+DB_PATH)
 
+# verbose or not
+VERBOSE = False
+
 #
 # get the interval of the datasets for this project
 # TODO: generalize the storage and retrieval of this data
@@ -282,12 +285,14 @@ def UnmappedData(identifier):
 #
 # return the segments of a structure
 #
-@app.route('/data/structure/<identifier>/segments')
-def SegmentData(identifier):
+@app.route('/data/structure/<projid>/<identifier>/segments')
+def SegmentData(projid, identifier):
+    if (VERBOSE):
+        print("Querying structure for segment data ...")
+
     conn    = db_connect.connect()
-    query   = conn.execute("SELECT segid, startid, length, startx, starty, startz, endx, endy, endz FROM structure WHERE structureid == {} ORDER BY segid".format(identifier))
+    query   = conn.execute("SELECT segid, startid, length, startx, starty, startz, endx, endy, endz FROM structure WHERE projid == ? AND structureid == ? ORDER BY segid", [projid, identifier])
     data    = []
-    lengths = []
     for b in query.cursor.fetchall():
         data.append({ 
                         'segid'  : int(b[0]),
@@ -383,6 +388,9 @@ def GetGeneMetadata(projid, name):
 #
 @app.route('/data/structure/<projid>/<structureid>/segment/<segmentids>/genes')
 def GenesForSegments(projid, structureid, segmentids):
+    if (VERBOSE):
+        print("Querying GenesForSegment ...")
+
     # if the query returns nothing, we return an empty list
     genes = []
 
@@ -421,7 +429,7 @@ def GenesForSegments(projid, structureid, segmentids):
                 seg_end   = results[0][1]
 
             else:
-                print("ERROR! no segment found for: {}, {}".format(structureid, s))
+                print("WARNING: no segment found for: {}, {}".format(structureid, s))
 
         # find the genes for a range 
         results = getGenesForLocationRange( seg_start, seg_end )
