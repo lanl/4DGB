@@ -18,3 +18,10 @@ def test_get_project_interval():
 def test_get_genes(): 
     result = client.get_genes()
     assert(len(result['genes']) == 1331)
+
+def test_get_gene_metadata(): 
+    result = client.get_gene_metadata('Btbd35f23')
+    assert(len(result) == 6)
+    assert(result['start'] == 3076875)
+    assert(result['end']   == 3078817)
+    assert(result['gID']   == 'gene:ENSMUSG00000100249')

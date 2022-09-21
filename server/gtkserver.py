@@ -344,7 +344,7 @@ def ProjectInterval(projid):
 #
 # get all genes in a project
 #
-@app.route('/<projid>/genes')
+@app.route('/genes/<projid>')
 def Genes(projid):
     # return all genes
     conn = db_connect.connect()
@@ -354,17 +354,18 @@ def Genes(projid):
     for g in query.cursor.fetchall():
         genes.append(g[0])
 
+    print("querying for genes")
     return jsonify({'genes': genes})
 
 #
 # get metadata for a gene 
 #
-@app.route('/gene/<name>')
-def GetGeneMetadata(name):
+@app.route('/genes/meta/<projid>/<name>')
+def GetGeneMetadata(projid, name):
     # return all genes
     conn = db_connect.connect()
 
-    query = conn.execute("SELECT start,end,length,gID,gene_type,gene_name from genes WHERE gene_name = ?", name)
+    query = conn.execute("SELECT start,end,length,gID,gene_type,gene_name from genes WHERE projid == ? AND gene_name = ?", [projid, name])
     results = query.cursor.fetchone()
 
     data = {
@@ -375,7 +376,6 @@ def GetGeneMetadata(name):
             "gene_type" : results[4],
             "gene_name" : results[5]
             }
-
 
     return jsonify(data)
 

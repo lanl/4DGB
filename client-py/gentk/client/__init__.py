@@ -61,21 +61,17 @@ class client:
 
         return response.json()
 
+    # updated
     def get_project_interval(self):
         return self._request(f'project/{self.projid}/interval')
 
-    def get_structure(self, structureID):
-        return self._request(f'data/structure/{structureID}/segments')
-
-    def get_structure_unmapped_segments(self, structureID):
-        return self._request(f'data/structure/{structureID}/unmapped')
-
     def get_genes(self):
-        return self._request(f'{self.projid}/genes')
+        return self._request(f'genes/{self.projid}')
 
     def get_gene_metadata(self, gene):
-        return self._request(f'gene/{gene}')
+        return self._request(f'genes/meta/{self.projid}/{gene}')
 
+    # not updated
     def get_genes_for_locations(self, structureID, locations):
         return self._request(f'data/structure/{structureID}/locations/{locations}/genes')
 
@@ -84,6 +80,12 @@ class client:
 
     def get_segments_for_genes(self, structureID, gene):
         return self._request(f'genes/{gene}/data/structure/{structureID}')
+
+    def get_structure(self, structureID):
+        return self._request(f'data/structure/{structureID}/segments')
+
+    def get_structure_unmapped_segments(self, structureID):
+        return self._request(f'data/structure/{structureID}/unmapped')
 
     def get_structure_arrays(self):
         return self.get_arrays('structure')
