@@ -470,8 +470,8 @@ def GenesForLocations(projid, structureid, locations):
 #
 # segments for a list of genes
 #
-@app.route('/genes/<names>/data/structure/<structureid>')
-def SegmentsForGene(names, structureid):
+@app.route('/genes/<projid>/<names>/data/structure/<structureid>')
+def SegmentsForGene(projid, names, structureid):
     # if the query returns nothing, we return an empty list
     segments = []
 

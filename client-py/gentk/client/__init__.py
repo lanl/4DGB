@@ -77,10 +77,10 @@ class client:
     def get_genes_for_segments(self, structureID, segIDs):
         return self._request(f'data/structure/{self.projid}/{structureID}/segment/{segIDs}/genes')
 
-    # not updated
     def get_segments_for_genes(self, structureID, gene):
-        return self._request(f'genes/{gene}/data/structure/{structureID}')
+        return self._request(f'genes/{self.projid}/{gene}/data/structure/{structureID}')
 
+    # not updated
     def get_structure(self, structureID):
         return self._request(f'data/structure/{structureID}/segments')
 

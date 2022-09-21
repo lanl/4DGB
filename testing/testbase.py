@@ -37,3 +37,10 @@ def test_get_gene_segments():
     segment  = math.ceil(int(3076875)/interval)
     result = client.get_genes_for_segments(0, f'{segment}') 
     assert(result['genes'] == ['Btbd35f23', 'Btbd35f24'])
+
+def test_get_segments_for_genes(): 
+    interval = client.get_project_interval()
+    segment  = math.ceil(int(3076875)/interval)
+    gene = 'Btbd35f24'
+    result = client.get_segments_for_genes(0, gene) 
+    assert(result['segments'] == [segment])
