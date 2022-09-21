@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Client 'base' test 
+name: Client unit test 
 
 on:
   push:
@@ -37,4 +37,4 @@ jobs:
         python3 release/test.00/server/gtkserver.py &
         sleep 5
         ls -la
-        pytest testing/test_base.py 
+        pytest testing/test_unit.py 
