@@ -86,15 +86,15 @@ class client:
     def get_structure_unmapped_segments(self, structureID):
         return self._request(f'data/structure/{self.projid}/{structureID}/unmapped')
 
-    # not updated
     def get_structure_arrays(self):
         return self.get_arrays('structure')
 
     def get_sequence_arrays(self):
         return self.get_arrays('sequence')
 
+    # not updated
     def get_arrays(self, type):
-        return self._request(f'data/arrays/{type}')
+        return self._request(f'data/{projid}/arrays/{type}')
 
     def get_array(self, arrayID, arraySlice):
         return self._request(f'data/array/{arrayID}/{arraySlice}')

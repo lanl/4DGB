@@ -152,11 +152,11 @@ def projectdir(path):
 #
 # return a list of the variables available
 #
-@app.route('/data/arrays/<atype>')
-def GetArrays(atype):
+@app.route('/data/<projid>/arrays/<atype>')
+def GetArrays(projid, atype):
     conn  = db_connect.connect()
     data  = []
-    query = conn.execute("SELECT name,id,type,min,max FROM array WHERE type == \'{}\' ORDER BY id".format(atype))
+    query = conn.execute("SELECT name,id,type,min,max FROM array WHERE projid == ? AND type == ? ORDER BY id", [projid, atype])
     for a in query.cursor.fetchall():
         element = { 
                     'name': a[0],
@@ -254,7 +254,12 @@ def SetArray():
     return jsonify(results)
 
 #
-# return the segments of a structure
+# get unmapped data for a structure
+#
+# using the data in the database, construct and return a list of integers that
+# show which segments are 'mapped', and which are 'unmapped'. This information
+# appears in the project.yaml file as a list of [begin, end] pairs, and these
+# if present are expanded to a full list, one for each segment in the database
 #
 @app.route('/data/structure/<projid>/<identifier>/unmapped')
 def UnmappedData(projid, identifier):
