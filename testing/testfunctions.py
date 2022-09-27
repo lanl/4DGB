@@ -179,7 +179,7 @@ def test_get_genes_for_segments():
                     'note'      : 'correct list query',
                     'segment'   : "7,8,9,10",
                     'structure' : 0,
-                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3','gene10=11']
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3','gene10-11']
                 },
                 {
                     'note'      : 'correct list query',
@@ -191,19 +191,19 @@ def test_get_genes_for_segments():
                     'note'      : 'correct list query',
                     'segment'   : "7,8-10",
                     'structure' : 0,
-                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3','gene10=11']
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3','gene10-11']
                 },
                 {
                     'note'      : 'correct list query',
                     'segment'   : "7,8,9-10",
                     'structure' : 0,
-                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3','gene10=11']
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3','gene10-11']
                 },
                 {
                     'note'      : 'correct list query',
                     'segment'   : "7 ,8, 9 -10 ",
                     'structure' : 0,
-                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3','gene10=11']
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3','gene10-11']
                 },
                 {
                     'note'      : 'Edge test: last segment is < 10000. Should return empty list',
