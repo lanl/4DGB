@@ -1,7 +1,10 @@
 # The Project
 
+A project has the following expected structure:
+
 ```
 projectname/
+    project.json        (required. defines project data)
     source/
         annotations.csv (optional)
     generated/          (generated during project make/release)
