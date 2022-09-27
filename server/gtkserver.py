@@ -258,20 +258,30 @@ def UnmappedData(identifier):
     query   = conn.execute("SELECT num_segments,unmapped FROM structure_metadata WHERE id == {}".format(identifier))
     results = query.cursor.fetchone()
 
+    print("results: {}".format(results))
+    if (results[1] != []) :
+        print("YES")
+    else:
+        print("NO")
+
     num_elements = results[0]
     # we are creating a 1-based array
     data = numpy.zeros(num_elements + 1)
 
+    # get rid of white space
     elem = results[1].replace(" ", "")
+    # get rid of first and last brackets
     elem = elem[1:]
     elem = elem[:-1]
-    for e in elem.split("],["):
-        e = e.replace("]", "")
-        e = e.replace("[", "")
+    # if there are elements here, expand them
+    if len(elem) > 0:
+        for e in elem.split("],["):
+            e = e.replace("]", "")
+            e = e.replace("[", "")
 
-        nums = e.split(",")
-        for i in range(int(nums[0]), int(nums[1]) + 1):
-            data[i] = 1
+            nums = e.split(",")
+            for i in range(int(nums[0]), int(nums[1]) + 1):
+                data[i] = 1
 
     # remove the 0th element
     final = numpy.delete(data, 0)
@@ -285,16 +295,17 @@ def UnmappedData(identifier):
 @app.route('/data/structure/<identifier>/segments')
 def SegmentData(identifier):
     conn    = db_connect.connect()
-    query   = conn.execute("SELECT segid, startid, length, startx, starty, startz, endx, endy, endz FROM structure WHERE structureid == {} ORDER BY segid".format(identifier))
+    query   = conn.execute("SELECT segid, startid, endid, length, startx, starty, startz, endx, endy, endz FROM structure WHERE structureid == {} ORDER BY segid".format(identifier))
     data    = []
     lengths = []
     for b in query.cursor.fetchall():
         data.append({ 
                         'segid'  : int(b[0]),
                         'startid': int(b[1]),
-                        'length' : int(b[2]),
-                        'start'  : [float(b[3]), float(b[4]), float(b[5])],
-                        'end'    : [float(b[6]), float(b[7]), float(b[8])],
+                        'endid'  : int(b[2]),
+                        'length' : int(b[3]),
+                        'start'  : [float(b[4]), float(b[5]), float(b[6])],
+                        'end'    : [float(b[7]), float(b[8]), float(b[9])],
                     })
 
     return jsonify({ 'segments': data })
@@ -478,16 +489,18 @@ def SegmentsForGene(names, structureid):
     for s in snames:
         query = conn.execute("SELECT start, end FROM genes WHERE gene_name == ?", s)
         results = query.cursor.fetchone()
-
+        # print("querying on :{}".format(s))
 
         if (results != None) :
             g_start = results[0]
             g_end   = results[1]
+            # print("start: {}".format(g_start))
+            # print("end: {}".format(g_end))
 
             query = conn.execute("SELECT segid from structure WHERE structureid = ? AND \
                                       ( ( startid BETWEEN ? AND ? ) OR ( endid BETWEEN ? AND ? ) OR \
-                                        ( startid > ? AND endid < ? ) OR ( startid < ? AND endid > ? ) ) ORDER BY segid", 
-                                      structureid, g_start, g_end, g_start, g_end, g_start, g_end, g_start, g_end)
+                                        ( startid < ? AND endid > ? ) ) ORDER BY segid", 
+                                      structureid, g_start, g_end, g_start, g_end, g_start, g_end)
             for b in query.cursor.fetchall():
                 if (b[0] not in segments) :
                     segments.append(b[0])

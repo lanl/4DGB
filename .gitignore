@@ -5,6 +5,7 @@ projects/test.01/generated
 projects/test.01/source/array
 projects/test.00/generated/
 projects/workflow_1-0-0/generated/
+projects/mouse*
 server/static/*.pdf
 __pycache__/
 venv/

@@ -160,11 +160,11 @@
             },
             "gene" : {
                 "current" : "curgene",
-                "favorites" : ["gene 1", "gene 2", "gene 3", "gene 4"]
+                "favorites" : ["", "gene1-2", "gene2-3", "gene6", "gene10-11", "CENT", "TEL"]
             },
             "location" : {
                 "current" : "curlocation",
-                "favorites" : ["location 1", "location 2", "location 3", "location 4", "location 5"]
+                "favorites" : ["", "0-200000", "200000-500000"]
             }
         },
         "contactmapcanvas": {
