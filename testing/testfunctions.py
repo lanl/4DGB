@@ -76,7 +76,7 @@ def test_get_structure():
                                 'segid': 1, 
                                 'start': [-1.0, 0.0, 0.0], 
                                 'startid': 0,
-                                'endid': 800000
+                                'endid': 400000
                                 },
                     'index'  : 0
                 },
