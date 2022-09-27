@@ -388,8 +388,8 @@ def GetGeneMetadata(name):
                 "start"     : results[0],
                 "end"       : results[1],
                 "length"    : results[2],
-                "gene_type" : results[4],
-                "gene_name" : results[5]
+                "gene_type" : results[3],
+                "gene_name" : results[4]
                 }
 
 
