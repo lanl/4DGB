@@ -259,7 +259,7 @@ def test_get_genes_for_locations():
                     'segment'   : "7,8-10",
                     'structure' : 0,
                     'locations' : "2400000-2800000,2800000-4000000",
-                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']
+                    'gold'      : ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3', 'gene10-11']
                 },
             ]
 

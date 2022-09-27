@@ -24,7 +24,7 @@
     },
     "annotations": {
         "url"       : "source/Mus_musculus.GRCm39.104.chromosome.X.gff3",
-        "citation"  : "Kevin L Howe, Premanand Achuthan, James Allen, Jamie Allen, Jorge Alvarez-Jarreta, M Ridwan Amode, Irina M Armean, Andrey G Azov, Ruth Bennett, Jyothish Bhai, Konstantinos Billis, Sanjay Boddu, Mehrnaz Charkhchi, Carla Cummins, Luca Da Rin Fioretto, Claire Davidson, Kamalkumar Dodiya, Bilal El Houdaigui, Reham Fatima, Astrid Gall, Carlos Garcia Giron, Tiago Grego, Cristina Guijarro-Clarke, Leanne Haggerty, Anmol Hemrom, Thibaut Hourlier, Osagie G Izuogu, Thomas Juettemann, Vinay Kaikala, Mike Kay, Ilias Lavidas, Tuan Le, Diana Lemos, Jose Gonzalez Martinez, José Carlos Marugán, Thomas Maurel, Aoife C McMahon, Shamika Mohanan, Benjamin Moore, Matthieu Muffato, Denye N Oheh, Dimitrios Paraschas, Anne Parker, Andrew Parton, Irina Prosovetskaia, Manoj P Sakthivel, Ahamed I Abdul Salam, Bianca M Schmitt, Helen Schuilenburg, Dan Sheppard, Emily Steed, Michal Szpak, Marek Szuba, Kieron Taylor, Anja Thormann, Glen Threadgold, Brandon Walts, Andrea Winterbottom, Marc Chakiachvili, Ameya Chaubal, Nishadi De Silva, Bethany Flint, Adam Frankish, Sarah E Hunt, Garth R IIsley, Nick Langridge, Jane E Loveland, Fergal J Martin, Jonathan M Mudge, Joanella Morales, Emily Perry, Magali Ruffier, John Tate, David Thybert, Stephen J Trevanion, Fiona Cunningham, Andrew D Yates, Daniel R Zerbino, Paul Flicek, Ensembl 2021, Nucleic Acids Research, Volume 49, Issue D1, 8 January 2021, Pages D884–D891, https://doi.org/10.1093/nar/gkaa942"
+        "citation"  : "https://doi.org/10.1093/nar/gkaa942"
     },
     "array" : [
         {
@@ -160,7 +160,7 @@
             },
             "gene" : {
                 "current" : "curgene",
-                "favorites" : ["", "gene1-2", "gene2-3", "gene6", "gene10-11", "CENT", "TEL"]
+                "favorites" : ["", "gene1-2", "gene2-3", "gene6", "gene10-11"]
             },
             "location" : {
                 "current" : "curlocation",
