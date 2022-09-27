@@ -5,6 +5,9 @@ TESTINGDIR=$(TESTDIR)/testing
 tests: pytests jstests
 
 pytests:
+	@echo "------------------------------------------------"
+	@echo "If tests fail, build and restart project test.00"
+	@echo "------------------------------------------------"
 	@if [ ! -d "$(SCRATCHDIR)" ]; then\
 		echo "Creating scratch dir";\
 		mkdir $(SCRATCHDIR);\
@@ -30,5 +33,8 @@ pytests:
 	@cd $(TESTDIR); pytest -vv testing/test_gentk_debug.py
 
 jstests:
+	@echo "------------------------------------------------"
+	@echo "If tests fail, build and restart project test.00"
+	@echo "------------------------------------------------"
 	@cd client-js; npm run test --detectOpenHandles tests/client-js.test.js
 	@cd client-js; npm run test --detectOpenHandles tests/selection.test.js
