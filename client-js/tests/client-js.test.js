@@ -40,7 +40,7 @@ test('client test', () => {
 
     // combined list (7,8-10)
     client.get_genes_for_segments( (response) => {
-                            expect(response).toStrictEqual({"genes": ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']});
+                            expect(response).toStrictEqual({"genes": ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3','gene10-11']});
                         }, 0, "7,8-10");
 
     // list of single values (7,8,9)
@@ -55,7 +55,7 @@ test('client test', () => {
 
     // combined list (7,8-10)
     client.get_genes_for_locations( (response) => {
-                            expect(response).toStrictEqual({"genes": ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3']});
+                            expect(response).toStrictEqual({"genes": ['Btbd35f10','Btbd35f11','Btbd35f16','Btbd35f18','Btbd35f23','Btbd35f24','Btbd35f3','gene10-11']});
                         }, 0, "2400000-2800000,2800000-4000000");
 
     client.get_genes_for_locations( (response) => {
