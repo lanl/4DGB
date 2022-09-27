@@ -1,5 +1,5 @@
-name,start,end,id,type,note
-gene1-2,380000,420000,gene1-2,gene,"segments 1,2"
-gene2-3,760000,840000,gene2-3,gene,"segments 2,3"
-gene6,2200000,2300000,gene6,gene,"segments 6"
-gene10-11,3800000,4200000,gene10-11,gene,"segments 10,11"
+name,start,end,type,note
+gene1-2,380000,420000,gene,"segments 1,2"
+gene2-3,760000,840000,gene,"segments 2,3"
+gene6,2200000,2300000,gene,"segments 6"
+gene10-11,3800000,4200000,gene,"segments 10,11"

@@ -20,7 +20,6 @@ def test_gene_query():
                         'start'     : 3076875,
                         'end'       : 3078817,
                         'length'    : 1942,
-                        'gID'       : 'gene:ENSMUSG00000100249',
                         'gene_name' : 'Btbd35f23',
                         'gene_type' : 'protein_coding'
                     },
@@ -28,7 +27,6 @@ def test_gene_query():
                         'start'     : 3148912,
                         'end'       : 3150852,
                         'length'    : 1940,
-                        'gID'       : 'gene:ENSMUSG00000096426',
                         'gene_name' : 'Btbd35f24',
                         'gene_type' : 'protein_coding'
                     }
@@ -39,7 +37,6 @@ def test_gene_query():
                         'start'     : 151901782,
                         'end'       : 151915857,
                         'length'    : 14075,
-                        'gID'       : 'gene:ENSMUSG00000071665',
                         'gene_name' : 'Foxr2',
                         'gene_type' : 'protein_coding'
                     },
@@ -47,7 +44,6 @@ def test_gene_query():
                         'start'     : 151819162,
                         'end'       : 151820571,
                         'length'    : 1409,
-                        'gID'       : 'gene:ENSMUSG00000047238',
                         'gene_name' : 'Mageh1',
                         'gene_type' : 'protein_coding'
                     },
@@ -55,7 +51,6 @@ def test_gene_query():
                         'start'     : 151922977,
                         'end'       : 151954939,
                         'length'    : 31962,
-                        'gID'       : 'gene:ENSMUSG00000041658',
                         'gene_name' : 'Rragb',
                         'gene_type' : 'protein_coding'
                     }
