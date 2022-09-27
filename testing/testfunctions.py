@@ -56,22 +56,28 @@ def test_get_structure():
                 {
                     'note'   : 'structure 1',
                     'sid'    : 0,
-                    'gold'   : {'end': [0.0, 0.0, 0.0], 
+                    'gold'   : {
+                                'end': [0.0, 0.0, 0.0], 
                                 'length': 400000, 
                                 'segid': 1, 
                                 'start': [-1.0, 0.0, 0.0], 
-                                'startid': 0},
+                                'startid': 0,
+                                'endid': 400000
+                                },
                     'index'  : 0
                     
                 },
                 {
                     'note'   : 'structure 2',
                     'sid'    : 1,
-                    'gold'   : {'end': [0.0, 0.0, 0.0], 
+                    'gold'   : {
+                                'end': [0.0, 0.0, 0.0], 
                                 'length': 400000, 
                                 'segid': 1, 
                                 'start': [-1.0, 0.0, 0.0], 
-                                'startid': 0},
+                                'startid': 0,
+                                'endid': 800000
+                                },
                     'index'  : 0
                 },
                 {
