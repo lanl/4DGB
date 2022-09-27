@@ -227,10 +227,10 @@ print("")
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS genes''')
     # create the table
-c.execute('''CREATE TABLE genes (id INTEGER PRIMARY KEY AUTOINCREMENT, start INT, end INT, length INT, gID TEXT, gene_type TEXT, gene_name TEXT)''')
+c.execute('''CREATE TABLE genes (id INTEGER PRIMARY KEY AUTOINCREMENT, start INT, end INT, length INT, gene_type TEXT, gene_name TEXT)''')
 
 # populate the table from a file
-insert = '''INSERT INTO genes (start,end,length,gID,gene_type,gene_name) VALUES(?,?,?,?,?,?)'''
+insert = '''INSERT INTO genes (start,end,length,gene_type,gene_name) VALUES(?,?,?,?,?)'''
 print("Creating genes table ...")
 
 # check if there is an annotations file in the project
@@ -321,7 +321,7 @@ if "annotations" in jsondata["data"]:
                         # optionally print out anything without a name
                         # print("No name found: {}".format(l))
 
-                    c.execute(insert, [v[3], v[4], length, values["ID"], values["biotype"], name]) 
+                    c.execute(insert, [v[3], v[4], length, values["biotype"], name]) 
 
 # ---------------------------------------------------------
 # if there is an annotations file, insert that data as well
@@ -333,7 +333,7 @@ if os.path.isfile(annotations_file):
     for e in df.to_dict(orient='records'):
         c.execute(insert, [ int(e['start']), int(e['end']), 
                             int(e['end']) - int(e['start']),
-                            e['id'], e['type'], e['name'] ] 
+                            e['type'], e['name'] ] 
                  )
 
 # ---------------------------------------------------------------------------
