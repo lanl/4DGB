@@ -1,4 +1,10 @@
-<h2>Project data</h2>
+<h2>Link-based tests of various queries for project test.00</h2>
+<p>
+This is a convenience-only file to help interactively test queries at the client/server level. This is not included in CI.
+</p>
+<hr>
+<h3>Links for test.00 project (some work for all projects)</h3>
+<h4>Project data</h4>
 <ul>
     <li><a href="http://127.0.0.1:8000/project/project.json">project.json</a></li>
     <li><a href="http://127.0.0.1:8000/project/interval">interval</a></li>
@@ -6,27 +12,22 @@
     <li><a href="http://127.0.0.1:8000/data/arrays/structure">arrays/structure</a></li>
     <li><a href="http://127.0.0.1:8000/genes">genes</a></li>
 </ul>
-<h3>Structure 0</h3>
+<h4>Structure 0</h4>
 <ul>
     <li><a href="http://127.0.0.1:8000/data/structure/0/unmapped">unmapped</a></li>
     <li><a href="http://127.0.0.1:8000/data/structure/0/segments">segments</a></li>
 </ul>
-<h3>Structure 1</h3>
+<h4>Structure 1</h4>
 <ul>
     <li><a href="http://127.0.0.1:8000/data/structure/1/unmapped">unmapped</a></li>
     <li><a href="http://127.0.0.1:8000/data/structure/1/segments">segments</a></li>
 </ul>
-<h3>Queries</h3>
+<h4>Queries</h4>
 <ul>
     <li><a href="http://127.0.0.1:8000/genes/gene1-2/data/structure/0">Segment(s) for gene: gene1-2</a></li>
     <li><a href="http://127.0.0.1:8000/genes/gene2-3/data/structure/0">Segment(s) for gene: gene2-3</a></li>
     <li><a href="http://127.0.0.1:8000/genes/gene5/data/structure/0">Segment(s) for gene: gene5</a></li>
     <li><a href="http://127.0.0.1:8000/genes/gene10-11/data/structure/0">Segment(s) for gene: gene10-11</a></li>
-</ul>
-<h3>Tests</h3>
-<h4>Genes for Locations</h4>
-<ul>
-    <li><a href="http://127.0.0.1:8000/data/structure/0/locations/2800000-3200000/genes">genes for locations</a></li>
 </ul>
 <h4>Genes for Segments</h4>
 <ul>
@@ -42,4 +43,23 @@
     <li><a href="http://127.0.0.1:8000/data/structure/0/segment/7,8,9-10/genes">genes for segments:7,8,9-10</a></li>
     <li><a href="http://127.0.0.1:8000/data/structure/0/segment/7 ,8, 9 -10/genes">genes for segments:7 ,8, 9 -10</a></li>
     <li><a href="http://127.0.0.1:8000/data/structure/0/segment/10000/genes">genes for segments:10000</a></li>
+</ul>
+<hr>
+<h3>Tests (from client-js/tests/client-js.test.js)</h3>
+<h4>Genes for Locations: client-js/tests/client-js.test.js</h4>
+<ul>
+    <li><a href="http://127.0.0.1:8000/data/structure/0/locations/2400000-2800000,2800000-3200000,3200000-3600000/genes">genes for locations: 2400000-2800000,2800000-3200000,3200000-3600000</a></li>
+    <li><a href="http://127.0.0.1:8000/data/structure/0/locations/2800000-3600000/genes">genes for locations: 2800000-3600000</a></li>
+    <li><a href="http://127.0.0.1:8000/data/structure/0/locations/2400000-2800000,2800000-4000000/genes">genes for locations: 2400000-2800000,2800000-4000000</a></li>
+    <li><a href="http://127.0.0.1:8000/data/structure/0/locations/2400000-3600000/genes">genes for locations: 2400000-3600000</a></li>
+</ul>
+<h4>Segments for Genes: client-js/tests/client-js.test.js</h4>
+<ul>
+    <li><a href="http://127.0.0.1:8000/genes/Btbd35f23/data/structure/0">segments for genes: Btbd35f23</a></li>
+</ul>
+<h4>Structure: client-js/tests/client-js.test.js</h4>
+<ul>
+    <li><a href="http://127.0.0.1:8000/data/structure/-1/segments">structure: -1</a></li>
+    <li><a href="http://127.0.0.1:8000/data/structure/0/segments">structure: 0</a></li>
+    <li><a href="http://127.0.0.1:8000/data/structure/1/segments">structure: 1</a></li>
 </ul>
