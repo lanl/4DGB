@@ -35,7 +35,7 @@ var LocationTests = [
                     'note'      : "End of range is just past the segment boundary",
                     'locations' : "2800000-3700000",
                     'segments'  : "8-10",
-                    'genes'     : "Btbd35f10,Btbd35f11,Btbd35f18,Btbd35f23,Btbd35f24"
+                    'genes'     : "Btbd35f10,Btbd35f11,Btbd35f18,Btbd35f23,Btbd35f24,gene10-11"
                 },
                 {
                     'test'      : 5,
@@ -49,7 +49,7 @@ var LocationTests = [
                     'note'      : "Begin before and end after segment boundary",
                     'locations' : "2700000-3700000",
                     'segments'  : "7-10",
-                    'genes'     : "Btbd35f10,Btbd35f11,Btbd35f18,Btbd35f23,Btbd35f24"
+                    'genes'     : "Btbd35f10,Btbd35f11,Btbd35f18,Btbd35f23,Btbd35f24,gene10-11"
                 }
             ]
 
@@ -83,7 +83,7 @@ var SegmentTests = [
                     'note'      : "End of range is just past the segment boundary",
                     'locations' : "2800000-4000000",
                     'segments'  : "8-10",
-                    'genes'     : "Btbd35f10,Btbd35f11,Btbd35f16,Btbd35f18,Btbd35f23,Btbd35f24,Btbd35f3"
+                    'genes'     : "Btbd35f10,Btbd35f11,Btbd35f16,Btbd35f18,Btbd35f23,Btbd35f24,Btbd35f3,gene10-11"
                 },
                 {
                     'test'      : 5,
@@ -97,7 +97,7 @@ var SegmentTests = [
                     'note'      : "Begin before and end after segment boundary",
                     'locations' : "2400000-4000000",
                     'segments'  : "7-10",
-                    'genes'     : "Btbd35f10,Btbd35f11,Btbd35f16,Btbd35f18,Btbd35f23,Btbd35f24,Btbd35f3"
+                    'genes'     : "Btbd35f10,Btbd35f11,Btbd35f16,Btbd35f18,Btbd35f23,Btbd35f24,Btbd35f3,gene10-11"
                 }
             ]
 
@@ -130,7 +130,7 @@ var GeneTests = [
                     'test'      : 4,
                     'locations' : "2800000-3200000,3200000-3600000,3600000-4000000",
                     'segments'  : "8,9,10",
-                    'genes'     : "Btbd35f10,Btbd35f11,Btbd35f16,Btbd35f18,Btbd35f23,Btbd35f24,Btbd35f3"
+                    'genes'     : "Btbd35f10,Btbd35f11,Btbd35f16,Btbd35f18,Btbd35f23,Btbd35f24,Btbd35f3,gene10-11"
                 },
                 {
                     'test'      : 5,
@@ -142,7 +142,7 @@ var GeneTests = [
                     'test'      : 6,
                     'locations' : "2800000-3200000,3200000-3600000,3600000-4000000",
                     'segments'  : "8,9,10",
-                    'genes'     : "Btbd35f10,Btbd35f11,Btbd35f16,Btbd35f18,Btbd35f23,Btbd35f24,Btbd35f3"
+                    'genes'     : "Btbd35f10,Btbd35f11,Btbd35f16,Btbd35f18,Btbd35f23,Btbd35f24,Btbd35f3,gene10-11"
                 }
             ]
 
