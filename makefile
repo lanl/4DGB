@@ -38,3 +38,6 @@ jstests:
 	@echo "------------------------------------------------"
 	@cd client-js; npm run test --detectOpenHandles tests/client-js.test.js
 	@cd client-js; npm run test --detectOpenHandles tests/selection.test.js
+
+update-version:
+	@./bin/update_version
