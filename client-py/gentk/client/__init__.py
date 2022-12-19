@@ -62,6 +62,9 @@ class client:
         return response.json()
 
     # updated
+    def get_project_id(self):
+        return self.projid 
+
     def get_project_interval(self):
         return self._request(f'project/{self.projid}/interval')
 
