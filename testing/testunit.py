@@ -12,6 +12,9 @@ def set_client(new_client, project, projid):
     client.project = project
     client.projid  = projid
 
+def test_get_project_id():
+    result = client.get_project_id()
+    assert(result == 'test00projid')
 
 def test_get_project_interval():
     result = client.get_project_interval()
