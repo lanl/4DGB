@@ -68,10 +68,10 @@ c.execute('''INSERT INTO gtk (version) VALUES(?)''', [gtkversion])
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS project''')
     # create the table 
-c.execute('''CREATE TABLE project (projid TEXT, name TEXT, creator TEXT, description TEXT, interval INT, created TEXT)''')
+c.execute('''CREATE TABLE project (projid TEXT, name TEXT, description TEXT, interval INT, created TEXT)''')
 p = jsondata["project"]
 projid = p['id']
-c.execute('''INSERT INTO project (projid,name,creator,description,interval,created) VALUES(?,?,?,?,?,?)''', [p['id'], p['name'], u['login'], p['description'], p['interval'], p['created']])
+c.execute('''INSERT INTO project (projid,name,description,interval,created) VALUES(?,?,?,?,?)''', [p['id'], p['name'], p['description'], p['interval'], p['created']])
 print("Creating project table ...")
 print("")
 
