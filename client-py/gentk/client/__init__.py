@@ -94,7 +94,7 @@ class client:
 
     # not updated
     def get_arrays(self, type):
-        return self._request(f'data/{projid}/arrays/{type}')
+        return self._request(f'data/{self.projid}/arrays/{type}')
 
     def get_array(self, arrayID, arraySlice):
         return self._request(f'data/array/{arrayID}/{arraySlice}')
