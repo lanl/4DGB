@@ -63,19 +63,6 @@ c.execute('''CREATE TABLE gtk (version TEXT)''')
 c.execute('''INSERT INTO gtk (version) VALUES(?)''', [gtkversion])
 
 # ---------------------------------------------------------------------------
-# USER table
-# ---------------------------------------------------------------------------
-    # start from scratch
-c.execute('''DROP TABLE IF EXISTS user''')
-    # create the table 
-c.execute('''CREATE TABLE user (givenname TEXT, familyname TEXT, login TEXT)''')
-u = jsondata["project"]["creator"]
-c.execute('''INSERT INTO user (givenname,familyname,login) VALUES(?,?,?)''', [u['givenName'], u['familyName'], u['login']])
-print("Creating user table ...")
-print("")
-
-
-# ---------------------------------------------------------------------------
 # PROJECT table
 # ---------------------------------------------------------------------------
     # start from scratch
