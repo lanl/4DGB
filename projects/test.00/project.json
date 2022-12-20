@@ -7,7 +7,7 @@
 "project": { 
     "id"    : "test00projid",
     "name"  : "Test Project",
-    "creator": {
+    "owner": {
         "givenName"     : "David",
         "familyName"    : "Rogers",
         "login"         : "dhr"

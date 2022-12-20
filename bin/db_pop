@@ -61,6 +61,20 @@ c.execute('''DROP TABLE IF EXISTS gtk''')
     # create the table 
 c.execute('''CREATE TABLE gtk (version TEXT)''')
 c.execute('''INSERT INTO gtk (version) VALUES(?)''', [gtkversion])
+print("Creating gtk table")
+print("")
+
+# ---------------------------------------------------------------------------
+# OWNER table
+# ---------------------------------------------------------------------------
+    # start from scratch
+c.execute('''DROP TABLE IF EXISTS owner''')
+    # create the table
+c.execute('''CREATE TABLE owner (givenname TEXT, familyname TEXT, login TEXT)''')
+user = jsondata["project"]["owner"]
+c.execute('''INSERT INTO owner (givenname,familyname,login) VALUES(?,?,?)''', [user['givenName'], user['familyName'], user['login']])
+print("Creating owner table")
+print("")
 
 # ---------------------------------------------------------------------------
 # PROJECT table
@@ -68,11 +82,11 @@ c.execute('''INSERT INTO gtk (version) VALUES(?)''', [gtkversion])
     # start from scratch
 c.execute('''DROP TABLE IF EXISTS project''')
     # create the table 
-c.execute('''CREATE TABLE project (projid TEXT, name TEXT, description TEXT, interval INT, created TEXT)''')
+c.execute('''CREATE TABLE project (projid TEXT, name TEXT, owner TEXT, description TEXT, interval INT, created TEXT)''')
 p = jsondata["project"]
 projid = p['id']
-c.execute('''INSERT INTO project (projid,name,description,interval,created) VALUES(?,?,?,?,?)''', [p['id'], p['name'], p['description'], p['interval'], p['created']])
-print("Creating project table ...")
+c.execute('''INSERT INTO project (projid,name,owner,description,interval,created) VALUES(?,?,?,?,?,?)''', [p['id'], p['name'], user['login'], p['description'], p['interval'], p['created']])
+print("Creating project table")
 print("")
 
 # ---------------------------------------------------------------------------
@@ -83,7 +97,7 @@ c.execute('''DROP TABLE IF EXISTS datasets''')
     # create the table 
 c.execute('''CREATE TABLE datasets (projid TEXT, ID TEXT, name TEXT, epigenetics TEXT, structure TEXT)''')
 insert = '''INSERT INTO datasets (projid,ID,name,epigenetics,structure) values(?,?,?,?,?)'''
-print("Creating datasets table ...")
+print("Creating datasets table")
 for d in jsondata["datasets"]:
     c.execute(insert, [projid, d["id"], d["name"], d["epigenetics"], d["structure"]["id"]]) 
 print("")
@@ -102,7 +116,7 @@ c.execute('''CREATE TABLE structure_metadata (projid TEXT, id INT, num_segments 
 # a segment is based on two points from the file - the 
 # current point, and the previous one. This takes advantage 
 # of the fact that the points are contiguous in the sequence
-print("Creating structure table ...")
+print("Creating structure table")
 for geom in jsondata["data"]["structure"]:
     infile = os.path.join( project, geom["url"])
     insert = '''INSERT INTO structure (projid,structureid,segid,startid,endid,length,startx,starty,startz,endx,endy,endz,centerx,centery,centerz) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
@@ -204,7 +218,7 @@ c.execute('''DROP TABLE IF EXISTS contactmap''')
     # create the table 
 c.execute('''CREATE TABLE contactmap (projid TEXT, id INT, x INT, y INT, value REAL)''')
 
-print("Creating contactmap records table")
+print("Creating contactmap table")
 for contact_map in jsondata["data"]["md-contact-map"]:
     map_id = contact_map["id"]
     infile = os.path.join( project, contact_map["url"] )
@@ -235,7 +249,7 @@ c.execute('''CREATE TABLE genes (projid TEXT, id INTEGER PRIMARY KEY AUTOINCREME
 
 # populate the table from a file
 insert = '''INSERT INTO genes (projid,start,end,length,gID,gene_type,gene_name) VALUES(?,?,?,?,?,?,?)'''
-print("Creating genes table ...")
+print("Creating genes table")
 
 # check if there is an annotations file in the project
 if "annotations" in jsondata["data"]:
