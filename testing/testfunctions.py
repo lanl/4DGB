@@ -11,7 +11,7 @@ def set_client(new_client, project, projid):
     client.projid  = projid
 
 
-def no_test_get_contactmap():
+def test_get_contactmap():
     tests = [
                 {
                     'note'  : 'Edge test: first segment is 0. Should return empty list', 
@@ -46,7 +46,7 @@ def no_test_get_contactmap():
             #comparing a fraction of the list
             assert (result['contacts'][t['index']] == t['gold'])
 
-def no_test_get_structure():
+def test_get_structure():
     tests = [
                 {
                     'note'   : 'Edge test: first segment is 0. Should return empty list', 
@@ -93,7 +93,7 @@ def no_test_get_structure():
             #comparing a fraction of the list
             assert (result['segments'][t['index']] == t['gold'])
 
-def no_test_get_structure_unmapped_segments():
+def test_get_structure_unmapped_segments():
     tests = [
                 {
                     'note'   : 'Edge test: first segment is 0. Should return empty list', 
@@ -125,13 +125,13 @@ def no_test_get_structure_unmapped_segments():
         assert(result['unmapped'] == t['gold'])
 
 
-def no_test_get_genes(): 
+def test_get_genes(): 
     
     result = client.get_genes()
     ogResult = '1600025M17Rik'
     assert (result['genes'][0] == ogResult) 
 
-def no_test_get_array():
+def test_get_array():
     tests = [
                 {
                     'note'  : 'Edge test: first segment is 0. Should return empty dict',
@@ -169,7 +169,7 @@ def no_test_get_array():
         assert (result['tags'] == t['tags'])
         assert (result['data']['values'] == t['values'])
 
-def no_test_get_genes_for_segments():
+def test_get_genes_for_segments():
     tests = [
                 {
                     'note'      : 'Edge test: first segment is 1. Should return empty list',
@@ -249,7 +249,7 @@ def no_test_get_genes_for_segments():
         result = client.get_genes_for_segments(t["structure"], t["segment"])
         assert (result['genes'] == t["gold"])
     
-def no_test_get_genes_for_locations():
+def test_get_genes_for_locations():
     tests = [
                 {
                     'note'      : 'correct query',
@@ -300,7 +300,7 @@ def no_test_get_genes_for_locations():
         assert (result['genes'] == t["gold"])
 
 
-def no_test_get_segments_for_genes():
+def test_get_segments_for_genes():
     tests = [
                 {
                     'note'      : 'Edge test: first structure is 0. Should return empty list',
@@ -367,7 +367,7 @@ def no_test_set_array():
     arrays = client.get_arrays('structure')
     assert(arrays['arrays'][t['structurearrayid']] == {'id': 8, 'max': None, 'min': None, 'type': 'structure', 'name': 'test set array'})
 
-def no_test_get_arrays():
+def test_get_arrays():
     tests = [
                 { 
                     'id'    : 0,
@@ -383,14 +383,14 @@ def no_test_get_arrays():
     for t in tests:
         assert(arrays['arrays'][t['id']] == t['array']) 
 
-def no_test_get_sampled_array():
+def test_get_sampled_array():
     array = client.get_sampled_array(7, 0, 0, 200000, 100)
     assert(len(array['data']) == 100)
 
     array = client.get_sampled_array(7, 1, 0, 200000, 52)
     assert(len(array['data']) == 52)
 
-def no_test_get_segment_ids():
+def test_get_segment_ids():
     tests = [
                 { 
                     'id'    : 0,
@@ -401,7 +401,7 @@ def no_test_get_segment_ids():
         ids = client.get_segment_ids(0)
         assert(t['ids'] == ids['segmentids'])
 
-def no_test_get_datset_ids():
+def test_get_datset_ids():
     tests = [
                 { 
                     'ids'   : [0, 1]
