@@ -107,7 +107,6 @@ class client:
     def get_contactmap(self, cmID):
         return self._request(f'data/contact-map/{self.projid}/{cmID}')
 
-    # not updated
     def set_array(self, array, params):
         # send the data to the server
         data = params
@@ -116,8 +115,10 @@ class client:
         response = self._postrequest('data/setarray/{self.projid}', data)
         return response["id"]
 
+    def get_dataset_ids(self):
+        return self._request('datasets/{self.projid}')
+
+    # not updated
     def get_sampled_array(self, arrayID, arraySlice, begin, end, numsamples ):
         return self._request(f'data/samplearray/{arrayID}/{arraySlice}/{begin}/{end}/{numsamples}')
 
-    def get_dataset_ids(self):
-        return self._request('datasets')

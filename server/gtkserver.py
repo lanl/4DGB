@@ -179,9 +179,10 @@ def GetArrays(projid, atype):
     return jsonify({ 'arrays': data })
 
 #
-# return a list of the project IDs
+# return a list of the dataset IDs
 #
-@app.route('/datasets')
+# Note: 'projid' added to API call, but not used
+@app.route('/datasets/<projid>')
 def GetDatasetIDs():
     return jsonify(get_dataset_ids())
 
