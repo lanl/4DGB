@@ -95,10 +95,13 @@ class client:
     def get_sequence_arrays(self):
         return self.get_arrays('sequence')
 
-    # not updated
     def get_arrays(self, type):
         return self._request(f'data/{self.projid}/arrays/{type}')
 
+    def get_segment_ids(self, structureID):
+        return self._request(f'data/structure/{self.projid}/{structureID}/segmentids')
+
+    # not updated
     def get_array(self, arrayID, arraySlice):
         return self._request(f'data/array/{arrayID}/{arraySlice}')
 
@@ -115,9 +118,6 @@ class client:
 
     def get_sampled_array(self, arrayID, arraySlice, begin, end, numsamples ):
         return self._request(f'data/samplearray/{arrayID}/{arraySlice}/{begin}/{end}/{numsamples}')
-
-    def get_segment_ids(self, structureID):
-        return self._request(f'data/structure/{structureID}/segmentids')
 
     def get_dataset_ids(self):
         return self._request('datasets')

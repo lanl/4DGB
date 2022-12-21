@@ -334,13 +334,15 @@ def SegmentData(projid, identifier):
 #
 # return the segments of a structure
 #
-@app.route('/data/structure/<identifier>/segmentids')
+@app.route('/data/structure/<projid>/<identifier>/segmentids')
 def SegmentIds(identifier):
     conn    = db_connect.connect()
-    query   = conn.execute("SELECT segid FROM structure WHERE structureid == {} ORDER BY segid".format(identifier))
+    query   = conn.execute("SELECT segid FROM structure WHERE projid == ? AND structureid == ? ORDER BY segid", [projid,identifier])
     data    = []
     for b in query.cursor.fetchall():
         data.append(b[0])
+
+    query = conn.execute("SELECT interval FROM project WHERE projid == ?", [projid])
 
     return jsonify({ 'segmentids': data })
 
