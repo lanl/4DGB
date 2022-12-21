@@ -183,7 +183,7 @@ def GetArrays(projid, atype):
 #
 # Note: 'projid' added to API call, but not used
 @app.route('/datasets/<projid>')
-def GetDatasetIDs():
+def GetDatasetIDs(projid):
     return jsonify(get_dataset_ids())
 
 #
@@ -191,7 +191,7 @@ def GetDatasetIDs():
 #
 # Note: 'projid' added to API call, but not used
 @app.route('/data/array/<projid>/<arrayID>/<arraySlice>')
-def GetArray(arrayID, arraySlice):
+def GetArray(projid, arrayID, arraySlice):
     array = load_array_data(arrayID, arraySlice)
 
     return jsonify(array)
@@ -200,7 +200,7 @@ def GetArray(arrayID, arraySlice):
 # set a data array
 #
 @app.route('/data/setarray/<projid>', methods=['POST'])
-def SetArray():
+def SetArray(projid):
     results = {}
     if (request.method == "POST"):
         # get the next IR
@@ -337,7 +337,7 @@ def SegmentData(projid, identifier):
 # return the segments of a structure
 #
 @app.route('/data/structure/<projid>/<identifier>/segmentids')
-def SegmentIds(identifier):
+def SegmentIds(projid, identifier):
     conn    = db_connect.connect()
     query   = conn.execute("SELECT segid FROM structure WHERE projid == ? AND structureid == ? ORDER BY segid", [projid,identifier])
     data    = []
@@ -352,7 +352,7 @@ def SegmentIds(identifier):
 # return contact records (Hi-C data)
 #
 @app.route('/data/contact-map/<projid>/<identifier>')
-def ContactMap(identifier):
+def ContactMap(projid, identifier):
     conn    = db_connect.connect()
     query   = conn.execute("SELECT x, y, value FROM contactmap WHERE projid == ? AND id == ?", [projid,identifier])
     data    = []
@@ -542,8 +542,8 @@ def SegmentsForGene(projid, names, structureid):
 #
 # get a sampled array 
 #
-@app.route('/data/samplearray/<arrayID>/<arraySlice>/<begin>/<end>/<numsamples>')
-def SampleArray(arrayID, arraySlice, begin, end, numsamples):
+@app.route('/data/samplearray/<projid>/<arrayID>/<arraySlice>/<begin>/<end>/<numsamples>')
+def SampleArray(projid, arrayID, arraySlice, begin, end, numsamples):
     array = get_array_metadata(arrayID)
 
     data = []

@@ -118,7 +118,6 @@ class client:
     def get_dataset_ids(self):
         return self._request('datasets/{self.projid}')
 
-    # not updated
     def get_sampled_array(self, arrayID, arraySlice, begin, end, numsamples ):
-        return self._request(f'data/samplearray/{arrayID}/{arraySlice}/{begin}/{end}/{numsamples}')
+        return self._request(f'data/samplearray/{self.projid}/{arrayID}/{arraySlice}/{begin}/{end}/{numsamples}')
 
