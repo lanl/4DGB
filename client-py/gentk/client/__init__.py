@@ -113,7 +113,7 @@ class client:
         data = params
         data["array"] = array
         
-        response = self._postrequest('data/setarray', data)
+        response = self._postrequest('data/setarray/{self.projid}', data)
         return response["id"]
 
     def get_sampled_array(self, arrayID, arraySlice, begin, end, numsamples ):

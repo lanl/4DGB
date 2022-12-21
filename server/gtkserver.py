@@ -198,7 +198,7 @@ def GetArray(arrayID, arraySlice):
 #
 # set a data array
 #
-@app.route('/data/setarray', methods=['POST'])
+@app.route('/data/setarray/<projid>', methods=['POST'])
 def SetArray():
     results = {}
     if (request.method == "POST"):
@@ -215,7 +215,7 @@ def SetArray():
 
         # save the file to the database
         data = request.get_json()
-        conn.execute('''INSERT INTO array (id,name,type,url) VALUES (?,?,?,?)''', [arrayID, data["name"], data["type"], fname])
+        conn.execute('''INSERT INTO array (projid,id,name,type,url) VALUES (?,?,?,?,?)''', [projid,arrayID, data["name"], data["type"], fname])
 
         with open(fullname, 'w') as jfile:
             jfile.write("{\n")
