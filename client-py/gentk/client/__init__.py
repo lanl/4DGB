@@ -101,13 +101,13 @@ class client:
     def get_segment_ids(self, structureID):
         return self._request(f'data/structure/{self.projid}/{structureID}/segmentids')
 
-    # not updated
     def get_array(self, arrayID, arraySlice):
-        return self._request(f'data/array/{arrayID}/{arraySlice}')
+        return self._request(f'data/array/{self.projid}/{arrayID}/{arraySlice}')
 
     def get_contactmap(self, cmID):
-        return self._request(f'data/contact-map/{cmID}')
+        return self._request(f'data/contact-map/{self.projid}/{cmID}')
 
+    # not updated
     def set_array(self, array, params):
         # send the data to the server
         data = params

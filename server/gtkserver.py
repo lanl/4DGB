@@ -188,7 +188,8 @@ def GetDatasetIDs():
 #
 # return a data array defined on the segments 
 #
-@app.route('/data/array/<arrayID>/<arraySlice>')
+# Note: 'projid' added to API call, but not used
+@app.route('/data/array/<projid>/<arrayID>/<arraySlice>')
 def GetArray(arrayID, arraySlice):
     array = load_array_data(arrayID, arraySlice)
 
@@ -349,10 +350,10 @@ def SegmentIds(identifier):
 #
 # return contact records (Hi-C data)
 #
-@app.route('/data/contact-map/<identifier>')
+@app.route('/data/contact-map/<projid>/<identifier>')
 def ContactMap(identifier):
     conn    = db_connect.connect()
-    query   = conn.execute("SELECT x, y, value FROM contactmap WHERE id == ?", [identifier])
+    query   = conn.execute("SELECT x, y, value FROM contactmap WHERE projid == ? AND id == ?", [projid,identifier])
     data    = []
     for c in query.cursor.fetchall():
         data.append({
