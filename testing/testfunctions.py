@@ -332,7 +332,7 @@ def test_get_segments_for_genes():
         result = client.get_segments_for_genes(t["structure"], t["gene"])
         assert (result['segments'] == t["gold"]) 
 
-def no_test_set_array():
+def test_set_array():
     tests = [
                 {
                     'metadata'  : {
@@ -354,6 +354,7 @@ def no_test_set_array():
 
     for t in tests:
         arrayid = client.set_array(t['values'], t['metadata'])
+        print("arrayid: {}".format(arrayid))
         assert(arrayid == t['arrayid'])
 
         for i in t['sliceids']:
@@ -365,6 +366,7 @@ def no_test_set_array():
             assert (result['data']['values'] != t['wrongvals'])
 
     arrays = client.get_arrays('structure')
+    print(arrays)
     assert(arrays['arrays'][t['structurearrayid']] == {'id': 8, 'max': None, 'min': None, 'type': 'structure', 'name': 'test set array'})
 
 def test_get_arrays():

@@ -216,7 +216,7 @@ def SetArray(projid):
 
         # save the file to the database
         data = request.get_json()
-        conn.execute('''INSERT INTO array (projid,id,name,type,url) VALUES (?,?,?,?,?)''', [projid,arrayID, data["name"], data["type"], fname])
+        conn.execute('''INSERT INTO array (projid,id,name,type,url) VALUES (?,?,?,?,?)''', [projid, arrayID, data["name"], data["type"], fname])
 
         with open(fullname, 'w') as jfile:
             jfile.write("{\n")
