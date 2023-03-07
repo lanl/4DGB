@@ -41,7 +41,7 @@ fi
 
 PROJECT="${1%/}"
 SRC="projects/$PROJECT"
-DEST="release/$PROJECT"
+DEST="release/server/static/$PROJECT"
 
 if ! [ -d "$SRC" ] || [ -z "$PROJECT" ] ; then
     echo "ERROR: Could not find project '$PROJECT'" >&2
@@ -74,28 +74,42 @@ rm -rf "$DEST"
 echo ""
 echo "Creating new release ..."
 # new install
-mkdir -p "$DEST/server" "$DEST/gentk"
+mkdir -p "$DEST/gtk/js" 
 
 echo ""
 echo "Building Javascript library ..."
 (cd client-js && npx webpack)
-cp  client-js/gtk-dist/gtk.min.js server/static/gtk/js/gtk.min.js
+cp  client-js/gtk-dist/gtk.min.js "$DEST/gtk/js/gtk.min.js"
 
 echo ""
 echo "Copying files ..."
 
 # Server and served content
-cp -a server/static "$DEST/server/static"
-sed -i.bak "s/GTK_PROJECT_NAME/$PROJECT/" "$DEST/server/static/index.html"
-cp server/{gtkserver.py,requirements.txt} "$DEST/server"
-cp -a "$SRC" "$DEST/server/static/project"
-
-cp server/license.md "$DEST"
+cp server/static/*.html "$DEST"
+sed -i.bak "s/GTK_PROJECT_NAME/$PROJECT/" "$DEST/index.html"
+find $DEST -type f -iname '*.html' -exec sed -i.bak "s/GTK_PROJECT_ID/$PROJECT/g" "{}" +;
+sed -i.bak "s/GTK_PROJECT_ID/$PROJECT/g" "$DEST/gtk/js/gtk.min.js"
+cp -a "$SRC" "$DEST/project"
 
 echo ""
-echo "Copying gentk python package ..."
-cp -a client-py/gentk "$DEST/gentk"
-cp client-py/requirements.txt client-py/genex "$DEST"
+echo "Checking shared flask server and static gtk/img in release folder ..."
+
+cp server/license.md release/
+if [ ! -f release/server/gtkserver.py ]; then
+    cp server/gtkserver.py release/server/gtkserver.py
+fi
+
+if [ ! -f release/server/requirements.txt ]; then
+    cp server/requirements.txt release/server/requirements.txt
+fi
+
+if [ ! -d release/server/static/gtk ]; then
+    cp -a server/static/gtk release/server/static
+fi
+
+if [ ! -d release/server/static/img ]; then
+    cp -a server/static/img release/server/static
+fi
 
 echo ""
 echo "Done!"

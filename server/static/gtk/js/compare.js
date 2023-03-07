@@ -56,34 +56,34 @@ function main( project ) {
     ThePanels[1].setController(TheController);
     TheTrackPanel.setController(TheController);
 
-    // If a 'gtkproject' is specified in the URL parameters, then
-    // we can enable saving/restoring state
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('gtkproject')) {
-        const store = window.localStorage;
-        const key = `settings_${params.get('gtkproject')}`;
+    // // If a 'gtkproject' is specified in the URL parameters, then
+    // // we can enable saving/restoring state
+    // const params = new URLSearchParams(window.location.search);
+    // if (params.has('gtkproject')) {
+    //     const store = window.localStorage;
+    //     const key = `settings_${params.get('gtkproject')}`;
 
-        // Restore state if one is saved
-        if (store.getItem(key)) {
-            TheController.deserialize( store.getItem(key) );
-        }
-        else {
-            // Init with default settings
-            TheController.triggerAll();
-        }
+    //     // Restore state if one is saved
+    //     if (store.getItem(key)) {
+    //         TheController.deserialize( store.getItem(key) );
+    //     }
+    //     else {
+    //         // Init with default settings
+    //         TheController.triggerAll();
+    //     }
     
-        // Save state after any change
-        TheController.on('anyChanged', (value, options) => {
-            if (options.debounced) {
-                const str = TheController.serialize();
-                store.setItem(key, str);
-            }
-        });
-    }
-    else {
-        // Set all components to default settings
+    //     // Save state after any change
+    //     TheController.on('anyChanged', (value, options) => {
+    //         if (options.debounced) {
+    //             const str = TheController.serialize();
+    //             store.setItem(key, str);
+    //         }
+    //     });
+    // }
+    // else {
+    //     // Set all components to default settings
         TheController.triggerAll();
-    }
+    // }
 
 }
 

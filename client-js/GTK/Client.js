@@ -31,9 +31,14 @@ class Client {
         const url = this.host !== undefined ? new URL(path, this.host) : path;
         const options = this.auth ? {
             headers: {
-                'Authorization': this.auth
+                'Authorization': this.auth,
+                'projectID': 'GTK_PROJECT_ID'
             }
-        } : undefined;
+        } : {
+            headers: {
+                'projectID': 'GTK_PROJECT_ID'
+            }
+        };
 
         fetch(url, options)
             .then(response => response.json())

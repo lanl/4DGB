@@ -23,49 +23,42 @@ import json
 # production server.
 #
 
-#
-# initialize
-# when run as a script, these can be overriden with command-line arguments
-#
-if 'PROJECT_HOME' in os.environ:
-    PROJECT_HOME = os.environ['PROJECT_HOME']
-else:
-    PROJECT_HOME = path.abspath(
-        path.join( path.dirname(__file__), 'static', 'project')
-    )
-
-PROJECT_FILE = path.join( PROJECT_HOME, 'project.json' )
-
-DB_PATH = path.abspath(
-    path.join( PROJECT_HOME, 'generated', 'generated-project.db')
-)
-
 app = Flask(__name__)
 api = Api(app)
 
-# If not running as the test server, we can run connect
-# to the database now (for the test server, the connection
-# is made at the bottom of the file after DB_PATH has had
-# a chance to be overwritten by command-line arguments)
-if __file__ != '__main__':
-    db_connect = create_engine('sqlite:///'+DB_PATH)
+#
+# get project information by projectID
+#
+def get_project_info(projectID):
+    PROJECT_HOME = path.abspath(
+        path.join( path.dirname(__file__), 'static', projectID, 'project')
+    )
+
+    PROJECT_FILE = path.join( PROJECT_HOME, 'project.json' )
+
+    DB_PATH = path.abspath(
+        path.join( PROJECT_HOME, 'generated', 'generated-project.db')
+    )
+
+    return {"projectHome": PROJECT_HOME, "projectFile": PROJECT_FILE, "dbPath": DB_PATH}
 
 #
 # get the interval of the datasets for this project
 # TODO: generalize the storage and retrieval of this data
 #
-def get_dataset_interval():
+def get_dataset_interval(projectID):
+
     interval = 0
-    with open(PROJECT_FILE, 'r', encoding="utf-8" ) as pfile:
+    with open(get_project_info(projectID)['projectFile'], 'r', encoding="utf-8" ) as pfile:
         data = json.load(pfile)
 
         interval = data["project"]["interval"]
 
     return interval
 
-def get_dataset_ids():
+def get_dataset_ids(projectID):
     datasets = []
-    with open(PROJECT_FILE, 'r', encoding="utf-8" ) as pfile:
+    with open(get_project_info(projectID)['projectFile'], 'r', encoding="utf-8" ) as pfile:
         data = json.load(pfile)
 
         for d in data["datasets"]:
@@ -75,7 +68,9 @@ def get_dataset_ids():
     return datasets
 
 
-def get_array_metadata(arrayID):
+def get_array_metadata(arrayID, projectID):
+    projectInfo = get_project_info(projectID)
+    db_connect = create_engine('sqlite:///'+projectInfo['dbPath'])
     conn  = db_connect.connect()
     data  = []
 
@@ -97,7 +92,7 @@ def get_array_metadata(arrayID):
             }
 
     if (len(results) != 0):
-        fname = PROJECT_HOME + "/" + results[0][0]
+        fname = projectInfo['projectHome'] + "/" + results[0][0]
 
         with open(fname, "r", encoding="utf-8" ) as jfile:
             array = json.load(jfile)
@@ -107,15 +102,15 @@ def get_array_metadata(arrayID):
 #
 # get the array data for an ID
 #
-def load_array_data(arrayID, arraySlice):
-    array = get_array_metadata(arrayID)
+def load_array_data(arrayID, arraySlice, projectID):
+    array = get_array_metadata(arrayID, projectID)
 
     if (array['type'] != None):
         # determine if there is data there
         info = array['data']['values'][int(arraySlice)]
         if (info['url'] != ""):
             # load the data from disk
-            data = numpy.load(PROJECT_HOME + "/" + info['url'])
+            data = numpy.load(get_project_info(projectID)['projectHome'] + "/" + info['url'])
             values = list(map(
                 lambda d: None if math.isnan(d) else d,
                 data[info['id']].tolist()
@@ -131,7 +126,7 @@ def load_array_data(arrayID, arraySlice):
 #
 @app.route('/')
 def home():
-    return app.send_static_file('index.html')
+    return 'API server on!'
 
 @app.route('/<path:path>')
 def root(path):
@@ -139,17 +134,23 @@ def root(path):
 
 @app.route('/project/project.json')
 def project():
-    return send_file(PROJECT_FILE)
+    projectID = request.headers.get('projectID')
+    return send_file(get_project_info(projectID)['projectFile'])
 
 @app.route('/project/<path:path>')
 def projectdir(path):
-    return send_from_directory(PROJECT_HOME, path)
+    projectID = request.headers.get('projectID')
+    
+    return send_from_directory(get_project_info(projectID)['projectHome'], path)
 
 #
 # return a list of the variables available
 #
 @app.route('/data/arrays/<atype>')
 def GetArrays(atype):
+    projectID = request.headers.get('projectID')
+
+    db_connect = create_engine('sqlite:///'+get_project_info(projectID)['dbPath'])
     conn  = db_connect.connect()
     data  = []
     query = conn.execute("SELECT name,id,type,min,max FROM array WHERE type == \'{}\' ORDER BY id".format(atype))
@@ -179,14 +180,17 @@ def GetArrays(atype):
 #
 @app.route('/datasets')
 def GetDatasetIDs():
-    return jsonify(get_dataset_ids())
+    projectID = request.headers.get('projectID')
+
+    return jsonify(get_dataset_ids(projectID))
 
 #
 # return a data array defined on the segments 
 #
 @app.route('/data/array/<arrayID>/<arraySlice>')
 def GetArray(arrayID, arraySlice):
-    array = load_array_data(arrayID, arraySlice)
+    projectID = request.headers.get('projectID')
+    array = load_array_data(arrayID, arraySlice, projectID)
 
     return jsonify(array)
 
@@ -198,15 +202,19 @@ def SetArray():
     results = {}
     if (request.method == "POST"):
         # get the next IR
+        projectID = request.headers.get('projectID')
+        projectInfo = get_project_info(projectID)
+
+        db_connect = create_engine('sqlite:///'+projectInfo['dbPath'])
         conn  = db_connect.connect()
         query = conn.execute("SELECT COUNT(*) FROM array")
         results = query.cursor.fetchall()
         arrayID = results[0][0]
         fid         = '{:04d}'.format(arrayID)
         fname       = 'source/array/{}.json'.format(fid) 
-        fullname    = '{}/{}'.format(PROJECT_HOME, fname)
+        fullname    = '{}/{}'.format(projectInfo['projectHome'], fname)
         aname       = 'source/array/{}.npz'.format(fid) 
-        arrayfname  = '{}/{}'.format(PROJECT_HOME, aname) 
+        arrayfname  = '{}/{}'.format(projectInfo['projectHome'], aname) 
 
         # save the file to the database
         data = request.get_json()
@@ -223,7 +231,7 @@ def SetArray():
             jfile.write("    \"dim\"   : {},\n".format(data["datadim"]))
             jfile.write("    \"values\" : [\n")
             firstTime = True;
-            for d in get_dataset_ids():
+            for d in get_dataset_ids(projectID):
                 if ( firstTime ) :
                     firstTime = False
                 else :
@@ -241,7 +249,7 @@ def SetArray():
         # for this call, we save the same array information for each dataset
         # we must provide another call to save different arrays for each dataset 
         kwargs = {} 
-        for d in get_dataset_ids():
+        for d in get_dataset_ids(projectID):
             kwargs["arr_{}".format(d)] = data["array"]
 
         numpy.savez_compressed(arrayfname, **kwargs) 
@@ -254,6 +262,9 @@ def SetArray():
 #
 @app.route('/data/structure/<identifier>/unmapped')
 def UnmappedData(identifier):
+    projectID = request.headers.get('projectID')
+
+    db_connect = create_engine('sqlite:///'+get_project_info(projectID)['dbPath'])
     conn    = db_connect.connect()
     query   = conn.execute("SELECT num_segments,unmapped FROM structure_metadata WHERE id == {}".format(identifier))
     results = query.cursor.fetchone()
@@ -294,6 +305,9 @@ def UnmappedData(identifier):
 #
 @app.route('/data/structure/<identifier>/segments')
 def SegmentData(identifier):
+    projectID = request.headers.get('projectID')
+
+    db_connect = create_engine('sqlite:///'+get_project_info(projectID)['dbPath'])
     conn    = db_connect.connect()
     query   = conn.execute("SELECT segid, startid, endid, length, startx, starty, startz, endx, endy, endz FROM structure WHERE structureid == {} ORDER BY segid".format(identifier))
     data    = []
@@ -315,6 +329,9 @@ def SegmentData(identifier):
 #
 @app.route('/data/structure/<identifier>/segmentids')
 def SegmentIds(identifier):
+    projectID = request.headers.get('projectID')
+
+    db_connect = create_engine('sqlite:///'+get_project_info(projectID)['dbPath'])
     conn    = db_connect.connect()
     query   = conn.execute("SELECT segid FROM structure WHERE structureid == {} ORDER BY segid".format(identifier))
     data    = []
@@ -328,6 +345,9 @@ def SegmentIds(identifier):
 #
 @app.route('/data/contact-map/<identifier>')
 def ContactMap(identifier):
+    projectID = request.headers.get('projectID')
+
+    db_connect = create_engine('sqlite:///'+get_project_info(projectID)['dbPath'])
     conn    = db_connect.connect()
     query   = conn.execute("SELECT x, y, value FROM contactmap WHERE id == ?", [identifier])
     data    = []
@@ -345,7 +365,9 @@ def ContactMap(identifier):
 #
 @app.route('/project/interval')
 def ProjectInterval():
-    return jsonify(get_dataset_interval())
+    projectID = request.headers.get('projectID')
+
+    return jsonify(get_dataset_interval(projectID))
 
 #
 # get all genes in a project
@@ -353,6 +375,9 @@ def ProjectInterval():
 @app.route('/genes')
 def Genes():
     # return all genes
+    projectID = request.headers.get('projectID')
+
+    db_connect = create_engine('sqlite:///'+get_project_info(projectID)['dbPath'])
     conn = db_connect.connect()
 
     query = conn.execute("SELECT DISTINCT gene_name from genes ORDER BY gene_name")
@@ -368,6 +393,9 @@ def Genes():
 @app.route('/gene/<name>')
 def GetGeneMetadata(name):
     # return all genes
+    projectID = request.headers.get('projectID')
+
+    db_connect = create_engine('sqlite:///'+get_project_info(projectID)['dbPath'])
     conn = db_connect.connect()
 
     query = conn.execute("SELECT start,end,length,gene_type,gene_name from genes WHERE gene_name = ?", name)
@@ -404,6 +432,9 @@ def GenesForSegments(structureid, segmentids):
     genes = []
 
     # find all genes that intersect with the segments
+    projectID = request.headers.get('projectID')
+
+    db_connect = create_engine('sqlite:///'+get_project_info(projectID)['dbPath'])
     conn = db_connect.connect()
     cleaned = re.sub(r'\s', '', segmentids)
     sids = cleaned.split(',')
@@ -459,6 +490,9 @@ def GenesForLocations(structureid, locations):
     genes = []
 
     # find all genes that intersect with the segments
+    projectID = request.headers.get('projectID')
+
+    db_connect = create_engine('sqlite:///'+get_project_info(projectID)['dbPath'])
     conn = db_connect.connect()
     cleaned = re.sub(r'\s', '', locations)
     locations = cleaned.split(',')
@@ -493,6 +527,9 @@ def SegmentsForGene(names, structureid):
     segments = []
 
     # find all genes that intersect with the segments
+    projectID = request.headers.get('projectID')
+
+    db_connect = create_engine('sqlite:///'+get_project_info(projectID)['dbPath'])
     conn = db_connect.connect()
     snames = names.split(',')
 
@@ -524,18 +561,20 @@ def SegmentsForGene(names, structureid):
 #
 @app.route('/data/samplearray/<arrayID>/<arraySlice>/<begin>/<end>/<numsamples>')
 def SampleArray(arrayID, arraySlice, begin, end, numsamples):
-    array = get_array_metadata(arrayID)
+    projectID = request.headers.get('projectID')
+    array = get_array_metadata(arrayID, projectID)
 
     data = []
     if ( 'sequence' in array['data']['values'][int(arraySlice)] ):
         # there is a sequence array
+        
         adata = array['data']['values'][int(arraySlice)]
-        url = "{}/{}".format(PROJECT_HOME, adata['sequence']['url'])
+        url = "{}/{}".format(get_project_info(projectID)['projectHome'], adata['sequence']['url'])
         data = bbi.fetch(url, adata['sequence']['chrom'], int(begin), int(end), int(numsamples))
     else:
         # there is a sequence array
-        array = load_array_data(arrayID, arraySlice)
-        interval = get_dataset_interval()
+        array = load_array_data(arrayID, arraySlice, projectID)
+        interval = get_dataset_interval(projectID)
         sid = int(int(begin)/interval)
             # add one, to include the final element we want
         eid = int(int(end)/interval) + 1
@@ -547,6 +586,9 @@ def SampleArray(arrayID, arraySlice, begin, end, numsamples):
 # helper function to query genes for a location range
 #
 def getGenesForLocationRange( start, end ):
+    projectID = request.headers.get('projectID')
+
+    db_connect = create_engine('sqlite:///'+get_project_info(projectID)['dbPath'])
     conn = db_connect.connect()
 
     # find the genes for the entire range
@@ -579,23 +621,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--port', default="8000", help="Server port")
     parser.add_argument('--host', default="127.0.0.1", help="Server bind address")
 
-    parser.add_argument(
-        '--project', default=PROJECT_HOME, metavar="PATH",
-        help="Custom path to project directory"
-    )
-
     args = parser.parse_args()
-    PROJECT_HOME = path.abspath(args.project)
 
-    PROJECT_FILE = path.join( PROJECT_HOME, 'project.json' )
-    DB_PATH = path.abspath(
-        path.join( PROJECT_HOME, 'generated', 'generated-project.db')
-    )
-
-    db_connect = create_engine('sqlite:///'+DB_PATH)
-
-    # cd to server directory
-    chdir( path.dirname(__file__) )
-
-    app.run(host=args.host, port=args.port)
+    app.run(host=args.host, port=args.port, debug=False)
 
