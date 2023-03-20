@@ -34,7 +34,7 @@ jobs:
         python3 setup.py install
     - name: Run the server and test with client 
       run: |
-        python3 release/test.00/server/gtkserver.py &
+        python3 release/server/gtkserver.py &
         sleep 5
         ls -la
         pytest testing/test_gentk_debug.py 
