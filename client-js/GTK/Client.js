@@ -13,9 +13,13 @@ class Client {
 
     constructor( host, options ) {
         this.host = host;
+        this.projectID = 'GTK_PROJECT_ID';
 
         if (options && options.auth) {
             this.auth = `Basic ${Buffer.from(options.auth).toString("base64")}`
+        }
+        if (options && options.projectID) {
+            this.projectID = options.projectID;
         }
     }
 
@@ -32,11 +36,11 @@ class Client {
         const options = this.auth ? {
             headers: {
                 'Authorization': this.auth,
-                'projectID': 'GTK_PROJECT_ID'
+                'projectID': this.projectID
             }
         } : {
             headers: {
-                'projectID': 'GTK_PROJECT_ID'
+                'projectID': this.projectID
             }
         };
 
