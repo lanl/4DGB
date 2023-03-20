@@ -35,7 +35,7 @@ jobs:
         echo 'installing javascript dependencies'
     - name: Run the server and test with client 
       run: |
-        python3 release/test.00/server/gtkserver.py &
+        python3 release/server/gtkserver.py &
         sleep 5
         echo 'running javascript test'
         (cd client-js && npm run test --detectOpenHandles tests/selection.test.js)

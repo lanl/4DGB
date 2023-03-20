@@ -157,8 +157,9 @@ const convert_test = ({test, locations, segments, genes, note}) => [
 ];
 
 beforeAll( async () => {
-    // This should be run against the 'test.01' project!
-    Client.TheClient   = new Client("http://127.0.0.1:8000");
+    // This should be run against the 'test.00' project!
+    const options = {projectID: 'test.00'};
+    Client.TheClient   = new Client("http://127.0.0.1:8000", options);
     Project.TheProject = await Project.getProject();
 });
 
